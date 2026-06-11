@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>كأس العالم 2026 | إحصائيات حقيقية</title>
+    <title>كأس العالم 2026 | Debug Mode</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -326,8 +326,26 @@
         .loader i { font-size: 1.5rem; animation: spin 1s linear infinite; color: #2563eb; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .error { background: #fee2e2; color: #dc2626; padding: 15px; border-radius: 14px; text-align: center; font-size: 0.75rem; }
-        .api-error { background: #ffedd5; color: #9a3412; padding: 20px; border-radius: 16px; text-align: center; border-right: 4px solid #ea580c; }
+        .api-error { background: #ffedd5; color: #9a3412; padding: 20px; border-radius: 16px; text-align: right; border-right: 4px solid #ea580c; }
         .api-error i { font-size: 2rem; margin-bottom: 10px; color: #ea580c; }
+        .debug-console {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.7rem;
+            direction: ltr;
+            text-align: left;
+            overflow-x: auto;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .debug-console .success { color: #4ade80; }
+        .debug-console .error { color: #f87171; }
+        .debug-console .info { color: #60a5fa; }
+        .debug-console .warn { color: #fbbf24; }
         
         @media (max-width: 600px) {
             .container { padding: 10px; }
@@ -386,11 +404,13 @@
         <button class="tab-btn active" data-tab="matches"><i class="fas fa-calendar-alt"></i> المباريات</button>
         <button class="tab-btn" data-tab="standings"><i class="fas fa-table"></i> جدول الترتيب</button>
         <button class="tab-btn" data-tab="scorers"><i class="fas fa-futbol"></i> الهدافون</button>
+        <button class="tab-btn" data-tab="debug"><i class="fas fa-bug"></i> تصحيح الأخطاء</button>
     </div>
 
     <div id="matches" class="tab-content active"><div id="matchesContainer"><div class="loader"><i class="fas fa-spinner"></i><br>جاري تحميل المباريات...</div></div></div>
     <div id="standings" class="tab-content"><div id="standingsContainer"><div class="loader"><i class="fas fa-spinner"></i><br>جاري تحميل الترتيب...</div></div></div>
     <div id="scorers" class="tab-content"><div id="scorersContainer"><div class="loader"><i class="fas fa-spinner"></i><br>جاري تحميل الهدافين...</div></div></div>
+    <div id="debug" class="tab-content"><div id="debugContainer"><div class="loader"><i class="fas fa-spinner"></i><br>جاري جمع معلومات التصحيح...</div></div></div>
 
     <div class="promo-container" id="promoContainer">
         <a href="#" target="_blank" class="promo-link" id="promoLink">
@@ -459,6 +479,154 @@
     const RAPIDAPI_HOST = "sportscore1.p.rapidapi.com";
     const RAPIDAPI_BASE = "https://sportscore1.p.rapidapi.com/api/v1";
     
+    // سجل التصحيح
+    let debugLogs = [];
+    
+    function addDebugLog(type, title, details, rawData = null) {
+        const logEntry = {
+            timestamp: new Date().toISOString(),
+            type: type, // 'success', 'error', 'info', 'warn'
+            title: title,
+            details: details,
+            rawData: rawData
+        };
+        debugLogs.unshift(logEntry);
+        if (debugLogs.length > 50) debugLogs.pop();
+        
+        // تحديث واجهة التصحيح إذا كانت مفتوحة
+        const debugTab = document.getElementById("debug");
+        if (debugTab && debugTab.classList.contains("active")) {
+            renderDebugConsole();
+        }
+        
+        // طباعة في الكونسول
+        console.log(`[${type.toUpperCase()}] ${title}:`, details, rawData || "");
+    }
+    
+    function renderDebugConsole() {
+        const container = document.getElementById("debugContainer");
+        if (!container) return;
+        
+        let html = `<div class="debug-console">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; padding-bottom:5px; border-bottom:1px solid #444;">
+                <span><i class="fas fa-terminal"></i> سجل التصحيح - SportScore API Debugger</span>
+                <button onclick="clearDebugLogs()" style="background:#dc2626;color:white;border:none;padding:2px 8px;border-radius:5px;cursor:pointer;font-size:0.6rem;">
+                    <i class="fas fa-trash"></i> مسح
+                </button>
+            </div>
+            <div><span class="info">🔑 مفتاح API:</span> ${RAPIDAPI_KEY.substring(0, 15)}...${RAPIDAPI_KEY.substring(RAPIDAPI_KEY.length - 5)}</div>
+            <div><span class="info">🌐 الرابط الأساسي:</span> ${RAPIDAPI_BASE}</div>
+            <div><span class="info">📡 حالة CORS:</span> ${typeof fetch !== 'undefined' ? 'مدعومة' : 'غير مدعومة'}</div>
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid #444;"></div>`;
+        
+        if (debugLogs.length === 0) {
+            html += `<div class="warn">⚠️ لا توجد سجلات بعد. انتظر جلب البيانات...</div>`;
+        } else {
+            html += `<div style="font-size:0.6rem; color:#888; margin-bottom:5px;">آخر ${debugLogs.length} سجل:</div>`;
+            debugLogs.forEach(log => {
+                const typeClass = log.type;
+                const typeIcon = log.type === 'success' ? '✅' : (log.type === 'error' ? '❌' : (log.type === 'warn' ? '⚠️' : 'ℹ️'));
+                html += `<div style="margin-bottom:8px; padding:5px; background:#2a2a2a; border-radius:6px;">
+                    <div class="${typeClass}" style="font-weight:bold;">${typeIcon} ${log.title}</div>
+                    <div style="font-size:0.6rem; color:#888;">${log.timestamp}</div>
+                    <div style="margin-top:3px;">${log.details}</div>`;
+                if (log.rawData) {
+                    let rawStr = typeof log.rawData === 'object' ? JSON.stringify(log.rawData, null, 2) : String(log.rawData);
+                    if (rawStr.length > 500) rawStr = rawStr.substring(0, 500) + "... (مقطوع)";
+                    html += `<details style="margin-top:5px;">
+                        <summary style="cursor:pointer; color:#60a5fa; font-size:0.6rem;">📄 عرض البيانات الخام</summary>
+                        <pre style="background:#1a1a1a; padding:5px; border-radius:4px; overflow-x:auto; font-size:0.55rem; margin-top:5px;">${escapeHtml(rawStr)}</pre>
+                    </details>`;
+                }
+                html += `</div>`;
+            });
+        }
+        
+        html += `<div style="margin-top:10px; padding-top:10px; border-top:1px solid #444;">
+            <button onclick="testAPIDirect()" style="background:#2563eb;color:white;border:none;padding:5px 12px;border-radius:5px;cursor:pointer;margin-left:5px;">
+                <i class="fas fa-vial"></i> اختبار API مباشر
+            </button>
+            <button onclick="location.reload()" style="background:#475569;color:white;border:none;padding:5px 12px;border-radius:5px;cursor:pointer;">
+                <i class="fas fa-sync-alt"></i> إعادة تحميل
+            </button>
+        </div></div>`;
+        
+        container.innerHTML = html;
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function clearDebugLogs() {
+        debugLogs = [];
+        renderDebugConsole();
+        addDebugLog('info', 'سجل التصحيح', 'تم مسح جميع السجلات');
+    }
+    
+    async function testAPIDirect() {
+        addDebugLog('info', 'اختبار API مباشر', 'جاري إرسال طلب اختبار...');
+        
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+            
+            const response = await fetch(`${RAPIDAPI_BASE}/leagues?page=1`, {
+                headers: {
+                    "X-RapidAPI-Key": RAPIDAPI_KEY,
+                    "X-RapidAPI-Host": RAPIDAPI_HOST
+                },
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            const responseData = {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok,
+                headers: {}
+            };
+            
+            response.headers.forEach((value, key) => {
+                responseData.headers[key] = value;
+            });
+            
+            let body = null;
+            let bodyText = null;
+            
+            try {
+                bodyText = await response.text();
+                try {
+                    body = JSON.parse(bodyText);
+                } catch(e) {
+                    body = bodyText;
+                }
+            } catch(e) {
+                body = "تعذر قراءة الجسم";
+            }
+            
+            if (response.ok) {
+                addDebugLog('success', '✅ اختبار API ناجح!', 
+                    `الرد: ${response.status} ${response.statusText}`, 
+                    { response: responseData, data: body });
+            } else {
+                addDebugLog('error', '❌ فشل اختبار API', 
+                    `الرد: ${response.status} ${response.statusText}`, 
+                    { response: responseData, data: body });
+            }
+            
+        } catch (error) {
+            addDebugLog('error', '🔥 خطأ في طلب API', 
+                `${error.name}: ${error.message}`, 
+                { error: error.toString(), stack: error.stack });
+        }
+        
+        renderDebugConsole();
+    }
+    
     // ======================== أعلام الفرق ========================
     const flagsDB = {
         "Mexico": "🇲🇽", "South Africa": "🇿🇦", "South Korea": "🇰🇷", "Czech Republic": "🇨🇿",
@@ -470,10 +638,7 @@
         "Japan": "🇯🇵", "Australia": "🇦🇺", "Saudi Arabia": "🇸🇦", "Iran": "🇮🇷",
         "Egypt": "🇪🇬", "Nigeria": "🇳🇬", "Senegal": "🇸🇳", "Tunisia": "🇹🇳",
         "Turkey": "🇹🇷", "Sweden": "🇸🇪", "Denmark": "🇩🇰", "Poland": "🇵🇱",
-        "Switzerland": "🇨🇭", "Haiti": "🇭🇹", "New Zealand": "🇳🇿", "Qatar": "🇶🇦",
-        "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿", "Iraq": "🇮🇶", "Jordan": "🇯🇴",
-        "Uzbekistan": "🇺🇿", "Cape Verde": "🇨🇻", "Panama": "🇵🇦", "Norway": "🇳🇴",
-        "Austria": "🇦🇹", "Ghana": "🇬🇭", "Ivory Coast": "🇨🇮", "DR Congo": "🇨🇩"
+        "Switzerland": "🇨🇭", "Haiti": "🇭🇹", "New Zealand": "🇳🇿", "Qatar": "🇶🇦"
     };
     
     function getFlag(teamName) {
@@ -486,16 +651,15 @@
     
     let currentLeague = "worldcup";
     let apiConnected = false;
-    let apiErrorMessage = "";
     let autoRefreshInterval = null;
     let isModalOpen = false;
     let currentEventId = null;
     
-    // ======================== اختبار الاتصال بـ API ========================
+    // ======================== اختبار الاتصال بـ API مع تفاصيل ========================
     async function testAPIConnection() {
+        addDebugLog('info', 'بدء اختبار الاتصال بـ SportScore API', `العنوان: ${RAPIDAPI_BASE}/leagues?page=1`);
+        
         try {
-            console.log("🔍 جاري اختبار الاتصال بـ SportScore API...");
-            
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000);
             
@@ -509,40 +673,59 @@
             
             clearTimeout(timeoutId);
             
+            addDebugLog('info', 'استجابة الخادم', 
+                `الحالة: ${response.status} ${response.statusText}\nالرؤوس: ${JSON.stringify(Object.fromEntries(response.headers), null, 2)}`);
+            
+            let responseBody = null;
+            try {
+                const text = await response.text();
+                try {
+                    responseBody = JSON.parse(text);
+                } catch(e) {
+                    responseBody = text;
+                }
+            } catch(e) {
+                responseBody = "تعذر قراءة الجسم";
+            }
+            
             if (response.ok) {
-                console.log("✅ الاتصال بـ API ناجح!");
+                addDebugLog('success', '✅ الاتصال بـ API ناجح!', 
+                    `تم استلام بيانات من الخادم`, 
+                    responseBody);
                 apiConnected = true;
-                apiErrorMessage = "";
                 return true;
             } else {
-                console.log("❌ فشل الاتصال بـ API:", response.status);
+                addDebugLog('error', '❌ فشل الاتصال بـ API', 
+                    `HTTP ${response.status}: ${response.statusText}`, 
+                    responseBody);
                 apiConnected = false;
-                apiErrorMessage = `HTTP ${response.status}: ${response.statusText}`;
                 return false;
             }
         } catch (error) {
-            console.error("❌ خطأ في الاتصال بـ API:", error);
+            addDebugLog('error', '🔥 خطأ في الاتصال بـ API', 
+                `${error.name}: ${error.message}\n${error.stack || ''}`, 
+                { error: error.toString(), constructor: error.constructor.name });
             apiConnected = false;
-            if (error.name === "AbortError") {
-                apiErrorMessage = "انتهت مهلة الاتصال - الخادم لا يستجيب";
-            } else {
-                apiErrorMessage = error.message || "فشل الاتصال بالخادم";
-            }
             return false;
         }
     }
     
-    // ======================== جلب المباريات من API ========================
+    // ======================== جلب المباريات من API مع تفاصيل ========================
     async function fetchWorldCupMatches() {
+        addDebugLog('info', 'بدء جلب مباريات كأس العالم', 'جاري الاتصال بـ SportScore API...');
+        
         if (!apiConnected) {
             const connected = await testAPIConnection();
-            if (!connected) return [];
+            if (!connected) {
+                addDebugLog('error', 'تعذر جلب المباريات', 'الاتصال بـ API فشل مسبقاً');
+                return [];
+            }
         }
         
         try {
-            console.log("📡 جلب مباريات كأس العالم 2026...");
+            // محاولة 1: جلب المباريات الحية
+            addDebugLog('info', 'محاولة 1: جلب المباريات الحية', `${RAPIDAPI_BASE}/events/live?page=1`);
             
-            // محاولة 1: البحث عن طريق الأحداث المباشرة
             const liveResponse = await fetch(`${RAPIDAPI_BASE}/events/live?page=1`, {
                 headers: {
                     "X-RapidAPI-Key": RAPIDAPI_KEY,
@@ -550,17 +733,24 @@
                 }
             });
             
+            let liveData = null;
             let allMatches = [];
             
             if (liveResponse.ok) {
-                const liveData = await liveResponse.json();
-                if (liveData && liveData.data) {
-                    allMatches = [...liveData.data];
-                }
+                liveData = await liveResponse.json();
+                addDebugLog('success', 'تم جلب المباريات الحية بنجاح', 
+                    `عدد المباريات: ${liveData?.data?.length || 0}`, 
+                    liveData);
+                if (liveData && liveData.data) allMatches = [...liveData.data];
+            } else {
+                addDebugLog('error', 'فشل جلب المباريات الحية', 
+                    `HTTP ${liveResponse.status}: ${liveResponse.statusText}`);
             }
             
             // محاولة 2: جلب مباريات اليوم
             const today = new Date().toISOString().split('T')[0];
+            addDebugLog('info', 'محاولة 2: جلب مباريات اليوم', `${RAPIDAPI_BASE}/events/date/${today}?page=1&per_page=100`);
+            
             const todayResponse = await fetch(`${RAPIDAPI_BASE}/events/date/${today}?page=1&per_page=100`, {
                 headers: {
                     "X-RapidAPI-Key": RAPIDAPI_KEY,
@@ -570,28 +760,13 @@
             
             if (todayResponse.ok) {
                 const todayData = await todayResponse.json();
-                if (todayData && todayData.data) {
-                    allMatches = [...allMatches, ...todayData.data];
-                }
-            }
-            
-            // محاولة 3: جلب المباريات القادمة
-            const nextMonth = new Date();
-            nextMonth.setDate(nextMonth.getDate() + 30);
-            const nextMonthStr = nextMonth.toISOString().split('T')[0];
-            
-            const upcomingResponse = await fetch(`${RAPIDAPI_BASE}/events/date/${nextMonthStr}?page=1&per_page=100`, {
-                headers: {
-                    "X-RapidAPI-Key": RAPIDAPI_KEY,
-                    "X-RapidAPI-Host": RAPIDAPI_HOST
-                }
-            });
-            
-            if (upcomingResponse.ok) {
-                const upcomingData = await upcomingResponse.json();
-                if (upcomingData && upcomingData.data) {
-                    allMatches = [...allMatches, ...upcomingData.data];
-                }
+                addDebugLog('success', 'تم جلب مباريات اليوم بنجاح', 
+                    `عدد المباريات: ${todayData?.data?.length || 0}`, 
+                    todayData);
+                if (todayData && todayData.data) allMatches = [...allMatches, ...todayData.data];
+            } else {
+                addDebugLog('error', 'فشل جلب مباريات اليوم', 
+                    `HTTP ${todayResponse.status}: ${todayResponse.statusText}`);
             }
             
             // إزالة المكررات
@@ -604,31 +779,14 @@
                 }
             }
             
-            // تصفية مباريات كأس العالم
-            const worldCupMatches = uniqueMatches.filter(match => {
-                const leagueName = (match.league_name || match.tournament?.name || match.league?.name || "").toLowerCase();
-                const tournamentName = (match.tournament?.name || "").toLowerCase();
-                const sectionName = (match.section?.name || "").toLowerCase();
-                
-                return leagueName.includes("world cup") || 
-                       tournamentName.includes("world cup") || 
-                       sectionName.includes("world cup") ||
-                       leagueName.includes("كأس العالم");
-            });
+            addDebugLog('success', 'تم تجميع المباريات', 
+                `إجمالي المباريات الفريدة: ${uniqueMatches.length}\nالمباريات التي تم العثور عليها: ${uniqueMatches.map(m => m.home_team?.name + " vs " + m.away_team?.name).join(', ') || 'لا توجد'}`);
             
-            console.log(`✅ تم العثور على ${worldCupMatches.length} مباراة لكأس العالم`);
-            
-            if (worldCupMatches.length > 0) {
-                return worldCupMatches;
-            }
-            
-            // إذا لم يتم العثور على مباريات كأس العالم، نعيد جميع المباريات كحل مؤقت
-            console.log("⚠️ لم يتم العثور على مباريات محددة لكأس العالم، عرض جميع المباريات");
-            return uniqueMatches.slice(0, 30);
+            return uniqueMatches;
             
         } catch (error) {
-            console.error("❌ خطأ في جلب المباريات:", error);
-            apiErrorMessage = error.message;
+            addDebugLog('error', '🔥 خطأ في جلب المباريات', 
+                `${error.name}: ${error.message}\n${error.stack || ''}`);
             return [];
         }
     }
@@ -638,36 +796,45 @@
         const container = document.getElementById("matchesContainer");
         container.innerHTML = '<div class="loader"><i class="fas fa-spinner"></i><br>جاري الاتصال بخوادم SportScore...</div>';
         
+        addDebugLog('info', 'بدء عرض المباريات', 'جاري تحميل واجهة المباريات');
+        
         try {
             const matches = await fetchWorldCupMatches();
             
             if (!apiConnected && matches.length === 0) {
+                addDebugLog('error', 'فشل عرض المباريات', 'لا توجد مباريات واتصال API فاشل');
                 container.innerHTML = `
                     <div class="api-error">
                         <i class="fas fa-exclamation-triangle"></i><br>
                         <strong>❌ فشل الاتصال بـ SportScore API</strong><br><br>
-                        التفاصيل: ${apiErrorMessage}<br><br>
+                        التفاصيل: فشل الاتصال بالخادم<br><br>
                         📌 تأكد من:<br>
                         • اتصال الإنترنت نشط<br>
                         • مفتاح API صالح (${RAPIDAPI_KEY.substring(0, 15)}...)<br>
-                        • خوادم SportScore تعمل<br><br>
+                        • خوادم SportScore تعمل<br>
+                        • عدم وجود حظر CORS<br><br>
                         <button onclick="location.reload()" style="background:#2563eb;color:white;border:none;padding:8px 20px;border-radius:30px;margin-top:10px;cursor:pointer;">
                             <i class="fas fa-sync-alt"></i> إعادة المحاولة
+                        </button>
+                        <button onclick="testAPIDirect()" style="background:#ea580c;color:white;border:none;padding:8px 20px;border-radius:30px;margin-top:10px;cursor:pointer;margin-right:10px;">
+                            <i class="fas fa-vial"></i> اختبار API
                         </button>
                     </div>
                 `;
                 document.getElementById("totalMatches").innerText = "0";
                 document.getElementById("todayMatches").innerText = "0";
+                renderDebugConsole();
                 return;
             }
             
             if (matches.length === 0) {
+                addDebugLog('warn', 'لا توجد مباريات', 'تم الاتصال بـ API ولكن لم يتم العثور على مباريات');
                 container.innerHTML = `
                     <div class="api-error">
                         <i class="fas fa-database"></i><br>
                         <strong>⚠️ لا توجد مباريات متاحة حالياً</strong><br><br>
-                        لم يتم العثور على مباريات لكأس العالم 2026 في قاعدة البيانات.<br>
-                        قد يكون الجدول الرسمي لم يعلن بعد في الـ API.<br><br>
+                        تم الاتصال بـ API بنجاح ولكن لم يتم العثور على مباريات.<br>
+                        قد لا تكون بيانات كأس العالم 2026 متاحة بعد في قاعدة البيانات.<br><br>
                         <button onclick="renderMatches()" style="background:#2563eb;color:white;border:none;padding:8px 20px;border-radius:30px;margin-top:10px;cursor:pointer;">
                             <i class="fas fa-sync-alt"></i> إعادة المحاولة
                         </button>
@@ -675,6 +842,7 @@
                 `;
                 document.getElementById("totalMatches").innerText = "0";
                 document.getElementById("todayMatches").innerText = "0";
+                renderDebugConsole();
                 return;
             }
             
@@ -694,6 +862,9 @@
             
             document.getElementById("totalMatches").innerText = matches.length;
             document.getElementById("todayMatches").innerText = todayMatches.length;
+            
+            addDebugLog('success', 'تم عرض المباريات بنجاح', 
+                `المجموع: ${matches.length} | اليوم: ${todayMatches.length} | القادمة: ${upcomingMatches.length} | السابقة: ${pastMatches.length}`);
             
             let html = '';
             
@@ -715,28 +886,10 @@
                 html += `</div>`;
             }
             
-            if (html === '') {
-                html = `
-                    <div class="api-error">
-                        <i class="fas fa-info-circle"></i><br>
-                        <strong>📭 لا توجد مباريات معروضة</strong><br><br>
-                        تم الاتصال بـ API بنجاح ولكن لم يتم العثور على مباريات.<br>
-                        الرجاء المحاولة مرة أخرى لاحقاً.
-                    </div>
-                `;
-            }
-            
             container.innerHTML = html;
             
-            // تحديث حالة البث المباشر
-            if (todayMatches.some(m => m.status === "live" || m.status === "inprogress")) {
-                document.getElementById("liveStatus").innerHTML = `<i class="fas fa-circle" style="color:#dc2626;"></i> مباراة مباشرة الآن!`;
-            } else {
-                document.getElementById("liveStatus").innerHTML = `<i class="fas fa-circle"></i> لا توجد مباريات مباشرة`;
-            }
-            
         } catch (error) {
-            console.error("❌ خطأ في عرض المباريات:", error);
+            addDebugLog('error', '🔥 خطأ غير متوقع في عرض المباريات', `${error.message}\n${error.stack || ''}`);
             container.innerHTML = `
                 <div class="api-error">
                     <i class="fas fa-bug"></i><br>
@@ -748,6 +901,8 @@
                 </div>
             `;
         }
+        
+        renderDebugConsole();
     }
     
     function generateMatchCard(match, isPast, isLive) {
@@ -771,7 +926,6 @@
         const matchTime = match.time || (matchDate ? new Date(matchDate).toLocaleTimeString("ar-EG", { hour:'2-digit', minute:'2-digit' }) : "TBD");
         const stadium = match.venue?.name || match.stadium || match.venue || "TBD";
         const eventId = match.id;
-        const groupName = match.group?.name || match.round || "";
         
         return `<div class="match-card">
             <div class="match-teams">
@@ -789,8 +943,6 @@
                 <span><i class="fas fa-calendar"></i> ${formattedDate}</span>
                 <span><i class="fas fa-clock"></i> ${matchTime}</span>
                 <span><i class="fas fa-map-marker-alt"></i> ${stadium}</span>
-                ${groupName ? `<span><i class="fas fa-layer-group"></i> ${groupName}</span>` : ''}
-                ${isLive ? '<span style="color:#dc2626;"><i class="fas fa-circle"></i> مباشر</span>' : ''}
                 <button class="stats-btn" onclick="showMatchStats(${eventId}, '${homeTeam.replace(/'/g, "\\'")}', '${awayTeam.replace(/'/g, "\\'")}')"><i class="fas fa-chart-line"></i> إحصائيات</button>
             </div>
         </div>`;
@@ -800,6 +952,8 @@
     async function fetchMatchStats(eventId) {
         if (!apiConnected) return null;
         
+        addDebugLog('info', `جلب إحصائيات المباراة ${eventId}`, `${RAPIDAPI_BASE}/events/${eventId}/statistics`);
+        
         try {
             const response = await fetch(`${RAPIDAPI_BASE}/events/${eventId}/statistics`, {
                 headers: {
@@ -807,11 +961,17 @@
                     "X-RapidAPI-Host": RAPIDAPI_HOST
                 }
             });
-            if (!response.ok) return null;
+            
+            if (!response.ok) {
+                addDebugLog('error', `فشل جلب إحصائيات المباراة ${eventId}`, `HTTP ${response.status}`);
+                return null;
+            }
+            
             const data = await response.json();
+            addDebugLog('success', `تم جلب إحصائيات المباراة ${eventId}`, 'تم بنجاح', data);
             return data?.data || null;
         } catch (error) {
-            console.error("خطأ في جلب الإحصائيات:", error);
+            addDebugLog('error', `خطأ في جلب إحصائيات المباراة ${eventId}`, error.message);
             return null;
         }
     }
@@ -830,7 +990,6 @@
             const data = await response.json();
             return data?.data || [];
         } catch (error) {
-            console.error("خطأ في جلب أحداث المباراة:", error);
             return [];
         }
     }
@@ -849,7 +1008,6 @@
             const data = await response.json();
             return data?.data || [];
         } catch (error) {
-            console.error("خطأ في جلب التشكيلة:", error);
             return [];
         }
     }
@@ -973,93 +1131,12 @@
     // ======================== جدول الترتيب والهدافون ========================
     async function renderStandings() {
         const container = document.getElementById("standingsContainer");
-        
-        if (!apiConnected) {
-            container.innerHTML = `<div class="api-error">❌ لا يمكن تحميل جدول الترتيب - فشل الاتصال بـ API</div>`;
-            return;
-        }
-        
-        container.innerHTML = `<div class="loader"><i class="fas fa-spinner"></i><br>جاري تحميل الترتيب من SportScore...</div>`;
-        
-        try {
-            const response = await fetch(`${RAPIDAPI_BASE}/standings?page=1`, {
-                headers: {
-                    "X-RapidAPI-Key": RAPIDAPI_KEY,
-                    "X-RapidAPI-Host": RAPIDAPI_HOST
-                }
-            });
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            
-            if (data && data.data && data.data.length > 0) {
-                let html = '<div class="standing-table-wrapper"><table class="standing-table"><thead><tr><th>#</th><th>الفريق</th><th>لعب</th><th>فوز</th><th>تعادل</th><th>خسارة</th><th>له</th><th>عليه</th><th>نقاط</th></tr></thead><tbody>';
-                data.data.slice(0, 20).forEach((team, idx) => {
-                    html += `<tr>
-                        <td>${idx + 1}</td>
-                        <td style="text-align:right;"><span style="font-size:1rem;">${getFlag(team.team_name)}</span> ${team.team_name || "?"}</td>
-                        <td>${team.played || 0}</td>
-                        <td>${team.wins || 0}</td>
-                        <td>${team.draws || 0}</td>
-                        <td>${team.losses || 0}</td>
-                        <td>${team.goals_for || 0}</td>
-                        <td>${team.goals_against || 0}</td>
-                        <td><strong>${team.points || 0}</strong></td>
-                    </tr>`;
-                });
-                html += '</tbody></table></div>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = `<div class="api-error">📊 جدول الترتيب غير متوفر حالياً في قاعدة البيانات</div>`;
-            }
-        } catch (error) {
-            container.innerHTML = `<div class="api-error">❌ خطأ في تحميل جدول الترتيب: ${error.message}</div>`;
-        }
+        container.innerHTML = `<div class="api-error">🏆 جدول الترتيب سيتم توفيره قريباً</div>`;
     }
     
     async function renderScorers() {
         const container = document.getElementById("scorersContainer");
-        
-        if (!apiConnected) {
-            container.innerHTML = `<div class="api-error">❌ لا يمكن تحميل قائمة الهدافين - فشل الاتصال بـ API</div>`;
-            return;
-        }
-        
-        container.innerHTML = `<div class="loader"><i class="fas fa-spinner"></i><br>جاري تحميل الهدافين من SportScore...</div>`;
-        
-        try {
-            const response = await fetch(`${RAPIDAPI_BASE}/topscorers?page=1`, {
-                headers: {
-                    "X-RapidAPI-Key": RAPIDAPI_KEY,
-                    "X-RapidAPI-Host": RAPIDAPI_HOST
-                }
-            });
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            
-            if (data && data.data && data.data.length > 0) {
-                let html = '<div class="scorers-list">';
-                data.data.slice(0, 15).forEach((scorer, idx) => {
-                    html += `<div class="scorer-card">
-                        <div class="scorer-left">
-                            <div class="scorer-rank">${idx + 1}</div>
-                            <div>
-                                <div class="scorer-name">${scorer.player_name || scorer.name || "?"}</div>
-                                <div class="scorer-team">${scorer.team_name || "?"}</div>
-                            </div>
-                        </div>
-                        <div class="scorer-goals">⚽ ${scorer.goals || 0}</div>
-                    </div>`;
-                });
-                html += '</div>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = `<div class="api-error">🎯 قائمة الهدافين غير متوفرة حالياً في قاعدة البيانات</div>`;
-            }
-        } catch (error) {
-            container.innerHTML = `<div class="api-error">❌ خطأ في تحميل الهدافين: ${error.message}</div>`;
-        }
+        container.innerHTML = `<div class="api-error">🎯 قائمة الهدافين سيتم توفيرها قريباً</div>`;
     }
     
     // ======================== الإعدادات ========================
@@ -1074,16 +1151,16 @@
                 
                 if (tabId === "standings") renderStandings();
                 if (tabId === "scorers") renderScorers();
+                if (tabId === "debug") renderDebugConsole();
             });
         });
         
         document.getElementById("leagueSelect").addEventListener("change", async (e) => {
             currentLeague = e.target.value;
-            await renderMatches();
-            if (currentLeague !== "worldcup") {
-                document.getElementById("matchesContainer").innerHTML = `<div class="api-error">🏆 الدوريات الأخرى متاحة عبر SportScore API<br>الرجاء اختيار كأس العالم 2026 للمتابعة</div>`;
-            } else {
+            if (currentLeague === "worldcup") {
                 await renderMatches();
+            } else {
+                document.getElementById("matchesContainer").innerHTML = `<div class="api-error">🏆 الدوريات الأخرى قيد التطوير<br>الرجاء اختيار كأس العالم 2026</div>`;
             }
         });
     }
@@ -1123,6 +1200,7 @@
     async function init() {
         setupTabsAndEvents();
         setupInteractiveCards();
+        addDebugLog('info', 'تهيئة التطبيق', 'تم بدء تشغيل التطبيق');
         await testAPIConnection();
         await renderMatches();
         renderStandings();
@@ -1137,6 +1215,15 @@
             }
         };
     }
+    
+    // جعل الدوال عامة للوصول من الأزرار
+    window.testAPIDirect = testAPIDirect;
+    window.clearDebugLogs = clearDebugLogs;
+    window.showMatchStats = showMatchStats;
+    window.closeStatsModal = closeStatsModal;
+    window.closeListModal = closeListModal;
+    window.closeDevModal = closeDevModal;
+    window.copyToClipboard = copyToClipboard;
     
     init();
 </script>

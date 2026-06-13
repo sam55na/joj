@@ -22,7 +22,6 @@ app.post('/api/football', async (req, res) => {
     const { action, team } = req.body;
     let prompt = "";
 
-    // صياغة الأوامر بدقة لإجبار النموذج على جلب الحقيقة الحالية فقط بتنسيق صلب
     if (action === "today_matches") {
         prompt = `أنت خبير ومحلل كرة قدم محترف متصل بالإنترنت وقواعد البيانات الحية. اليوم هو 13 يونيو 2026.
         أعطني قائمة بالمباريات الحقيقية والواقعية الجارية أو المجدولة لهذا اليوم (13 يونيو 2026) في البطولات الكبرى (أوروبية، قارية، عربية).
@@ -63,24 +62,20 @@ app.post('/api/football', async (req, res) => {
 
         rawTextResponse = response.text.trim();
         
-        // تنظيف أي علامات نصوص برمجية (Markdown) قد يضيفها الموديل تلقائياً
         let cleanJsonText = rawTextResponse;
         if (cleanJsonText.startsWith("```json")) {
             cleanJsonText = cleanJsonText.replace(/```json|```/g, "").trim();
         }
 
-        // محاولة تحويل النص إلى كائن وبرمجته للموقع
         const parsedData = JSON.parse(cleanJsonText);
         res.json({ type: "parsed", data: parsedData });
 
     } catch (error) {
-        // طباعة المشكلة بالكامل في سيرفر ريندر (Logs)
         console.error("--- FOOTBALL SERVER ERROR LOG ---");
         console.error("Error details:", error.message);
         console.error("Raw response captured from AI:", rawTextResponse);
         console.error("---------------------------------");
 
-        // إرسال الرد الخام والمشكلة إلى الواجهة لمعاينتها فوراً بدلاً من الانهيار
         res.status(200).json({ 
             type: "raw_error", 
             message: "فشل في معالجة القالب القياسي لـ JSON، إليك البيانات الخام القادمة من السيرفر مباشرة.",

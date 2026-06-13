@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 
-// تفعيل العبور الآمن للمتصفحات (CORS) بالكامل لتتصل الواجهة بدون قيود
+// تفعيل العبور الآمن للمتصفحات (CORS) بالكامل لضمان اتصال الواجهة
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
@@ -12,56 +13,26 @@ app.use(cors({
 
 app.use(express.json());
 
-// تعريف متغير الذكاء الاصطناعي عالمياً ليتم تهيئته ديناميكياً
-let ai = null;
+// تهيئة كائن الذكاء الاصطناعي بشكل آمن ومباشر
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
-// دالة ذكية لتجهيز حزمة جوجل فور إقلاع السيرفر وتفادي خطأ الانهيار (Status 1)
-async function initializeGemini() {
-    try {
-        // استدعاء الحزمة ديناميكياً للتوافق التام مع النسخ الحديثة
-        const genAIModule = await import('@google/genai');
-        
-        // التحقق من طريقة تصدير الكائن في النسخة المثبتة
-        const GoogleGenAI = genAIModule.GoogleGenAI || genAIModule.default?.GoogleGenAI;
-        
-        if (GoogleGenAI) {
-            ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-            console.log("✅ Gemini API Client initialized successfully.");
-        } else {
-            console.error("❌ Could not find GoogleGenAI class in the module exports.");
-        }
-    } catch (err) {
-        console.error("❌ Failed to load @google/genai module dynamically:", err.message);
-    }
-}
-
-// بدء تهيئة الحزمة فوراً
-initializeGemini();
-
-// نقطة فحص نبضات الخادم للتأكد من استيقاظه وصلاحية البيئة
+// نقطة فحص نبضات الخادم للتأكد من استقراره وعمله
 app.get('/api/health', (req, res) => {
     if (!process.env.GEMINI_API_KEY) {
-        return res.status(500).json({ status: "error", message: "Missing GEMINI_API_KEY in Render." });
+        return res.status(500).json({ status: "error", message: "Missing GEMINI_API_KEY in Render Environment Variables." });
     }
-    if (!ai) {
-        return res.status(500).json({ status: "error", message: "Gemini SDK failed to initialize." });
-    }
-    res.status(200).json({ status: "healthy", message: "Server is online and Gemini is ready!" });
+    res.status(200).json({ status: "healthy", message: "Server is fully active and Gemini is ready!" });
 });
 
-// المسار الرئيسي لمعالجة طلبات واجهة المستخدم
+// المسار الرئيسي لمعالجة طلبات واجهة كرة القدم
 app.post('/api/football', async (req, res) => {
-    if (!ai) {
-        return res.status(500).json({ error: "Gemini AI client is not initialized on this server instance." });
-    }
-
     const { action, team } = req.body;
     let prompt = "";
 
     if (action === "today_matches") {
         prompt = `أنت خبير ومحلل كرة قدم محترف متصل بالإنترنت وقواعد البيانات الحية. اليوم هو 13 يونيو 2026.
         أعطني قائمة بالمباريات الحقيقية والواقعية الجارية أو المجدولة لهذا اليوم (13 يونيو 2026) في البطولات الكبرى (الأوروبية، القارية، أو العربية).
-        يجب أن يكون ردك بصيغة JSON فقط وبدون أي نصوص توضيحية خارج القالب (No Markdown formatting, just pure JSON object).
+        يجب أن يكون ردك بصيغة JSON فقط وبدون أي نصوص توضيحية خارج القالب أو علامات اقتباس مسبقة (No Markdown formatting, just pure JSON object).
         هيكل الـ JSON المطلوب بدقة:
         {
             "matches": [
@@ -95,23 +66,25 @@ app.post('/api/football', async (req, res) => {
             contents: prompt,
         });
 
-        if (response.text && typeof response.text === 'function') {
-            rawTextResponse = response.text();
-        } else if (response.text) {
-            rawTextResponse = response.text;
-        } else if (response.candidates && response.candidates[0].content.parts[0].text) {
+        // استخراج النص بطريقة مرنة تمنع أي خطأ غير متوقع
+        if (response && response.text) {
+            rawTextResponse = typeof response.text === 'function' ? response.text() : response.text;
+        } else if (response && response.candidates && response.candidates[0]?.content?.parts[0]?.text) {
             rawTextResponse = response.candidates[0].content.parts[0].text;
+        }
+
+        if (!rawTextResponse) {
+            throw new Error("استجابة الذكاء الاصطناعي فارغة تماماً.");
         }
 
         rawTextResponse = rawTextResponse.trim();
         
+        // تنظيف علامات الماركداون باحتياط كامل لحماية السيرفر من الانهيار عند السطر 11
         let cleanJsonText = rawTextResponse;
-        if (cleanJsonText.startsWith("```json")) {
-            cleanJsonText = cleanJsonText.replace(/
-```json|```/g, "").trim();
-        } else if (cleanJsonText.startsWith("```")) {
-            cleanJsonText = cleanJsonText.replace(/
-```/g, "").trim();
+        if (cleanJsonText.includes("```json")) {
+            cleanJsonText = cleanJsonText.split("```json")[1].split("```")[0].trim();
+        } else if (cleanJsonText.includes("```")) {
+            cleanJsonText = cleanJsonText.split("```")[1].split("```")[0].trim();
         }
 
         const parsedData = JSON.parse(cleanJsonText);
@@ -125,15 +98,12 @@ app.post('/api/football', async (req, res) => {
 
         res.status(200).json({ 
             type: "raw_error", 
-            message: "حدث خطأ أثناء قراءة القالب القياسي، تم تحويل البيانات للحالة الخام.",
+            message: "حدث خطأ في معالجة البيانات، تم الانتقال للحالة الخام.",
             errorDetails: error.message,
-            rawText: rawTextResponse || "لم يتم استقبال نص، تفقد متغيرات البيئة في ريندر."
+            rawText: rawTextResponse || "لم يتم استقبال أي نص، يرجى تفقّد مفتاح البيئة في ريندر."
         });
     }
 });
 
-// تشغيل السيرفر على المنفذ المخصص لريندر
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server is fully booted and listening on port ${PORT}`);
-});
+app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Real-Time Server active on port ${PORT}`));

@@ -1,7 +1,7 @@
 {
   "name": "ai-football-clean-backend",
   "version": "1.0.0",
-  "description": "خادم كرة القدم الحقيقي المستقل والمباشر",
+  "description": "خادم كرة القدم الحقيقي المستقل والمباشر لعام 2026",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

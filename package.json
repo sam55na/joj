@@ -1,7 +1,7 @@
 {
-  "name": "ai-football-real-backend",
+  "name": "ai-football-clean-backend",
   "version": "1.0.0",
-  "description": "خادم كرة القدم المتصل بـ Gemini مباشرة لجلب بيانات حقيقية",
+  "description": "خادم كرة القدم الحقيقي المستقل والمباشر",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

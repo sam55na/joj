@@ -3,203 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI FOOTBALL - منصة البيانات الحقيقية</title>
+    <title>AI FOOTBALL LIVE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans min-h-screen">
 
-    <div id="initialSplashLoader" class="fixed inset-0 bg-gray-950 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="relative flex items-center justify-center mb-6">
-            <div class="animate-spin rounded-full h-24 w-24 border-4 border-t-green-500 border-r-transparent border-b-gray-800 border-l-transparent"></div>
-            <i class="fa-solid fa-futbol text-3xl text-green-400 absolute animate-bounce"></i>
-        </div>
-        <h2 class="text-2xl font-black text-white tracking-widest mb-2">AI FOOTBALL</h2>
-        <p id="loaderStatusText" class="text-gray-400 text-sm animate-pulse px-4 text-center">جاري فحص استجابة خادم ريندر الحية المتنقلة...</p>
+    <div id="initialSplashLoader" class="fixed inset-0 bg-gray-950 z-[9999] flex flex-col items-center justify-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-4 border-t-green-500 border-r-transparent border-b-gray-800 border-l-transparent mb-4"></div>
+        <p id="loaderStatusText" class="text-gray-400 text-sm animate-pulse">جاري ربط واستيقاظ السيرفر المباشر على ريندر...</p>
     </div>
 
     <nav class="bg-gray-900 border-b border-gray-800 p-4 sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-black text-green-500 tracking-wider">AI FOOTBALL</h1>
-            <span class="text-sm bg-gray-800 px-3 py-1.5 rounded-full text-gray-400 border border-gray-700">
-                اتصال السيرفر: <span id="serverStatusBadge" class="text-amber-400 font-bold">جاري الفحص...</span>
-            </span>
+            <h1 class="text-xl font-black text-green-500 tracking-wider">AI FOOTBALL SYSTEM</h1>
+            <span id="serverStatusBadge" class="text-xs bg-gray-800 px-3 py-1.5 rounded-full text-amber-400 font-mono">جاري الفحص...</span>
         </div>
     </nav>
 
-    <main class="container mx-auto px-4 py-8 max-w-6xl">
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
         
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-            <button onclick="sendRequest('today_matches')" class="flex items-center justify-center gap-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 p-5 rounded-2xl shadow-lg font-bold text-lg transition-all transform hover:-translate-y-1">
-                <i class="fa-solid fa-calendar-day text-xl"></i> سحب مباريات اليوم الحقيقية
+        <div class="text-center mb-10">
+            <button onclick="fetchTodayMatches()" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 px-8 py-4 rounded-2xl font-bold text-lg shadow-xl transition-all transform hover:-translate-y-1">
+                <i class="fa-solid fa-sync-alt ml-2 animate-spin"></i> جلب وعرض جدول مباريات اليوم الكاملة (13 يونيو 2026)
             </button>
-            
-            <div class="flex bg-gray-900 p-3 rounded-2xl border border-gray-800 shadow-md">
-                <input type="text" id="teamInput" placeholder="اكتب اسم الفريق (مثال: ريال مدريد)..." class="bg-transparent text-white placeholder-gray-500 w-full px-4 focus:outline-none">
-                <button onclick="sendRequest('team_stats')" class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-xl font-bold transition-colors whitespace-nowrap">
-                    جلب الإحصائيات
-                </button>
-            </div>
+        </div>
 
-            <button onclick="sendRequest('live_update')" class="flex items-center justify-center gap-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 p-5 rounded-2xl shadow-lg font-bold text-lg transition-all transform hover:-translate-y-1">
-                <i class="fa-solid fa-satellite-dish text-xl animate-pulse"></i> مراقبة البث اللحظي الحالي
-            </button>
-        </section>
-
-        <section id="outputArea">
-            <div class="text-center py-20 text-gray-600 border-2 border-dashed border-gray-800 rounded-3xl">
-                <i class="fa-solid fa-server text-5xl mb-4 text-gray-700"></i>
-                <p class="text-lg">المنصة فارغة تماماً وجاهزة لاستقبال طلبك الأول لعرض البيانات المباشرة.</p>
+        <section id="outputArea" class="space-y-6">
+            <div class="text-center py-16 text-gray-600 border-2 border-dashed border-gray-800 rounded-3xl">
+                <p class="text-base">الواجهة خالية تماماً من البيانات الافتراضية، اضغط الزر بالأعلى لسحب البيانات الحية مباشرة.</p>
             </div>
         </section>
 
     </main>
 
     <script>
-        // التعديل الجوهري: تم كتابة النطاق الكامل والصحيح للسيرفر الخاص بك على ريندر لحل مشكلة الاتصال
         const BASE_URL = "https://joj-d0kl.onrender.com";
-        const SERVER_URL = `${BASE_URL}/api/football`;
-        const HEALTH_URL = `${BASE_URL}/api/health`;
-
-        // فحص جاهزية خادم ريندر وإخفاء اللودر فور الاستجابة
+        
         async function checkSystemHealth() {
             try {
-                const response = await fetch(HEALTH_URL);
-                if (!response.ok) throw new Error("Network response was not ok");
+                const response = await fetch(`${BASE_URL}/api/health`);
                 const data = await response.json();
-                
                 if (data.status === "healthy" || data.status === "missing_key") {
                     document.getElementById('initialSplashLoader').style.display = 'none';
-                    document.getElementById('serverStatusBadge').innerText = "متصل ونشط";
-                    document.getElementById('serverStatusBadge').className = "text-green-400 font-bold";
+                    document.getElementById('serverStatusBadge').innerText = "متصل بالخادم";
+                    document.getElementById('serverStatusBadge').className = "text-green-400 font-bold text-xs bg-gray-800 px-3 py-1.5 rounded-full";
                 }
             } catch (err) {
-                document.getElementById('loaderStatusText').innerText = "في انتظار استجابة السيرفر (ريندر يستغرق ثوانٍ للإقلاع في وضع الخمول)...";
                 setTimeout(checkSystemHealth, 3000);
             }
         }
         window.addEventListener('DOMContentLoaded', checkSystemHealth);
 
-        // المحرك الرئيسي لإرسال الطلبات
-        async function sendRequest(actionType) {
-            const teamVal = document.getElementById('teamInput').value.trim();
-            if (actionType === 'team_stats' && !teamVal) {
-                alert("يرجى إدخال اسم الفريق أولاً!");
+        // 1. طلب مباريات اليوم من السيرفر
+        async function fetchTodayMatches() {
+            showLoading();
+            try {
+                const response = await fetch(`${BASE_URL}/api/football`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "today_matches" })
+                });
+                const result = await response.json();
+                
+                if (result.type === "parsed") {
+                    renderMatchesList(result.data.matches);
+                } else {
+                    renderRaw(result);
+                }
+            } catch (err) {
+                renderError(err.message);
+            }
+        }
+
+        // بناء قائمة مباريات اليوم الحقيقية بدون أي عنصر وهمي ثابت
+        function renderMatchesList(matches) {
+            const container = document.getElementById('outputArea');
+            if(!matches || matches.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 py-10">لم يتم رصد أي مباريات حقيقية مجدولة اليوم في الملاعب العالمية.</div>`;
                 return;
             }
 
-            showLoadingState();
-
-            try {
-                const response = await fetch(SERVER_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: actionType, team: teamVal })
-                });
-                
-                const result = await response.json();
-
-                if (result.type === "parsed") {
-                    renderCleanData(actionType, result.data);
-                } else if (result.type === "raw_error") {
-                    renderRawResponseBlock(result);
-                }
-            } catch (error) {
-                renderErrorBlock("تعذر الاتصال بالخادم بالكامل", "تأكد من فتح كود server.js وتحديث الـ Build في ريندر.");
-            }
-        }
-
-        function renderCleanData(action, data) {
-            const container = document.getElementById('outputArea');
-            let html = "";
-
-            if (action === "today_matches") {
-                html = `<h2 class="text-xl font-bold mb-6 text-green-400"><i class="fa-solid fa-check-double ml-2"></i>مباريات اليوم الحقيقية والواقعية المتوفرة</h2>`;
-                html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
-                
-                if (!data.matches || data.matches.length === 0) {
-                    html += `<div class="col-span-2 text-center py-10 text-gray-500">لا توجد مباريات جارية حالياً لليوم.</div>`;
-                } else {
-                    data.matches.forEach(match => {
-                        html += `
-                            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-md">
-                                <div class="flex justify-between text-xs text-gray-400 mb-3 bg-gray-950 p-2 rounded-lg">
-                                    <span>🏆 ${match.tournament}</span>
-                                    <span class="text-green-500 font-bold">${match.liveStatus}</span>
-                                </div>
-                                <div class="flex items-center justify-between text-center py-2">
-                                    <div class="w-2/5 font-bold">${match.homeTeam}</div>
-                                    <div class="w-1/5 bg-gray-950 px-3 py-1.5 rounded-xl text-yellow-400 font-mono font-bold">${match.score?.home ?? 0} - ${match.score?.away ?? 0}</div>
-                                    <div class="w-2/5 font-bold">${match.awayTeam}</div>
-                                </div>
-                                <div class="text-center mt-3 text-xs text-gray-500 border-t border-gray-800 pt-2">⏰ التوقيت: ${match.time}</div>
-                            </div>`;
-                    });
-                }
-                html += `</div>`;
-            } 
-            else if (action === "team_stats") {
-                html = `
-                    <div class="bg-gray-900 border border-gray-800 rounded-3xl p-6 max-w-2xl mx-auto shadow-2xl">
-                        <h2 class="text-2xl font-black text-blue-400 border-b border-gray-800 pb-3 mb-4">${data.teamName}</h2>
-                        <p class="text-gray-400 text-sm mb-4">البطولة: ${data.league} | الترتيب الحالي: <span class="text-yellow-400 font-bold">#${data.rank}</span></p>
-                        <div class="grid grid-cols-4 gap-2 text-center text-sm font-mono mb-4">
-                            <div class="bg-gray-950 p-2 rounded">لعب: ${data.matchesPlayed}</div>
-                            <div class="bg-green-950 text-green-400 p-2 rounded">فوز: ${data.wins}</div>
-                            <div class="bg-yellow-950 text-yellow-400 p-2 rounded">تعادل: ${data.draws}</div>
-                            <div class="bg-red-950 text-red-400 p-2 rounded">خسارة: ${data.losses}</div>
+            let html = `<div class="grid grid-cols-1 gap-4">`;
+            matches.forEach(match => {
+                let statusColor = match.status === 'ارية' || match.status.includes('جارية') ? 'text-red-500 animate-pulse' : 'text-gray-400';
+                html += `
+                    <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="text-right">
+                            <span class="text-xs bg-gray-950 px-2 py-1 rounded text-green-400 block w-max mb-1">🏆 ${match.tournament}</span>
+                            <span class="text-xs ${statusColor}">الحالة: ${match.status} | ⏰ التوقيت: ${match.time}</span>
                         </div>
-                        <div class="text-xs space-y-2 bg-gray-950 p-4 rounded-xl">
-                            <div>الهداف الحالي: <span class="text-blue-400 font-bold">${data.topScorer}</span></div>
-                            <div>الأهداف له: <span class="text-green-400">${data.goalsScored}</span> | الأهداف عليه: <span class="text-red-400">${data.goalsConceded}</span></div>
+                        
+                        <div class="flex items-center gap-4 font-bold text-lg my-2 md:my-0">
+                            <span>${match.homeTeam}</span>
+                            <span class="bg-gray-950 px-3 py-1.5 rounded-xl text-yellow-400 font-mono">${match.score.home} - ${match.score.away}</span>
+                            <span>${match.awayTeam}</span>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="fetchMatchStats('${match.homeTeam}', '${match.awayTeam}', '${match.status}', '${match.tournament}')" class="bg-blue-600 hover:bg-blue-500 text-xs font-bold px-4 py-2.5 rounded-xl transition-colors">
+                                <i class="fa-solid fa-chart-bar ml-1"></i> الإحصائيات والأحداث
+                            </button>
+                            <button onclick="fetchComparison('${match.homeTeam}', '${match.awayTeam}')" class="bg-purple-600 hover:bg-purple-500 text-xs font-bold px-4 py-2.5 rounded-xl transition-colors">
+                                <i class="fa-solid fa-shuffle ml-1"></i> مقارنة الفريقين
+                            </button>
                         </div>
                     </div>`;
-            } 
-            else if (action === "live_update") {
-                html = `
-                    <div class="bg-gray-900 border border-red-900/30 rounded-3xl p-6 max-w-xl mx-auto text-center shadow-xl">
-                        <div class="text-xs bg-red-600 text-white font-bold px-3 py-1 rounded-full inline-block mb-4 animate-pulse">مباشر الآن د ${data.minute}'</div>
-                        <div class="flex justify-between items-center mb-6">
-                            <span class="text-lg font-bold w-2/5">${data.homeTeam}</span>
-                            <span class="text-2xl font-mono bg-gray-950 px-4 py-2 rounded-xl text-red-500 border border-gray-800 font-black">${data.score?.home ?? 0} - ${data.score?.away ?? 0}</span>
-                            <span class="text-lg font-bold w-2/5">${data.awayTeam}</span>
-                        </div>
-                        <div class="bg-gray-950 p-4 rounded-xl text-right text-sm text-gray-300 border border-gray-800">
-                            <span class="text-amber-400 font-bold"><i class="fa-solid fa-bolt ml-1"></i> آخر حدث رُصد:</span> ${data.lastEvent}
-                        </div>
-                    </div>`;
-            }
-
+            });
+            html += `</div>`;
             container.innerHTML = html;
         }
 
-        function renderRawResponseBlock(result) {
+        // 2. طلب أحداث وإحصائيات المباراة الحية أو السابقة ديناميكياً
+        async function fetchMatchStats(home, away, status, tournament) {
+            showLoading();
+            try {
+                const response = await fetch(`${BASE_URL}/api/football`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "match_stats", homeTeam: home, awayTeam: away, matchStatus: status, tournament: tournament })
+                });
+                const result = await response.json();
+                
+                if (result.type === "parsed") {
+                    let d = result.data;
+                    let eventsHtml = d.events.map(e => `<li class="bg-gray-950 p-2.5 rounded-lg border-r-4 border-blue-500 text-xs text-gray-300">${e}</li>`).join('');
+                    document.getElementById('outputArea').innerHTML = `
+                        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl max-w-2xl mx-auto shadow-2xl">
+                            <button onclick="fetchTodayMatches()" class="text-xs text-gray-400 hover:text-white mb-4 block"><i class="fa-solid fa-arrow-right ml-1"></i> العودة لجدول المباريات</button>
+                            <h3 class="text-lg font-black text-blue-400 mb-2 text-center">${home} ضد ${away}</h3>
+                            <p class="text-center text-xs text-gray-500 mb-6">تقرير حالة الملعب: <span class="text-yellow-400 font-bold">${d.status}</span></p>
+                            
+                            <div class="space-y-3 mb-6">
+                                <div class="text-xs text-gray-400 flex justify-between"><span>الاستحواذ:</span> <span>${d.possession.home}% - ${d.possession.away}%</span></div>
+                                <div class="w-full bg-gray-950 h-2 rounded-full overflow-hidden flex">
+                                    <div class="bg-blue-500" style="width: ${d.possession.home}%"></div>
+                                    <div class="bg-gray-700" style="width: ${d.possession.away}%"></div>
+                                </div>
+                                <div class="text-xs text-gray-400 flex justify-between pt-2"><span>التسديدات:</span> <span>${d.shots.home} - ${d.shots.away}</span></div>
+                            </div>
+
+                            <h4 class="text-sm font-bold text-gray-200 border-b border-gray-800 pb-2 mb-3"><i class="fa-solid fa-bolt ml-1 text-yellow-500"></i> شريط الأحداث والسيناريو الفعلي:</h4>
+                            <ul class="space-y-2">${eventsHtml || '<p class="text-xs text-gray-500">لا توجد أحداث مسجلة حالياً لهذه الحالة.</p>'}</ul>
+                        </div>`;
+                } else {
+                    renderRaw(result);
+                }
+            } catch (err) {
+                renderError(err.message);
+            }
+        }
+
+        // 3. طلب مقارنة حقيقية بين الفريقين
+        async function fetchComparison(home, away) {
+            showLoading();
+            try {
+                const response = await fetch(`${BASE_URL}/api/football`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "compare_teams", homeTeam: home, awayTeam: away })
+                });
+                const result = await response.json();
+                
+                if (result.type === "parsed") {
+                    let d = result.data;
+                    document.getElementById('outputArea').innerHTML = `
+                        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl max-w-2xl mx-auto shadow-2xl">
+                            <button onclick="fetchTodayMatches()" class="text-xs text-gray-400 hover:text-white mb-4 block"><i class="fa-solid fa-arrow-right ml-1"></i> العودة لجدول المباريات</button>
+                            <h3 class="text-lg font-black text-purple-400 mb-6 text-center"><i class="fa-solid fa-balance-scale ml-2"></i>تحليل مواجهة: ${d.teamA} vs ${d.teamB}</h3>
+                            
+                            <div class="space-y-4 mb-6">
+                                <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                                    <h4 class="text-xs font-bold text-green-400 mb-1">📈 وضع وجاهزية ${d.teamA}:</h4>
+                                    <p class="text-xs text-gray-300 leading-relaxed">${d.analysisA}</p>
+                                </div>
+                                <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                                    <h4 class="text-xs font-bold text-blue-400 mb-1">📈 وضع وجاهزية ${d.teamB}:</h4>
+                                    <p class="text-xs text-gray-300 leading-relaxed">${d.analysisB}</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-purple-950/30 border border-purple-900/40 p-4 rounded-xl text-center">
+                                <h4 class="text-xs font-bold text-purple-300 mb-1">⚔️ تاريخ المواجهات والمؤشرات الحقيقية:</h4>
+                                <p class="text-xs text-gray-300 leading-relaxed">${d.headToHead}</p>
+                            </div>
+                        </div>`;
+                } else {
+                    renderRaw(result);
+                }
+            } catch (err) {
+                renderError(err.message);
+            }
+        }
+
+        function showLoading() {
             document.getElementById('outputArea').innerHTML = `
-                <div class="bg-amber-950/20 border border-amber-500/30 rounded-3xl p-6 max-w-3xl mx-auto">
-                    <div class="flex items-center gap-3 text-amber-400 font-bold mb-4">
-                        <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
-                        <h3>تنبيه: تم استقبال رد لم يطابق قالب التنسيق القياسي</h3>
-                    </div>
-                    <p class="text-xs text-gray-400 mb-2">السبب: <code class="text-red-400 bg-black p-1 rounded font-mono">${result.errorDetails}</code></p>
-                    <h4 class="text-xs font-bold text-gray-300 mb-1">النص المباشر المستلم:</h4>
-                    <pre class="bg-gray-950 p-4 rounded-xl border border-gray-800 text-xs text-left overflow-x-auto text-yellow-200/90 font-mono whitespace-pre-wrap">${result.rawText}</pre>
+                <div class="flex flex-col items-center justify-center py-16">
+                    <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent border-green-500 mb-2"></div>
+                    <p class="text-xs text-gray-500 animate-pulse">جاري سحب ومعالجة البيانات الواقعية من خادم الذكاء الاصطناعي الحالي...</p>
                 </div>`;
         }
 
-        function showLoadingState() {
+        function renderRaw(result) {
             document.getElementById('outputArea').innerHTML = `
-                <div class="flex flex-col items-center justify-center py-20">
-                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-t-transparent border-green-500 mb-3"></div>
-                    <p class="text-sm text-gray-500 animate-pulse">جاري سحب معلومات الملاعب الحية...</p>
+                <div class="bg-amber-950/20 border border-amber-500/30 rounded-2xl p-5 max-w-2xl mx-auto">
+                    <p class="text-xs text-amber-400 font-bold mb-2"><i class="fa-solid fa-bug ml-1"></i> لم يتمكن النظام من صب الـ JSON بالتنسيق القياسي، إليك الرد الخام المعبر عن الحقيقة:</p>
+                    <pre class="bg-gray-950 p-4 rounded-xl border border-gray-800 text-xs text-left overflow-x-auto text-yellow-100 font-mono whitespace-pre-wrap">${result.rawText}</pre>
                 </div>`;
         }
 
-        function renderErrorBlock(title, msg) {
+        function renderError(msg) {
             document.getElementById('outputArea').innerHTML = `
-                <div class="bg-red-950/30 border border-red-500/20 rounded-2xl p-6 text-center text-red-400 max-w-md mx-auto">
-                    <i class="fa-solid fa-circle-xmark text-4xl mb-2"></i>
-                    <h4 class="font-bold">${title}</h4>
-                    <p class="text-xs text-gray-500 mt-1">${msg}</p>
+                <div class="bg-red-950/20 border border-red-500/30 rounded-xl p-4 text-center text-red-400 text-xs max-w-sm mx-auto">
+                    <i class="fa-solid fa-exclamation-circle mb-1"></i> الاتصال تعذر، تأكد من تحديث الكود وبناء الخادم على ريندر بنجاح.
                 </div>`;
         }
     </script>

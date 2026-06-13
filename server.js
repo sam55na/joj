@@ -4,7 +4,7 @@ const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 
-// تفعيل العبور الآمن للمتصفحات (CORS) بالكامل لضمان اتصال الواجهة
+// تفعيل CORS الكامل لضمان عبور طلبات الواجهة بدون قيود المتصفح
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
@@ -13,15 +13,21 @@ app.use(cors({
 
 app.use(express.json());
 
-// تهيئة كائن الذكاء الاصطناعي بشكل آمن ومباشر
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+// قراءة المفتاح وتوليد تنبيه واضح في الـ Logs إذا كان فارغاً لمنع توقف السيرفر
+const apiKey = process.env.GEMINI_API_KEY || "";
+if (!apiKey) {
+    console.log("⚠️ تنبيه حاسم: متغير البيئة GEMINI_API_KEY فارغ حالياً في ريندر! يرجى التحقق من إعداده.");
+}
+
+// تهيئة كائن جوجل
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
 // نقطة فحص نبضات الخادم للتأكد من استقراره وعمله
 app.get('/api/health', (req, res) => {
-    if (!process.env.GEMINI_API_KEY) {
-        return res.status(500).json({ status: "error", message: "Missing GEMINI_API_KEY in Render Environment Variables." });
-    }
-    res.status(200).json({ status: "healthy", message: "Server is fully active and Gemini is ready!" });
+    res.status(200).json({ 
+        status: process.env.GEMINI_API_KEY ? "healthy" : "missing_key", 
+        message: process.env.GEMINI_API_KEY ? "السيرفر نشط والمفتاح تم رصده بنجاح!" : "السيرفر نشط لكن المفتاح غائب في ريندر." 
+    });
 });
 
 // المسار الرئيسي لمعالجة طلبات واجهة كرة القدم
@@ -32,17 +38,17 @@ app.post('/api/football', async (req, res) => {
     if (action === "today_matches") {
         prompt = `أنت خبير ومحلل كرة قدم محترف متصل بالإنترنت وقواعد البيانات الحية. اليوم هو 13 يونيو 2026.
         أعطني قائمة بالمباريات الحقيقية والواقعية الجارية أو المجدولة لهذا اليوم (13 يونيو 2026) في البطولات الكبرى (الأوروبية، القارية، أو العربية).
-        يجب أن يكون ردك بصيغة JSON فقط وبدون أي نصوص توضيحية خارج القالب أو علامات اقتباس مسبقة (No Markdown formatting, just pure JSON object).
+        يجب أن يكون ردك بصيغة JSON فقط وبدون أي نصوص توضيحية خارج القالب (No Markdown formatting, just pure JSON object).
         هيكل الـ JSON المطلوب بدقة:
         {
             "matches": [
-                { "homeTeam": "اسم الفريق المستضيف", "awayTeam": "اسم الفريق الضيف", "time": "توقيت المباراة", "tournament": "اسم البطولة", "liveStatus": "الحالة الحالية للمباراة بالملعب", "score": { "home": 0, "away": 0 } }
+                { "homeTeam": "اسم الفريق المستضيف", "awayTeam": "اسم الفريق الضيف", "time": "توقيت المباراة", "tournament": "اسم البطولة", "liveStatus": "الحالة الحالية", "score": { "home": 0, "away": 0 } }
             ]
         }`;
     } 
     else if (action === "team_stats" && team) {
-        prompt = `أعطني الإحصائيات الحقيقية والفعلية الحالية لفريق (${team}) لآخر مواسمه الحالية لعام 2026.
-        يجب أن يكون الرد بصيغة JSON نظيفة فقط (Pure JSON Object).
+        prompt = `أعطني الإحصائيات الحقيقية والفعلية الحالية لفريق (${team}) لعام 2026.
+        يجب أن يكون الرد بصيغة JSON نظيفة فقط.
         هيكل الـ JSON المطلوب:
         {
             "teamName": "${team}", "league": "اسم الدوري الحالي", "rank": 1, "matchesPlayed": 30, "wins": 20, "draws": 5, "losses": 5, "topScorer": "اسم هداف الفريق الحالي الحقيقي", "goalsScored": 60, "goalsConceded": 25
@@ -50,10 +56,9 @@ app.post('/api/football', async (req, res) => {
     } 
     else if (action === "live_update") {
         prompt = `أعطني تحديثاً حياً ولحظياً حقيقياً لأهم مباراة جارية الآن في الملاعب بتاريخ اليوم 13 يونيو 2026.
-        إذا لم تكن هناك مباراة جارية في هذه الثواني، اختر آخر مباراة قوية انتهت اليوم وقدم بياناتها الحقيقية.
         يجب أن يكون الرد بصيغة JSON فقط:
         {
-            "minute": 75, "homeTeam": "الفريق الأول", "awayTeam": "الفريق الثاني", "score": { "home": 1, "away": 0 }, "possession": { "home": 50, "away": 50 }, "shotsOnTarget": { "home": 5, "away": 3 }, "lastEvent": "وصف دقيق باللغة العربية لآخر حدث واقعي في الملعب"
+            "minute": 75, "homeTeam": "الفريق الأول", "awayTeam": "الفريق الثاني", "score": { "home": 1, "away": 0 }, "possession": { "home": 50, "away": 50 }, "shotsOnTarget": { "home": 5, "away": 3 }, "lastEvent": "وصف دقيق باللغة العربية لآخر حدث"
         }`;
     } else {
         return res.status(400).json({ error: "Action configuration is missing or invalid." });
@@ -61,46 +66,51 @@ app.post('/api/football', async (req, res) => {
 
     let rawTextResponse = "";
     try {
+        // طلب التوليد من الذكاء الاصطناعي
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: prompt,
         });
 
-        // استخراج النص بطريقة مرنة تمنع أي خطأ غير متوقع
+        // استخراج النص بذكاء وبأكثر من طريقة لتجنب الانهيار تماماً
         if (response && response.text) {
             rawTextResponse = typeof response.text === 'function' ? response.text() : response.text;
         } else if (response && response.candidates && response.candidates[0]?.content?.parts[0]?.text) {
             rawTextResponse = response.candidates[0].content.parts[0].text;
         }
 
-        if (!rawTextResponse) {
-            throw new Error("استجابة الذكاء الاصطناعي فارغة تماماً.");
+        // إذا كانت الاستجابة فارغة، نمررها مباشرة للـ catch بدون إحداث كراش للسيرفر
+        if (!rawTextResponse || typeof rawTextResponse !== 'string') {
+            throw new Error("استجابة الذكاء الاصطناعي فارغة أو غير نصية.");
         }
 
-        rawTextResponse = rawTextResponse.trim();
+        let cleanJsonText = rawTextResponse.trim();
         
-        // تنظيف علامات الماركداون باحتياط كامل لحماية السيرفر من الانهيار عند السطر 11
-        let cleanJsonText = rawTextResponse;
+        // معالجة نصوص الماركداون بشكل آمن جداً يضمن عدم حدوث خطأ سطر 11 السابق
         if (cleanJsonText.includes("```json")) {
-            cleanJsonText = cleanJsonText.split("```json")[1].split("```")[0].trim();
+            const parts = cleanJsonText.split("```json");
+            if (parts[1]) cleanJsonText = parts[1].split("```")[0].trim();
         } else if (cleanJsonText.includes("```")) {
-            cleanJsonText = cleanJsonText.split("```")[1].split("```")[0].trim();
+            const parts = cleanJsonText.split("```");
+            if (parts[1]) cleanJsonText = parts[1].trim();
         }
 
         const parsedData = JSON.parse(cleanJsonText);
         res.json({ type: "parsed", data: parsedData });
 
     } catch (error) {
-        console.error("--- FOOTBALL SERVER ERROR LOG ---");
-        console.error("Error Message:", error.message);
-        console.error("Raw response:", rawTextResponse);
-        console.error("---------------------------------");
+        // طباعة تشخيصية واضحة في الـ Render Logs
+        console.error("--- LOG ERROR FOOTBALL ---");
+        console.error("المشكلة:", error.message);
+        console.error("النص الخام المستلم:", rawTextResponse);
+        console.error("--------------------------");
 
+        // إرجاع رد خام آمن للواجهة بدلاً من جعل السيرفر يعطي Status 1 ويموت
         res.status(200).json({ 
             type: "raw_error", 
-            message: "حدث خطأ في معالجة البيانات، تم الانتقال للحالة الخام.",
+            message: "فشل السيرفر في هيكلة الـ JSON، تم تحويل البيانات للحالة الخام لتفادي الانهيار.",
             errorDetails: error.message,
-            rawText: rawTextResponse || "لم يتم استقبال أي نص، يرجى تفقّد مفتاح البيئة في ريندر."
+            rawText: rawTextResponse || "لم يتم استقبال نص من الذكاء الاصطناعي بنجاح، تحقق من إعداد الـ API Key الخاص بك."
         });
     }
 });

@@ -1,26 +1,13 @@
 {
-  "name": "ai-football-backend",
+  "name": "autonomous-ai-football",
   "version": "1.0.0",
-  "description": "خادم منصة كرة القدم الذكية المتصل بالذكاء الاصطناعي والمجهز لمنصة ريندر",
+  "description": "خادم مستقل ومجاني بالكامل لخدمات كرة القدم الذكية",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node server.js"
   },
-  "keywords": [
-    "node",
-    "express",
-    "ai",
-    "football",
-    "render"
-  ],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
   }
 }

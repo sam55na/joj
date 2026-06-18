@@ -727,7 +727,6 @@
             font-weight: bold;
         }
 
-        /* ============ التذييل ============ */
         .app-footer {
             background: linear-gradient(135deg, var(--primary-blue), #0d47a1);
             color: var(--primary-white);
@@ -933,7 +932,7 @@
                         <span><span class="stat-label">📊 الطلبات:</span> <span class="stat-value" id="requestCount">0</span></span>
                         <span><span class="stat-label">✅ الناجحة:</span> <span class="stat-value" id="successCount">0</span></span>
                         <span><span class="stat-label">❌ الفاشلة:</span> <span class="stat-value" id="failCount">0</span></span>
-                        <span><span class="stat-label">📋 المباريات:</span> <span class="stat-value" id="matchCount">0</span></span>
+                        <span><span class="stat-label">⚽ مباريات كرة القدم:</span> <span class="stat-value" id="matchCount">0</span></span>
                     </div>
                     <div class="debug-container" id="debugLog">
                         <div class="log-entry info">
@@ -955,7 +954,7 @@
 
         <footer class="app-footer">
             <p>© 2026 Football Pro Hub - جميع الحقوق محفوظة</p>
-            <p>📊 بيانات حقيقية من TheSportsDB | جميع المباريات</p>
+            <p>⚽ مباريات كرة القدم فقط من TheSportsDB</p>
         </footer>
     </div>
 
@@ -1035,6 +1034,12 @@
 
         // ============ جلب المباريات ============
 
+        function isSoccerMatch(event) {
+            // التحقق من أن الرياضة هي كرة قدم
+            const sport = event.strSport || '';
+            return sport.toLowerCase() === 'soccer';
+        }
+
         async function fetchMatchesForDate(dateStr) {
             try {
                 const url = `${BASE_URL}/eventsday.php?d=${dateStr}`;
@@ -1049,22 +1054,28 @@
                 }
 
                 const data = await response.json();
-                
-                // تخزين الرد الخام
                 rawResponseData = data;
+                
                 addDebugLog(`📦 استلام بيانات ${dateStr}`, 'info', { 
                     status: 'success',
                     totalEvents: data?.events?.length || 0,
                     keys: Object.keys(data)
                 });
 
-                // طباعة الرد الخام كامل في Debug
+                // طباعة الرد الخام
                 addDebugLog(`📄 الرد الخام من ${dateStr}`, 'raw', JSON.stringify(data, null, 2));
 
                 if (data && data.events && data.events.length > 0) {
-                    addDebugLog(`📊 ${dateStr}: ${data.events.length} مباراة`, 'info');
+                    // تصفية مباريات كرة القدم فقط
+                    const soccerEvents = data.events.filter(event => isSoccerMatch(event));
+                    
+                    addDebugLog(`⚽ ${dateStr}: ${data.events.length} مباراة إجمالاً, ${soccerEvents.length} مباراة كرة قدم`, 'info');
 
-                    const events = data.events.map(event => ({
+                    // عرض الرياضات الموجودة
+                    const sports = [...new Set(data.events.map(e => e.strSport || 'غير معروف'))];
+                    addDebugLog(`🏅 الرياضات الموجودة: ${sports.join(', ')}`, 'info');
+
+                    const events = soccerEvents.map(event => ({
                         id: event.idEvent || Date.now() + Math.random(),
                         homeTeam: event.strHomeTeam || 'غير معروف',
                         awayTeam: event.strAwayTeam || 'غير معروف',
@@ -1081,13 +1092,15 @@
                         venue: event.strVenue || 'غير معروف',
                         round: event.strRound || '',
                         season: event.strSeason || '',
-                        // حفظ البيانات الخام للتحقق
+                        sport: event.strSport || 'Soccer',
                         raw: event
                     }));
 
-                    // عرض أسماء البطولات الموجودة
-                    const leagues = [...new Set(events.map(e => e.competition))];
-                    addDebugLog(`🏆 البطولات الموجودة: ${leagues.join(', ')}`, 'success');
+                    // عرض البطولات الموجودة
+                    if (events.length > 0) {
+                        const leagues = [...new Set(events.map(e => e.competition))];
+                        addDebugLog(`🏆 البطولات الموجودة: ${leagues.join(', ')}`, 'success');
+                    }
 
                     return events;
                 }
@@ -1131,8 +1144,8 @@
                 document.getElementById('matchCount').textContent = allMatches.length;
 
                 if (allMatches.length === 0) {
-                    addDebugLog(`⚠️ لا توجد مباريات`, 'warning');
-                    document.getElementById('dataSource').textContent = '⚠️ لا توجد مباريات';
+                    addDebugLog(`⚠️ لا توجد مباريات كرة قدم`, 'warning');
+                    document.getElementById('dataSource').textContent = '⚠️ لا توجد مباريات كرة قدم';
                     document.getElementById('dataSource').className = 'source-badge error';
                     renderToday([]);
                     renderTomorrow([]);
@@ -1142,14 +1155,14 @@
 
                 successCount++;
                 document.getElementById('successCount').textContent = successCount;
-                document.getElementById('dataSource').textContent = `✅ TheSportsDB (${allMatches.length})`;
+                document.getElementById('dataSource').textContent = `✅ TheSportsDB (${allMatches.length} مباراة كرة قدم)`;
                 document.getElementById('dataSource').className = 'source-badge success';
 
                 renderToday(todayMatches);
                 renderTomorrow(tomorrowMatches);
                 populateCompetitions(allMatches);
 
-                addDebugLog(`✅ تم تحميل ${allMatches.length} مباراة`, 'success');
+                addDebugLog(`✅ تم تحميل ${allMatches.length} مباراة كرة قدم`, 'success');
 
             } catch (error) {
                 addDebugLog(`❌ فشل التحميل: ${error.message}`, 'error');
@@ -1197,7 +1210,7 @@
 
         function renderMatchesGrouped(matches, dayLabel) {
             if (!matches || matches.length === 0) {
-                return `<div class="empty-state">❌ لا توجد مباريات ${dayLabel}</div>`;
+                return `<div class="empty-state">⚽ لا توجد مباريات كرة قدم ${dayLabel}</div>`;
             }
 
             const sortedMatches = [...matches].sort((a, b) => {
@@ -1575,7 +1588,7 @@
                 if (matches.length === 0) matches = allMatches;
 
                 if (matches.length === 0) {
-                    container.innerHTML = `<div class="empty-state">❌ لا توجد مباريات لعرض التوقعات</div>`;
+                    container.innerHTML = `<div class="empty-state">⚽ لا توجد مباريات كرة قدم لعرض التوقعات</div>`;
                     return;
                 }
 
@@ -1665,7 +1678,7 @@
 
         async function initializeApp() {
             addDebugLog(`🚀 تهيئة التطبيق...`, 'info');
-            addDebugLog(`📋 جلب جميع المباريات من TheSportsDB`, 'info');
+            addDebugLog(`⚽ جلب مباريات كرة القدم فقط من TheSportsDB`, 'info');
             await loadAllMatches();
 
             setInterval(() => {

@@ -19,7 +19,6 @@
             --debug-text: #00ff88;
             --success-color: #00c853;
             --gold: #ffd700;
-            --orange: #ff6f00;
         }
 
         * {
@@ -41,7 +40,6 @@
             min-height: 100vh;
         }
 
-        /* ============ الرأس ============ */
         .app-header {
             background: linear-gradient(135deg, var(--primary-blue) 0%, #0d47a1 100%);
             color: var(--primary-white);
@@ -111,7 +109,6 @@
             color: var(--debug-bg);
         }
 
-        /* ============ المحتوى الرئيسي ============ */
         .main-content {
             display: flex;
             flex: 1;
@@ -122,7 +119,6 @@
             padding: 2rem;
         }
 
-        /* ============ الشريط الجانبي ============ */
         .sidebar {
             width: 280px;
             background: linear-gradient(135deg, var(--light-gray) 0%, #e8eaf6 100%);
@@ -208,7 +204,6 @@
             background: linear-gradient(135deg, var(--primary-red), #b71c1c);
         }
 
-        /* ============ منطقة المحتوى ============ */
         .content-area {
             flex: 1;
             min-width: 0;
@@ -222,7 +217,6 @@
             border-bottom: 2px solid var(--gold);
         }
 
-        /* ============ بطاقات المباريات ============ */
         .day-section {
             margin-bottom: 2.5rem;
         }
@@ -318,11 +312,6 @@
             border-color: var(--primary-red);
             background: linear-gradient(135deg, rgba(229, 57, 53, 0.05), rgba(26, 35, 126, 0.05));
             animation: glow 2s infinite;
-        }
-
-        .match-card.worldcup {
-            border-color: var(--gold);
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(26, 35, 126, 0.05));
         }
 
         @keyframes glow {
@@ -643,17 +632,18 @@
             padding: 1.5rem;
             border-radius: 12px;
             font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            max-height: 500px;
+            font-size: 0.8rem;
+            max-height: 600px;
             overflow-y: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
             border: 2px solid var(--debug-text);
+            line-height: 1.4;
         }
 
         .debug-container .log-entry {
-            padding: 0.25rem 0;
-            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+            padding: 0.2rem 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.05);
         }
 
         .debug-container .log-entry.error {
@@ -668,10 +658,23 @@
         .debug-container .log-entry.info {
             color: #44aaff;
         }
+        .debug-container .log-entry.raw {
+            color: #ff66ff;
+        }
         .debug-container .log-entry .timestamp {
             color: #888;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             margin-left: 0.5rem;
+        }
+        .debug-container .log-entry .json-data {
+            color: #88ddff;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.5rem;
+            margin: 0.2rem 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
         .debug-controls {
@@ -696,6 +699,10 @@
         }
         .debug-btn.export {
             background: #44aaff;
+            color: white;
+        }
+        .debug-btn.raw {
+            background: #ff66ff;
             color: white;
         }
 
@@ -735,7 +742,6 @@
             font-size: 0.9rem;
         }
 
-        /* ============ عام ============ */
         .hidden {
             display: none;
         }
@@ -773,7 +779,6 @@
             color: var(--text-secondary);
         }
 
-        /* ============ استجابة ============ */
         @media (max-width: 1024px) {
             .main-content {
                 flex-direction: column;
@@ -827,6 +832,10 @@
                 flex-wrap: wrap;
                 padding: 0.8rem 1rem;
             }
+            .debug-container {
+                font-size: 0.7rem;
+                max-height: 400px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -859,7 +868,6 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- الرأس -->
         <header class="app-header">
             <div class="header-content">
                 <div class="logo">
@@ -876,18 +884,15 @@
         </header>
 
         <div class="main-content">
-            <!-- الشريط الجانبي -->
             <aside class="sidebar">
                 <div class="filter-section">
                     <h3>🔍 التصفية</h3>
-
                     <div class="filter-group">
                         <label>🏆 البطولة:</label>
                         <select id="competitionSelect" class="select-input" onchange="filterMatches()">
                             <option value="">جميع البطولات</option>
                         </select>
                     </div>
-
                     <div class="filter-group">
                         <label>📌 حالة المباراة:</label>
                         <select id="statusSelect" class="select-input" onchange="filterMatches()">
@@ -897,41 +902,32 @@
                             <option value="FINISHED">✅ منتهية</option>
                         </select>
                     </div>
-
                     <button class="refresh-btn" onclick="loadAllMatches()">🔄 تحديث البيانات</button>
-
                     <div style="margin-top: 1rem; text-align: center; font-size: 0.75rem;">
                         📡 المصدر: <span id="dataSource" class="source-badge">جاري التحميل...</span>
                     </div>
                 </div>
             </aside>
 
-            <!-- المحتوى الرئيسي -->
             <main class="content-area">
-                <!-- تبويب اليوم -->
                 <div id="todayTab">
                     <h2>📋 مباريات اليوم</h2>
                     <div id="todayContainer"></div>
                 </div>
-
-                <!-- تبويب الغد -->
                 <div id="tomorrowTab" class="hidden">
                     <h2>📅 مباريات الغد</h2>
                     <div id="tomorrowContainer"></div>
                 </div>
-
-                <!-- تبويب التوقعات -->
                 <div id="predictionsTab" class="hidden">
                     <h2>📊 التوقعات والإحصائيات</h2>
                     <div id="predictionsContainer"></div>
                 </div>
-
-                <!-- تبويب Debug -->
                 <div id="debugTab" class="hidden">
                     <h2>🐛 وحدة تصحيح الأخطاء</h2>
                     <div class="debug-controls">
                         <button class="debug-btn clear" onclick="clearDebugLog()">🗑️ مسح السجل</button>
                         <button class="debug-btn export" onclick="exportDebugLog()">📤 تصدير السجل</button>
+                        <button class="debug-btn raw" onclick="showRawResponse()">📄 عرض الرد الخام</button>
                     </div>
                     <div class="debug-stats">
                         <span><span class="stat-label">📊 الطلبات:</span> <span class="stat-value" id="requestCount">0</span></span>
@@ -949,35 +945,25 @@
             </main>
         </div>
 
-        <!-- نافذة الإحصائيات -->
         <div class="stats-modal" id="statsModal">
             <div class="stats-modal-content">
                 <button class="stats-modal-close" onclick="closeStats()">✕</button>
                 <h3 class="stats-modal-title" id="statsModalTitle">📊 إحصائيات المواجهات</h3>
-                <div id="statsModalBody">
-                    <div class="loading">⏳ جاري التحميل...</div>
-                </div>
+                <div id="statsModalBody"><div class="loading">⏳ جاري التحميل...</div></div>
             </div>
         </div>
 
-        <!-- التذييل -->
         <footer class="app-footer">
             <p>© 2026 Football Pro Hub - جميع الحقوق محفوظة</p>
-            <p>📊 بيانات حقيقية من TheSportsDB | جميع البطولات العالمية</p>
+            <p>📊 بيانات حقيقية من TheSportsDB | جميع المباريات</p>
         </footer>
     </div>
 
     <script>
-        /**
-         * ============================================================
-         *  🚀 Football Pro Hub - مباريات اليوم والغد
-         *  يعتمد على TheSportsDB API - يجلب جميع المباريات ثم يصفى
-         * ============================================================
-         */
-
         // ============ Debug Logger ============
         const debugLog = [];
         let requestCount = 0, successCount = 0, failCount = 0;
+        let rawResponseData = null;
 
         function addDebugLog(message, type = 'info', data = null) {
             const timestamp = new Date().toLocaleTimeString();
@@ -987,7 +973,11 @@
             if (container) {
                 const div = document.createElement('div');
                 div.className = `log-entry ${type}`;
-                div.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+                let content = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+                if (data) {
+                    content += `<div class="json-data">${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}</div>`;
+                }
+                div.innerHTML = content;
                 container.appendChild(div);
                 container.scrollTop = container.scrollHeight;
             }
@@ -1009,6 +999,7 @@
                 `;
             }
             debugLog.length = 0;
+            rawResponseData = null;
         }
 
         function exportDebugLog() {
@@ -1025,172 +1016,55 @@
             addDebugLog('📤 تم تصدير السجل', 'success');
         }
 
+        function showRawResponse() {
+            if (rawResponseData) {
+                addDebugLog('📄 عرض الرد الخام من API', 'raw', rawResponseData);
+            } else {
+                addDebugLog('⚠️ لا يوجد رد خام مخزن', 'warning');
+            }
+        }
+
         // ============ TheSportsDB API ============
         const BASE_URL = 'https://www.thesportsdb.com/api/v1/json/3';
-
-        // ============ البطولات الكبرى العالمية (جميع الأسماء المحتملة) ============
-        const MAJOR_LEAGUES = {
-            // كأس العالم - جميع الأسماء المحتملة
-            'FIFA World Cup': { priority: 0, icon: '🏆' },
-            'World Cup': { priority: 0, icon: '🏆' },
-            'World Cup 2026': { priority: 0, icon: '🏆' },
-            'FIFA World Cup 2026': { priority: 0, icon: '🏆' },
-            
-            // دوري أبطال أوروبا
-            'UEFA Champions League': { priority: 1, icon: '🏆' },
-            'Champions League': { priority: 1, icon: '🏆' },
-            
-            // الدوري الأوروبي
-            'UEFA Europa League': { priority: 2, icon: '🏆' },
-            'Europa League': { priority: 2, icon: '🏆' },
-            
-            // دوري المؤتمر الأوروبي
-            'UEFA Europa Conference League': { priority: 3, icon: '🏆' },
-            'Europa Conference League': { priority: 3, icon: '🏆' },
-            
-            // كوبا ليبرتادوريس
-            'Copa Libertadores': { priority: 4, icon: '🏆' },
-            'Libertadores': { priority: 4, icon: '🏆' },
-            
-            // كوبا سودأمريكانا
-            'Copa Sudamericana': { priority: 5, icon: '🏆' },
-            'Sudamericana': { priority: 5, icon: '🏆' },
-            
-            // دوري أبطال أفريقيا
-            'CAF Champions League': { priority: 6, icon: '🏆' },
-            'African Champions League': { priority: 6, icon: '🏆' },
-            
-            // دوري أبطال آسيا
-            'AFC Champions League': { priority: 7, icon: '🏆' },
-            'Asian Champions League': { priority: 7, icon: '🏆' },
-            
-            // الدوريات الخمس الكبرى
-            'English Premier League': { priority: 10, icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-            'Premier League': { priority: 10, icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-            'La Liga': { priority: 11, icon: '🇪🇸' },
-            'LaLiga': { priority: 11, icon: '🇪🇸' },
-            'Bundesliga': { priority: 12, icon: '🇩🇪' },
-            'Serie A': { priority: 13, icon: '🇮🇹' },
-            'Ligue 1': { priority: 14, icon: '🇫🇷' },
-            
-            // بطولات أخرى مهمة
-            'Primeira Liga': { priority: 15, icon: '🇵🇹' },
-            'Eredivisie': { priority: 16, icon: '🇳🇱' },
-            'Major League Soccer': { priority: 17, icon: '🇺🇸' },
-            'MLS': { priority: 17, icon: '🇺🇸' },
-            'Saudi Pro League': { priority: 18, icon: '🇸🇦' },
-            'Egyptian Premier League': { priority: 19, icon: '🇪🇬' },
-            'Brazilian Serie A': { priority: 20, icon: '🇧🇷' },
-            'Argentine Primera Division': { priority: 21, icon: '🇦🇷' },
-            'Mexican Liga MX': { priority: 22, icon: '🇲🇽' },
-        };
-
-        // الكلمات المفتاحية للبحث في أسماء البطولات
-        const MAJOR_KEYWORDS = [
-            'world cup', 'worldcup', 'champions league', 'europa league', 
-            'premier league', 'la liga', 'bundesliga', 'serie a', 'ligue 1',
-            'libertadores', 'sudamericana', 'primeira', 'eredivisie', 'mls',
-            'saudi pro league', 'egyptian premier', 'brazilian serie a',
-            'argentine primera', 'liga mx', 'conference league', 'african champions',
-            'asian champions', 'copa libertadores', 'copa sudamericana'
-        ];
 
         // ============ الحالة العامة ============
         let todayMatches = [];
         let tomorrowMatches = [];
         let allMatches = [];
-        let filteredToday = [];
-        let filteredTomorrow = [];
         let isFetching = false;
-
-        // ============ دوال التحقق من البطولات ============
-
-        function isMajorLeague(leagueName) {
-            if (!leagueName) return false;
-            
-            const lower = leagueName.toLowerCase();
-            
-            // التحقق المباشر
-            if (MAJOR_LEAGUES[leagueName]) return true;
-            
-            // التحقق من الكلمات المفتاحية
-            for (const keyword of MAJOR_KEYWORDS) {
-                if (lower.includes(keyword)) {
-                    return true;
-                }
-            }
-            
-            // التحقق من الأسماء المستعارة
-            for (const [key, value] of Object.entries(MAJOR_LEAGUES)) {
-                if (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) {
-                    return true;
-                }
-            }
-            
-            return false;
-        }
-
-        function getLeaguePriority(leagueName) {
-            if (!leagueName) return 999;
-            
-            if (MAJOR_LEAGUES[leagueName]) {
-                return MAJOR_LEAGUES[leagueName].priority;
-            }
-            
-            const lower = leagueName.toLowerCase();
-            for (const [key, value] of Object.entries(MAJOR_LEAGUES)) {
-                if (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) {
-                    return value.priority;
-                }
-            }
-            
-            return 999;
-        }
-
-        function getLeagueIcon(leagueName) {
-            if (!leagueName) return '⚽';
-            
-            if (MAJOR_LEAGUES[leagueName]) {
-                return MAJOR_LEAGUES[leagueName].icon;
-            }
-            
-            const lower = leagueName.toLowerCase();
-            for (const [key, value] of Object.entries(MAJOR_LEAGUES)) {
-                if (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) {
-                    return value.icon;
-                }
-            }
-            
-            return '⚽';
-        }
-
-        function isWorldCup(leagueName) {
-            if (!leagueName) return false;
-            const lower = leagueName.toLowerCase();
-            return lower.includes('world cup') || lower.includes('worldcup');
-        }
 
         // ============ جلب المباريات ============
 
         async function fetchMatchesForDate(dateStr) {
             try {
                 const url = `${BASE_URL}/eventsday.php?d=${dateStr}`;
-                addDebugLog(`📡 جلب مباريات ${dateStr}`, 'info');
-                
+                addDebugLog(`📡 جلب مباريات ${dateStr}`, 'info', { url });
+
                 const response = await fetch(url);
                 requestCount++;
                 document.getElementById('requestCount').textContent = requestCount;
 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
 
                 const data = await response.json();
-                addDebugLog(`📦 استلام بيانات ${dateStr}`, 'info');
+                
+                // تخزين الرد الخام
+                rawResponseData = data;
+                addDebugLog(`📦 استلام بيانات ${dateStr}`, 'info', { 
+                    status: 'success',
+                    totalEvents: data?.events?.length || 0,
+                    keys: Object.keys(data)
+                });
+
+                // طباعة الرد الخام كامل في Debug
+                addDebugLog(`📄 الرد الخام من ${dateStr}`, 'raw', JSON.stringify(data, null, 2));
 
                 if (data && data.events && data.events.length > 0) {
-                    addDebugLog(`📊 ${dateStr}: ${data.events.length} مباراة إجمالاً`, 'info');
-                    
-                    // جلب جميع المباريات ثم تصفية الكبرى
-                    const allEvents = data.events.map(event => ({
+                    addDebugLog(`📊 ${dateStr}: ${data.events.length} مباراة`, 'info');
+
+                    const events = data.events.map(event => ({
                         id: event.idEvent || Date.now() + Math.random(),
                         homeTeam: event.strHomeTeam || 'غير معروف',
                         awayTeam: event.strAwayTeam || 'غير معروف',
@@ -1206,34 +1080,24 @@
                         competition: event.strLeague || 'غير معروف',
                         venue: event.strVenue || 'غير معروف',
                         round: event.strRound || '',
-                        season: event.strSeason || ''
+                        season: event.strSeason || '',
+                        // حفظ البيانات الخام للتحقق
+                        raw: event
                     }));
 
-                    // تصفية البطولات الكبرى
-                    const majorEvents = allEvents.filter(event => {
-                        return isMajorLeague(event.competition);
-                    });
+                    // عرض أسماء البطولات الموجودة
+                    const leagues = [...new Set(events.map(e => e.competition))];
+                    addDebugLog(`🏆 البطولات الموجودة: ${leagues.join(', ')}`, 'success');
 
-                    // عرض أسماء البطولات التي تم العثور عليها
-                    const foundLeagues = [...new Set(majorEvents.map(e => e.competition))];
-                    if (foundLeagues.length > 0) {
-                        addDebugLog(`🏆 ${dateStr}: البطولات الموجودة: ${foundLeagues.join(', ')}`, 'success');
-                    }
-
-                    addDebugLog(`📊 ${dateStr}: ${majorEvents.length} مباراة من البطولات الكبرى`, 'info');
-                    
-                    // عرض عينة من البيانات للتحقق
-                    if (majorEvents.length > 0) {
-                        const sample = majorEvents[0];
-                        addDebugLog(`📝 مثال: ${sample.homeTeam} vs ${sample.awayTeam} (${sample.competition})`, 'info');
-                    }
-
-                    return majorEvents;
+                    return events;
                 }
 
+                addDebugLog(`⚠️ ${dateStr}: لا توجد مباريات`, 'warning');
                 return [];
             } catch (error) {
                 addDebugLog(`❌ فشل جلب ${dateStr}: ${error.message}`, 'error');
+                failCount++;
+                document.getElementById('failCount').textContent = failCount;
                 return [];
             }
         }
@@ -1252,7 +1116,9 @@
                 const todayStr = formatDate(today);
                 const tomorrowStr = formatDate(tomorrow);
 
-                // جلب مباريات اليوم والغد بالتوازي
+                addDebugLog(`📅 جلب اليوم: ${todayStr}`, 'info');
+                addDebugLog(`📅 جلب الغد: ${tomorrowStr}`, 'info');
+
                 const [todayData, tomorrowData] = await Promise.all([
                     fetchMatchesForDate(todayStr),
                     fetchMatchesForDate(tomorrowStr)
@@ -1262,17 +1128,10 @@
                 tomorrowMatches = tomorrowData;
                 allMatches = [...todayMatches, ...tomorrowMatches];
 
-                // ترتيب المباريات حسب البطولات
-                allMatches.sort((a, b) => {
-                    const priorityA = getLeaguePriority(a.competition);
-                    const priorityB = getLeaguePriority(b.competition);
-                    return priorityA - priorityB;
-                });
-
                 document.getElementById('matchCount').textContent = allMatches.length;
 
                 if (allMatches.length === 0) {
-                    addDebugLog(`⚠️ لا توجد مباريات في البطولات الكبرى`, 'warning');
+                    addDebugLog(`⚠️ لا توجد مباريات`, 'warning');
                     document.getElementById('dataSource').textContent = '⚠️ لا توجد مباريات';
                     document.getElementById('dataSource').className = 'source-badge error';
                     renderToday([]);
@@ -1286,18 +1145,16 @@
                 document.getElementById('dataSource').textContent = `✅ TheSportsDB (${allMatches.length})`;
                 document.getElementById('dataSource').className = 'source-badge success';
 
-                // عرض المباريات
                 renderToday(todayMatches);
                 renderTomorrow(tomorrowMatches);
                 populateCompetitions(allMatches);
 
-                addDebugLog(`✅ تم تحميل ${allMatches.length} مباراة (اليوم: ${todayMatches.length}, الغد: ${tomorrowMatches.length})`, 'success');
+                addDebugLog(`✅ تم تحميل ${allMatches.length} مباراة`, 'success');
 
             } catch (error) {
                 addDebugLog(`❌ فشل التحميل: ${error.message}`, 'error');
                 document.getElementById('dataSource').textContent = '❌ فشل';
                 document.getElementById('dataSource').className = 'source-badge error';
-                
                 renderToday([]);
                 renderTomorrow([]);
             }
@@ -1340,15 +1197,9 @@
 
         function renderMatchesGrouped(matches, dayLabel) {
             if (!matches || matches.length === 0) {
-                return `
-                    <div class="empty-state">
-                        ❌ لا توجد مباريات في البطولات الكبرى ${dayLabel}<br>
-                        <small>البطولات: كأس العالم، دوري أبطال أوروبا، الدوري الأوروبي، الدوريات الخمس الكبرى</small>
-                    </div>
-                `;
+                return `<div class="empty-state">❌ لا توجد مباريات ${dayLabel}</div>`;
             }
 
-            // ترتيب المباريات: المباشرة أولاً، ثم القادمة حسب الوقت، ثم المنتهية
             const sortedMatches = [...matches].sort((a, b) => {
                 const isLiveA = a.status === 'LIVE' || a.status === 'In Progress';
                 const isLiveB = b.status === 'LIVE' || b.status === 'In Progress';
@@ -1362,7 +1213,6 @@
                 return a.time.localeCompare(b.time);
             });
 
-            // تجميع حسب البطولة
             const grouped = {};
             sortedMatches.forEach(match => {
                 const league = match.competition || 'بطولة غير معروفة';
@@ -1370,12 +1220,7 @@
                 grouped[league].push(match);
             });
 
-            // ترتيب البطولات حسب الأهمية
-            const sortedLeagues = Object.keys(grouped).sort((a, b) => {
-                const priorityA = getLeaguePriority(a);
-                const priorityB = getLeaguePriority(b);
-                return priorityA - priorityB;
-            });
+            const sortedLeagues = Object.keys(grouped);
 
             let html = `
                 <div class="day-section">
@@ -1391,15 +1236,12 @@
                 const liveCount = matchesInLeague.filter(m =>
                     m.status === 'LIVE' || m.status === 'In Progress'
                 ).length;
-                const icon = getLeagueIcon(league);
-                const isWC = isWorldCup(league);
 
                 html += `
-                    <div class="competition-section" style="${isWC ? 'border-right-color: var(--gold);' : ''}">
+                    <div class="competition-section">
                         <div class="competition-header">
-                            <h4>${icon} ${league}</h4>
+                            <h4>⚽ ${league}</h4>
                             ${liveCount > 0 ? `<span class="live-count">🔴 ${liveCount} مباشر</span>` : ''}
-                            ${isWC ? `<span style="background:var(--gold);color:var(--primary-blue);padding:0.2rem 0.8rem;border-radius:20px;font-size:0.7rem;font-weight:700;">🏆 كأس العالم</span>` : ''}
                             <span style="margin-right:auto;font-size:0.8rem;color:var(--text-secondary);">${matchesInLeague.length} مباراة</span>
                         </div>
                         <div class="matches-grid">
@@ -1422,7 +1264,6 @@
         function createMatchCard(match) {
             const isLive = match.status === 'LIVE' || match.status === 'In Progress';
             const isFinished = match.status === 'FINISHED' || match.status === 'Finished';
-            const isWC = isWorldCup(match.competition);
 
             const hasScore = match.homeScore !== null && match.awayScore !== null;
             const scoreDisplay = hasScore ?
@@ -1438,7 +1279,7 @@
             const timeDisplay = match.time ? `🕐 ${match.time}` : '';
 
             return `
-                <div class="match-card ${isLive ? 'live' : ''} ${isWC ? 'worldcup' : ''}">
+                <div class="match-card ${isLive ? 'live' : ''}">
                     <div class="match-header-card">
                         <span style="font-size:0.7rem;color:var(--text-secondary);">${match.round || ''}</span>
                         <span class="match-status ${statusClass}">${statusText}</span>
@@ -1478,17 +1319,10 @@
 
             select.innerHTML = '<option value="">🏆 جميع البطولات</option>';
 
-            const sortedComps = Array.from(competitions).sort((a, b) => {
-                const priorityA = getLeaguePriority(a);
-                const priorityB = getLeaguePriority(b);
-                return priorityA - priorityB;
-            });
-
-            sortedComps.forEach(name => {
+            Array.from(competitions).sort().forEach(name => {
                 const option = document.createElement('option');
                 option.value = name;
-                const icon = getLeagueIcon(name);
-                option.textContent = `${icon} ${name}`;
+                option.textContent = `⚽ ${name}`;
                 select.appendChild(option);
             });
 
@@ -1505,8 +1339,8 @@
                 return matchesCompetition && matchesStatus;
             };
 
-            filteredToday = todayMatches.filter(filterFn);
-            filteredTomorrow = tomorrowMatches.filter(filterFn);
+            const filteredToday = todayMatches.filter(filterFn);
+            const filteredTomorrow = tomorrowMatches.filter(filterFn);
 
             renderToday(filteredToday);
             renderTomorrow(filteredTomorrow);
@@ -1555,9 +1389,7 @@
                     const h2hUrl = `${BASE_URL}/eventsh2h.php?t1=${encodeURIComponent(homeTeamName)}&t2=${encodeURIComponent(awayTeamName)}`;
                     const h2hResponse = await fetch(h2hUrl);
                     h2hData = await h2hResponse.json();
-                } catch (e) {
-                    addDebugLog(`⚠️ فشل جلب المواجهات: ${e.message}`, 'warning');
-                }
+                } catch (e) {}
 
                 const [homeInfo, awayInfo] = await Promise.all([
                     fetchTeamInfo(homeTeamName),
@@ -1569,12 +1401,7 @@
                 body.innerHTML = renderStatsHTML(homeTeamName, awayTeamName, h2hData, homeInfo, awayInfo, prediction);
 
             } catch (error) {
-                body.innerHTML = `
-                    <div class="error-message">
-                        ⚠️ ${error.message}
-                    </div>
-                `;
-                addDebugLog(`❌ فشل الإحصائيات: ${error.message}`, 'error');
+                body.innerHTML = `<div class="error-message">⚠️ ${error.message}</div>`;
             }
         }
 
@@ -1583,7 +1410,6 @@
                 const url = `${BASE_URL}/searchteams.php?t=${encodeURIComponent(teamName)}`;
                 const response = await fetch(url);
                 const data = await response.json();
-
                 if (data && data.teams && data.teams.length > 0) {
                     const t = data.teams[0];
                     return {
@@ -1610,32 +1436,21 @@
                 h2hData.events.forEach(event => {
                     const hScore = parseInt(event.intHomeScore) || 0;
                     const aScore = parseInt(event.intAwayScore) || 0;
-                    
                     if (hScore > aScore) homeWins++;
                     else if (aScore > hScore) awayWins++;
                     else draws++;
-                    
                     homeGoals += hScore;
                     awayGoals += aScore;
                 });
             }
 
             const totalMatches = homeWins + awayWins + draws;
-            
             let homeProb = 33, awayProb = 33, drawProb = 34;
-            
+
             if (totalMatches > 0) {
                 homeProb = Math.round((homeWins / totalMatches) * 100);
                 awayProb = Math.round((awayWins / totalMatches) * 100);
                 drawProb = Math.round((draws / totalMatches) * 100);
-            }
-
-            if (homeGoals > awayGoals && totalMatches > 0) {
-                homeProb += 5;
-                awayProb -= 3;
-            } else if (awayGoals > homeGoals && totalMatches > 0) {
-                awayProb += 5;
-                homeProb -= 3;
             }
 
             const total = homeProb + awayProb + drawProb;
@@ -1644,9 +1459,7 @@
                 drawProb += diff;
             }
 
-            let prediction = '';
-            let confidence = '';
-            
+            let prediction = '', confidence = '';
             if (homeProb > awayProb && homeProb > drawProb) {
                 prediction = `🏠 فوز ${homeName}`;
                 confidence = homeProb > 60 ? 'عالي' : homeProb > 45 ? 'متوسط' : 'منخفض';
@@ -1667,20 +1480,7 @@
                 }
             }
 
-            return {
-                homeProb,
-                awayProb,
-                drawProb,
-                prediction,
-                confidence,
-                scorePrediction,
-                totalMatches,
-                homeWins,
-                awayWins,
-                draws,
-                homeGoals,
-                awayGoals
-            };
+            return { homeProb, awayProb, drawProb, prediction, confidence, scorePrediction, totalMatches, homeWins, awayWins, draws, homeGoals, awayGoals };
         }
 
         function renderStatsHTML(homeName, awayName, h2hData, homeInfo, awayInfo, prediction) {
@@ -1715,26 +1515,12 @@
                     <div class="prediction-box">
                         <h4>📊 توقع المباراة</h4>
                         <div style="display:flex;justify-content:space-around;margin:0.3rem 0;">
-                            <div>
-                                <div style="font-size:0.7rem;color:var(--primary-blue);">${homeName}</div>
-                                <div style="font-size:1.3rem;font-weight:700;color:var(--primary-blue);">${prediction.homeProb}%</div>
-                            </div>
-                            <div>
-                                <div style="font-size:0.7rem;color:var(--primary-blue);">تعادل</div>
-                                <div style="font-size:1.3rem;font-weight:700;color:var(--gold);">${prediction.drawProb}%</div>
-                            </div>
-                            <div>
-                                <div style="font-size:0.7rem;color:var(--primary-blue);">${awayName}</div>
-                                <div style="font-size:1.3rem;font-weight:700;color:var(--primary-blue);">${prediction.awayProb}%</div>
-                            </div>
+                            <div><div style="font-size:0.7rem;">${homeName}</div><div style="font-size:1.3rem;font-weight:700;">${prediction.homeProb}%</div></div>
+                            <div><div style="font-size:0.7rem;">تعادل</div><div style="font-size:1.3rem;font-weight:700;color:var(--gold);">${prediction.drawProb}%</div></div>
+                            <div><div style="font-size:0.7rem;">${awayName}</div><div style="font-size:1.3rem;font-weight:700;">${prediction.awayProb}%</div></div>
                         </div>
-                        <div class="prediction-text">
-                            🎯 ${prediction.prediction}
-                            ${prediction.scorePrediction ? ` | ${prediction.scorePrediction}` : ''}
-                        </div>
-                        <div style="font-size:0.8rem;color:var(--primary-blue);">
-                            الثقة: ${prediction.confidence} | ${prediction.totalMatches} مواجهة سابقة
-                        </div>
+                        <div class="prediction-text">🎯 ${prediction.prediction} ${prediction.scorePrediction ? `| ${prediction.scorePrediction}` : ''}</div>
+                        <div style="font-size:0.8rem;">الثقة: ${prediction.confidence} | ${prediction.totalMatches} مواجهة سابقة</div>
                     </div>
                 `;
             }
@@ -1762,26 +1548,11 @@
                         </div>
                     `;
                 });
-
-                if (prediction && prediction.totalMatches > 0) {
-                    html += `
-                        <div style="margin-top:0.5rem;padding:0.5rem;background:white;border-radius:6px;text-align:center;font-size:0.85rem;">
-                            <span style="margin:0 0.5rem;">🏠 ${homeName}: ${prediction.homeWins} فوز</span>
-                            <span style="margin:0 0.5rem;">🤝 تعادل: ${prediction.draws}</span>
-                            <span style="margin:0 0.5rem;">✈️ ${awayName}: ${prediction.awayWins} فوز</span>
-                            <span style="margin:0 0.5rem;">⚽ ${prediction.homeGoals + prediction.awayGoals} هدف</span>
-                        </div>
-                    `;
-                }
             } else {
                 html += `<div class="info-text">لا توجد مواجهات سابقة مسجلة</div>`;
             }
 
-            html += `
-                </div>
-            `;
-
-            html += '</div>';
+            html += `</div></div>`;
             return html;
         }
 
@@ -1798,20 +1569,13 @@
         async function loadPredictions() {
             const container = document.getElementById('predictionsContainer');
             container.innerHTML = '<div class="loading">⏳ جاري تحميل التوقعات...</div>';
-            addDebugLog(`🔄 بدء تحميل التوقعات...`, 'info');
 
             try {
                 let matches = todayMatches;
-                if (matches.length === 0) {
-                    matches = allMatches;
-                }
+                if (matches.length === 0) matches = allMatches;
 
                 if (matches.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            ❌ لا توجد مباريات لعرض التوقعات
-                        </div>
-                    `;
+                    container.innerHTML = `<div class="empty-state">❌ لا توجد مباريات لعرض التوقعات</div>`;
                     return;
                 }
 
@@ -1820,7 +1584,7 @@
                 for (const match of matches.slice(0, 15)) {
                     const homeName = match.homeTeam;
                     const awayName = match.awayTeam;
-                    
+
                     let h2hData = null;
                     try {
                         const h2hUrl = `${BASE_URL}/eventsh2h.php?t1=${encodeURIComponent(homeName)}&t2=${encodeURIComponent(awayName)}`;
@@ -1859,12 +1623,8 @@
                                     <span>🤝 ${prediction.drawProb}%</span>
                                     <span>✈️ ${prediction.awayProb}%</span>
                                 </div>
-                                <div style="font-weight:700;font-size:0.9rem;">
-                                    🎯 ${prediction.prediction}
-                                </div>
-                                <div style="font-size:0.7rem;color:var(--primary-blue);">
-                                    ثقة: ${prediction.confidence} | 📅 ${dateStr}
-                                </div>
+                                <div style="font-weight:700;font-size:0.9rem;">🎯 ${prediction.prediction}</div>
+                                <div style="font-size:0.7rem;">ثقة: ${prediction.confidence} | 📅 ${dateStr}</div>
                             </div>
                         </div>
                     `;
@@ -1872,15 +1632,9 @@
 
                 html += '</div>';
                 container.innerHTML = html;
-                addDebugLog(`✅ تم عرض ${Math.min(matches.length, 15)} توقع`, 'success');
 
             } catch (error) {
-                container.innerHTML = `
-                    <div class="error-message">
-                        ⚠️ ${error.message}
-                    </div>
-                `;
-                addDebugLog(`❌ فشل التوقعات: ${error.message}`, 'error');
+                container.innerHTML = `<div class="error-message">⚠️ ${error.message}</div>`;
             }
         }
 
@@ -1911,7 +1665,7 @@
 
         async function initializeApp() {
             addDebugLog(`🚀 تهيئة التطبيق...`, 'info');
-            addDebugLog(`📋 جلب جميع المباريات ثم تصفية البطولات الكبرى`, 'info');
+            addDebugLog(`📋 جلب جميع المباريات من TheSportsDB`, 'info');
             await loadAllMatches();
 
             setInterval(() => {

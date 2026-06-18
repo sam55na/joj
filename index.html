@@ -15,6 +15,8 @@
             --text-secondary: #666666;
             --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+            --debug-bg: #1a1a2e;
+            --debug-text: #00ff88;
         }
 
         /* ============ إعادة تعيين عام ============ */
@@ -109,6 +111,16 @@
             background-color: var(--primary-red);
             border-color: var(--primary-white);
             box-shadow: 0 4px 12px rgba(255, 51, 51, 0.3);
+        }
+
+        .tab-btn.debug-tab {
+            background-color: rgba(0, 255, 136, 0.2);
+            border-color: #00ff88;
+        }
+
+        .tab-btn.debug-tab.active {
+            background-color: #00ff88;
+            color: #1a1a2e;
         }
 
         /* ============ المحتوى الرئيسي ============ */
@@ -384,6 +396,105 @@
             font-weight: 500;
         }
 
+        /* ============ Debug Styles ============ */
+        .debug-container {
+            background-color: var(--debug-bg);
+            color: var(--debug-text);
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 2px solid #00ff88;
+        }
+
+        .debug-container .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .debug-container .log-entry.error {
+            color: #ff4444;
+        }
+
+        .debug-container .log-entry.success {
+            color: #44ff88;
+        }
+
+        .debug-container .log-entry.warning {
+            color: #ffaa44;
+        }
+
+        .debug-container .log-entry.info {
+            color: #44aaff;
+        }
+
+        .debug-container .log-entry .timestamp {
+            color: #888;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+
+        .debug-controls {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .debug-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .debug-btn.clear {
+            background-color: #ff4444;
+            color: white;
+        }
+
+        .debug-btn.clear:hover {
+            background-color: #cc0000;
+        }
+
+        .debug-btn.export {
+            background-color: #44aaff;
+            color: white;
+        }
+
+        .debug-btn.export:hover {
+            background-color: #0088cc;
+        }
+
+        .debug-stats {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background-color: rgba(0, 255, 136, 0.1);
+            border-radius: 4px;
+        }
+
+        .debug-stats span {
+            font-size: 0.8rem;
+        }
+
+        .debug-stats .stat-label {
+            color: #888;
+        }
+
+        .debug-stats .stat-value {
+            color: var(--debug-text);
+            font-weight: bold;
+        }
+
         /* ============ التذييل ============ */
         .app-footer {
             background: linear-gradient(135deg, var(--primary-blue) 0%, #0052A3 100%);
@@ -466,6 +577,11 @@
 
             .team-name {
                 font-size: 0.85rem;
+            }
+
+            .debug-container {
+                font-size: 0.7rem;
+                max-height: 400px;
             }
         }
 
@@ -571,6 +687,16 @@
             font-weight: 700;
             color: var(--primary-red);
         }
+
+        .source-badge {
+            display: inline-block;
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -583,9 +709,10 @@
                     <p>متابع المباريات الاحترافي</p>
                 </div>
                 <nav class="nav-tabs">
-                    <button class="tab-btn active" data-tab="matches">المباريات</button>
-                    <button class="tab-btn" data-tab="standings">الترتيب</button>
-                    <button class="tab-btn" data-tab="predictions">التوقعات</button>
+                    <button class="tab-btn active" data-tab="matches">📋 المباريات</button>
+                    <button class="tab-btn" data-tab="standings">🏆 الترتيب</button>
+                    <button class="tab-btn" data-tab="predictions">📊 التوقعات</button>
+                    <button class="tab-btn debug-tab" data-tab="debug">🐛 Debug</button>
                 </nav>
             </div>
         </header>
@@ -594,7 +721,7 @@
             <!-- الشريط الجانبي -->
             <aside class="sidebar">
                 <div class="filter-section">
-                    <h3>التصفية والبحث</h3>
+                    <h3>🔍 التصفية والبحث</h3>
 
                     <div class="filter-group">
                         <label>البحث عن فريق:</label>
@@ -602,25 +729,26 @@
                     </div>
 
                     <div class="filter-group">
-                        <label>البطولة:</label>
+                        <label>🏆 البطولة:</label>
                         <select id="competitionSelect" class="select-input" onchange="filterMatches()">
                             <option value="">جميع البطولات</option>
                         </select>
                     </div>
 
                     <div class="filter-group">
-                        <label>حالة المباراة:</label>
+                        <label>📌 حالة المباراة:</label>
                         <select id="statusSelect" class="select-input" onchange="filterMatches()">
                             <option value="">جميع المباريات</option>
-                            <option value="SCHEDULED">قادمة</option>
-                            <option value="LIVE">مباشر</option>
-                            <option value="FINISHED">منتهية</option>
+                            <option value="LIVE">🟢 مباشر</option>
+                            <option value="SCHEDULED">⏳ قادمة</option>
+                            <option value="FINISHED">✅ منتهية</option>
                         </select>
                     </div>
 
                     <button class="refresh-btn" onclick="loadMatches()">🔄 تحديث البيانات</button>
-                    <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-secondary); text-align: center;">
-                        المصدر: <span id="dataSource">جاري التحميل...</span>
+
+                    <div style="margin-top: 1rem; text-align: center; font-size: 0.75rem; color: var(--text-secondary);">
+                        📡 المصدر: <span id="dataSource" class="source-badge">جاري التحميل...</span>
                     </div>
                 </div>
             </aside>
@@ -629,20 +757,49 @@
             <main class="content-area">
                 <!-- تبويب المباريات -->
                 <div id="matchesTab">
-                    <h2>المباريات</h2>
+                    <h2>📋 المباريات</h2>
                     <div id="matchesContainer"></div>
                 </div>
 
                 <!-- تبويب الترتيب -->
                 <div id="standingsTab" class="hidden">
-                    <h2>جداول الترتيب</h2>
+                    <h2>🏆 جداول الترتيب</h2>
                     <div id="standingsContainer"></div>
                 </div>
 
                 <!-- تبويب التوقعات -->
                 <div id="predictionsTab" class="hidden">
-                    <h2>التوقعات والإحصائيات</h2>
-                    <div class="info-text">🎯 سيتم إضافة التوقعات المتقدمة قريباً</div>
+                    <h2>📊 التوقعات والإحصائيات</h2>
+                    <div class="info-text">
+                        🎯 سيتم إضافة التوقعات المتقدمة قريباً<br>
+                        <small>تابعونا للتحديثات القادمة</small>
+                    </div>
+                </div>
+
+                <!-- تبويب Debug -->
+                <div id="debugTab" class="hidden">
+                    <h2>🐛 وحدة تصحيح الأخطاء</h2>
+                    <div class="debug-controls">
+                        <button class="debug-btn clear" onclick="clearDebugLog()">🗑️ مسح السجل</button>
+                        <button class="debug-btn export" onclick="exportDebugLog()">📤 تصدير السجل</button>
+                        <button class="debug-btn" style="background-color:#00ff88;color:#1a1a2e;" onclick="testConnection()">🔗 اختبار الاتصال</button>
+                    </div>
+                    <div class="debug-stats">
+                        <span><span class="stat-label">📊 الطلبات:</span> <span class="stat-value" id="requestCount">0</span></span>
+                        <span><span class="stat-label">✅ الناجحة:</span> <span class="stat-value" id="successCount">0</span></span>
+                        <span><span class="stat-label">❌ الفاشلة:</span> <span class="stat-value" id="failCount">0</span></span>
+                        <span><span class="stat-label">📡 المصدر الحالي:</span> <span class="stat-value" id="currentSource">-</span></span>
+                    </div>
+                    <div class="debug-container" id="debugLog">
+                        <div class="log-entry info">
+                            <span class="timestamp">[${new Date().toLocaleTimeString()}]</span>
+                            🚀 تم تهيئة وحدة التصحيح
+                        </div>
+                        <div class="log-entry info">
+                            <span class="timestamp">[${new Date().toLocaleTimeString()}]</span>
+                            📡 جاهز لجلب البيانات من المصادر...
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -650,18 +807,108 @@
         <!-- التذييل -->
         <footer class="app-footer">
             <p>© 2026 Football Pro Hub - جميع الحقوق محفوظة</p>
-            <p>بيانات حقيقية من مصادر موثوقة</p>
+            <p>📊 بيانات حقيقية من مصادر موثوقة | 🚀 نظام احتياطي لضمان الاستقرار</p>
         </footer>
     </div>
 
     <script>
         /**
          * ============================================================
-         *  DATA FETCHER - جلب البيانات من مصادر متعددة مع Fallback
+         *  🚀 نظام جلب البيانات المتقدم مع Debug Logging
          * ============================================================
          */
 
-        // قائمة المصادر بالترتيب
+        // ============ Debug Logger ============
+        const debugLog = [];
+        let requestCount = 0;
+        let successCount = 0;
+        let failCount = 0;
+
+        function addDebugLog(message, type = 'info', data = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = { timestamp, message, type, data };
+            debugLog.push(entry);
+
+            // تحديث الـ UI
+            const container = document.getElementById('debugLog');
+            const div = document.createElement('div');
+            div.className = `log-entry ${type}`;
+            div.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+
+            // تحديث الإحصائيات
+            document.getElementById('requestCount').textContent = requestCount;
+            document.getElementById('successCount').textContent = successCount;
+            document.getElementById('failCount').textContent = failCount;
+
+            // طباعة في الكونسول
+            console.log(`[${type.toUpperCase()}] ${message}`, data || '');
+        }
+
+        function clearDebugLog() {
+            document.getElementById('debugLog').innerHTML = `
+                <div class="log-entry info">
+                    <span class="timestamp">[${new Date().toLocaleTimeString()}]</span>
+                    🗑️ تم مسح السجل
+                </div>
+            `;
+            debugLog.length = 0;
+            requestCount = 0;
+            successCount = 0;
+            failCount = 0;
+            document.getElementById('requestCount').textContent = '0';
+            document.getElementById('successCount').textContent = '0';
+            document.getElementById('failCount').textContent = '0';
+        }
+
+        function exportDebugLog() {
+            const text = debugLog.map(entry =>
+                `[${entry.timestamp}] [${entry.type}] ${entry.message}${entry.data ? '\n' + JSON.stringify(entry.data, null, 2) : ''}`
+            ).join('\n\n');
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `debug-log-${new Date().toISOString()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            addDebugLog('📤 تم تصدير السجل بنجاح', 'success');
+        }
+
+        async function testConnection() {
+            addDebugLog('🔗 بدء اختبار الاتصال بالمصادر...', 'info');
+            const sources = ['https://site.api.espn.com/apis/site/v2/sports/soccer/all/scores'];
+
+            for (const url of sources) {
+                try {
+                    addDebugLog(`📡 محاولة الاتصال بـ ${url}...`, 'info');
+                    const response = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        addDebugLog(`✅ الاتصال ناجح! تم استلام ${data.events?.length || 0} مباراة`, 'success', data);
+                        document.getElementById('currentSource').textContent = 'ESPN ✅';
+                        return;
+                    } else {
+                        addDebugLog(`⚠️ استجابة غير متوقعة: ${response.status}`, 'warning');
+                    }
+                } catch (error) {
+                    addDebugLog(`❌ فشل الاتصال: ${error.message}`, 'error');
+                }
+            }
+
+            addDebugLog('❌ جميع محاولات الاتصال فشلت', 'error');
+            document.getElementById('currentSource').textContent = '❌ غير متصل';
+        }
+
+        // ============ قائمة المصادر ============
         const DATA_SOURCES = [{
             id: 'espn',
             name: 'ESPN',
@@ -671,27 +918,27 @@
             id: 'flashscore',
             name: 'Flashscore',
             url: 'https://www.flashscore.com/',
-            type: 'flashscore'
+            type: 'scrape'
         }, {
             id: 'soccerway',
             name: 'Soccerway',
             url: 'https://www.soccerway.com/',
-            type: 'soccerway'
+            type: 'scrape'
         }, {
             id: 'onefootball',
             name: 'OneFootball',
             url: 'https://www.onefootball.com/',
-            type: 'onefootball'
+            type: 'scrape'
         }, {
             id: 'bbc',
             name: 'BBC Sport',
             url: 'https://www.bbc.com/sport/football',
-            type: 'bbc'
+            type: 'scrape'
         }, {
             id: 'goal',
             name: 'Goal.com',
             url: 'https://www.goal.com/',
-            type: 'goal'
+            type: 'scrape'
         }];
 
         // ============ الحالة العامة ============
@@ -702,44 +949,52 @@
 
         // ============ دوال جلب البيانات ============
 
-        /**
-         * محاولة جلب البيانات من جميع المصادر بالترتيب
-         * @param {string} endpoint - نوع البيانات ('matches' أو 'standings')
-         * @returns {Promise<Object>} - البيانات التي تم جلبها
-         */
         async function fetchWithFallback(endpoint) {
+            requestCount++;
+            document.getElementById('requestCount').textContent = requestCount;
+
             for (let i = 0; i < DATA_SOURCES.length; i++) {
                 const source = DATA_SOURCES[i];
                 try {
-                    console.log(`محاولة جلب من ${source.name}...`);
+                    addDebugLog(`🔄 محاولة جلب من ${source.name} (${i+1}/${DATA_SOURCES.length})...`, 'info');
+                    document.getElementById('dataSource').textContent = `⏳ ${source.name}...`;
+                    document.getElementById('currentSource').textContent = `⏳ ${source.name}`;
 
                     let data;
                     if (source.type === 'espn') {
                         data = await fetchFromESPN(source, endpoint);
                     } else {
-                        // المصادر الأخرى نستخدم proxy أو محاكاة
-                        data = await fetchFromGeneric(source, endpoint);
+                        data = await fetchFromProxy(source, endpoint);
                     }
 
                     if (data && data.success) {
                         activeDataSource = source.name;
-                        document.getElementById('dataSource').textContent = source.name;
+                        successCount++;
+                        document.getElementById('successCount').textContent = successCount;
+                        document.getElementById('dataSource').textContent = `✅ ${source.name}`;
+                        document.getElementById('currentSource').textContent = `${source.name} ✅`;
+                        addDebugLog(`✅ نجح الجلب من ${source.name} (${data.matches?.length || data.standings?.length || 0} عنصر)`,
+                            'success', data);
                         return data;
                     }
                 } catch (error) {
-                    console.warn(`فشل الجلب من ${source.name}:`, error.message);
+                    failCount++;
+                    document.getElementById('failCount').textContent = failCount;
+                    addDebugLog(`⚠️ فشل الجلب من ${source.name}: ${error.message}`, 'error');
                 }
             }
 
             // إذا فشلت جميع المصادر
+            addDebugLog('❌ جميع المصادر فشلت! لا توجد بيانات.', 'error');
+            document.getElementById('dataSource').textContent = '❌ لا توجد بيانات';
+            document.getElementById('currentSource').textContent = '❌ فشل';
             throw new Error('تعذر جلب البيانات من جميع المصادر');
         }
 
-        /**
-         * جلب البيانات من ESPN API
-         */
         async function fetchFromESPN(source, endpoint) {
             try {
+                addDebugLog(`📡 جلب من ESPN API...`, 'info');
+
                 const response = await fetch(source.url, {
                     headers: {
                         'Accept': 'application/json',
@@ -747,11 +1002,14 @@
                     }
                 });
 
+                addDebugLog(`📡 استجابة ESPN: ${response.status} ${response.statusText}`, 'info');
+
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
                 const data = await response.json();
+                addDebugLog(`📦 استلام بيانات ESPN: ${Object.keys(data).join(', ')}`, 'info', data);
 
                 if (endpoint === 'matches') {
                     return parseESPNMatches(data);
@@ -759,93 +1017,122 @@
                     return parseESPNStandings(data);
                 }
             } catch (error) {
-                throw new Error(`ESPN: ${error.message}`);
+                addDebugLog(`❌ خطأ في ESPN: ${error.message}`, 'error');
+                throw error;
             }
         }
 
-        /**
-         * جلب البيانات من مصادر عامة (محاكاة)
-         * في التطبيق الحقيقي تستخدم proxy أو web scraping
-         */
-        async function fetchFromGeneric(source, endpoint) {
-            // محاكاة تأخير الشبكة
-            await new Promise(resolve => setTimeout(resolve, 800));
-
-            // محاولة جلب عبر proxy مجاني (مثال)
+        async function fetchFromProxy(source, endpoint) {
             try {
+                addDebugLog(`📡 جلب من ${source.name} عبر Proxy...`, 'info');
+
                 const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(source.url)}`;
-                const response = await fetch(proxyUrl);
+                const response = await fetch(proxyUrl, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
 
                 if (!response.ok) {
                     throw new Error(`Proxy ${response.status}`);
                 }
 
-                const data = await response.json();
+                const result = await response.json();
+                addDebugLog(`📦 استلام بيانات من Proxy (${result.contents?.length || 0} بايت)`, 'info');
 
-                // محاولة استخراج البيانات من HTML (في التطبيق الحقيقي)
-                // هنا نعيد بيانات محاكاة للتوضيح
-                return generateMockData(endpoint);
+                const html = result.contents || '';
+                const extracted = extractDataFromHTML(html, endpoint);
+
+                if (extracted && extracted.success) {
+                    addDebugLog(`✅ استخراج ${extracted.matches?.length || extracted.standings?.length || 0} عنصر من HTML`,
+                        'success');
+                    return extracted;
+                }
+
+                throw new Error('لا توجد بيانات في الصفحة');
             } catch (error) {
-                // في حالة فشل proxy نعيد بيانات محاكاة
-                return generateMockData(endpoint);
+                addDebugLog(`❌ خطأ في Proxy: ${error.message}`, 'error');
+                throw error;
             }
         }
 
-        /**
-         * توليد بيانات محاكاة للاختبار
-         */
-        function generateMockData(endpoint) {
+        function extractDataFromHTML(html, endpoint) {
+            // محاولة استخراج البيانات من HTML
+            const matches = [];
+
             if (endpoint === 'matches') {
-                return {
-                    success: true,
-                    source: 'mock',
-                    matches: [{
-                        id: Date.now(),
-                        homeTeam: { name: 'الريال' },
-                        awayTeam: { name: 'برشلونة' },
-                        utcDate: new Date().toISOString(),
-                        status: 'LIVE',
-                        score: { fullTime: { home: 2, away: 1 } },
-                        competition: { name: 'الدوري الإسباني', code: 'LALIGA' },
-                        venue: 'سانتياغو برنابيو'
-                    }, {
-                        id: Date.now() + 1,
-                        homeTeam: { name: 'ليفربول' },
-                        awayTeam: { name: 'مانشستر سيتي' },
-                        utcDate: new Date(Date.now() + 3600000).toISOString(),
-                        status: 'SCHEDULED',
-                        score: { fullTime: { home: null, away: null } },
-                        competition: { name: 'الدوري الإنجليزي', code: 'PL' },
-                        venue: 'أنفيلد'
-                    }]
-                };
-            } else {
-                return {
-                    success: true,
-                    source: 'mock',
-                    standings: [
-                        { position: 1, team: { name: 'الريال' }, points: 89, playedGames: 30, won: 27, draw: 8,
-                        lost: 5, goalDifference: 65 },
-                        { position: 2, team: { name: 'برشلونة' }, points: 82, playedGames: 30, won: 25, draw: 7,
-                        lost: 8, goalDifference: 58 }
-                    ]
-                };
+                // البحث عن أنماط المباريات في HTML
+                const patterns = [
+                    /([\u0600-\u06FF\w\s]{2,30})\s*[\d]+\s*[-:]\s*[\d]+\s*([\u0600-\u06FF\w\s]{2,30})/g,
+                    /([\u0600-\u06FF\w\s]{2,30})\s+vs\s+([\u0600-\u06FF\w\s]{2,30})/gi,
+                    /([\u0600-\u06FF\w\s]{2,30})\s*-\s*([\u0600-\u06FF\w\s]{2,30})/g
+                ];
+
+                for (const pattern of patterns) {
+                    let match;
+                    while ((match = pattern.exec(html)) !== null) {
+                        if (match.length >= 3) {
+                            const home = match[1].trim();
+                            const away = match[2].trim();
+                            if (home.length > 1 && away.length > 1 && home !== away) {
+                                matches.push({
+                                    id: Date.now() + Math.random() * 1000 + matches.length,
+                                    homeTeam: { name: home },
+                                    awayTeam: { name: away },
+                                    utcDate: new Date().toISOString(),
+                                    status: 'SCHEDULED',
+                                    score: { fullTime: { home: null, away: null } },
+                                    competition: { name: 'غير معروف', code: 'UNK' },
+                                    venue: 'غير معروف'
+                                });
+                            }
+                        }
+                    }
+                }
+
+                // إزالة التكرارات
+                const uniqueMatches = [];
+                const seen = new Set();
+                for (const m of matches) {
+                    const key = `${m.homeTeam.name}-${m.awayTeam.name}`;
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        uniqueMatches.push(m);
+                    }
+                }
+
+                if (uniqueMatches.length > 0) {
+                    addDebugLog(`✅ تم استخراج ${uniqueMatches.length} مباراة من HTML`, 'success');
+                    return { success: true, source: 'extracted', matches: uniqueMatches.slice(0, 20) };
+                }
             }
+
+            return { success: false };
         }
 
-        /**
-         * تحليل بيانات ESPN للمباريات
-         */
         function parseESPNMatches(data) {
             const matches = [];
 
-            if (data && data.events) {
-                data.events.forEach(event => {
-                    const homeTeam = event.competitions?.[0]?.competitors?.[0];
-                    const awayTeam = event.competitions?.[0]?.competitors?.[1];
+            addDebugLog(`🔍 تحليل بيانات ESPN للمباريات...`, 'info');
+
+            if (!data || !data.events) {
+                addDebugLog(`⚠️ لا توجد أحداث في بيانات ESPN`, 'warning');
+                return { success: false };
+            }
+
+            addDebugLog(`📊 عدد الأحداث: ${data.events.length}`, 'info');
+
+            data.events.forEach((event, index) => {
+                try {
+                    const comp = event.competitions?.[0];
+                    const homeTeam = comp?.competitors?.[0];
+                    const awayTeam = comp?.competitors?.[1];
                     const status = event.status?.type?.description || 'SCHEDULED';
-                    const scoreHome = homeTeam?.score || null;
-                    const scoreAway = awayTeam?.score || null;
+
+                    if (!homeTeam || !awayTeam) {
+                        addDebugLog(`⚠️ حدث ${index}: بيانات غير مكتملة`, 'warning');
+                        return;
+                    }
 
                     matches.push({
                         id: event.id || Date.now() + Math.random(),
@@ -855,72 +1142,101 @@
                         status: status.toUpperCase(),
                         score: {
                             fullTime: {
-                                home: scoreHome !== null ? parseInt(scoreHome) : null,
-                                away: scoreAway !== null ? parseInt(scoreAway) : null
+                                home: homeTeam?.score !== undefined ? parseInt(homeTeam.score) : null,
+                                away: awayTeam?.score !== undefined ? parseInt(awayTeam.score) : null
                             }
                         },
                         competition: {
-                            name: event.competitions?.[0]?.group?.name || event.league?.name || 'غير معروف',
-                            code: event.competitions?.[0]?.group?.id || 'UNK'
+                            name: comp?.group?.name || comp?.name || 'غير معروف',
+                            code: comp?.group?.id || 'UNK'
                         },
-                        venue: event.competitions?.[0]?.venue?.fullName || 'غير معروف'
+                        venue: comp?.venue?.fullName || 'غير معروف'
                     });
-                });
+
+                    addDebugLog(`✅ حدث ${index}: ${homeTeam?.team?.displayName} vs ${awayTeam?.team?.displayName}`,
+                        'success');
+                } catch (e) {
+                    addDebugLog(`⚠️ خطأ في معالجة الحدث ${index}: ${e.message}`, 'error');
+                }
+            });
+
+            if (matches.length === 0) {
+                addDebugLog(`⚠️ لم يتم العثور على مباريات في بيانات ESPN`, 'warning');
+                return { success: false };
             }
 
-            return {
-                success: matches.length > 0,
-                source: 'espn',
-                matches: matches
-            };
+            addDebugLog(`✅ تم تحليل ${matches.length} مباراة من ESPN`, 'success');
+            return { success: true, source: 'espn', matches: matches };
         }
 
-        /**
-         * تحليل بيانات ESPN للترتيب
-         */
         function parseESPNStandings(data) {
             const standings = [];
 
-            if (data && data.standings && data.standings.entries) {
-                data.standings.entries.forEach((entry, index) => {
+            addDebugLog(`🔍 تحليل بيانات ESPN للترتيب...`, 'info');
+
+            if (!data || !data.standings || !data.standings.entries) {
+                addDebugLog(`⚠️ لا توجد بيانات ترتيب في ESPN`, 'warning');
+                return { success: false };
+            }
+
+            addDebugLog(`📊 عدد الفرق: ${data.standings.entries.length}`, 'info');
+
+            data.standings.entries.forEach((entry, index) => {
+                try {
+                    const stats = entry.stats || [];
                     standings.push({
                         position: index + 1,
                         team: { name: entry.team?.displayName || 'غير معروف' },
-                        points: entry.stats?.[0]?.value || 0,
-                        playedGames: entry.stats?.[1]?.value || 0,
-                        won: entry.stats?.[2]?.value || 0,
-                        draw: entry.stats?.[3]?.value || 0,
-                        lost: entry.stats?.[4]?.value || 0,
-                        goalDifference: entry.stats?.[5]?.value || 0
+                        points: stats[0]?.value || 0,
+                        playedGames: stats[1]?.value || 0,
+                        won: stats[2]?.value || 0,
+                        draw: stats[3]?.value || 0,
+                        lost: stats[4]?.value || 0,
+                        goalDifference: stats[5]?.value || 0
                     });
-                });
+                } catch (e) {
+                    addDebugLog(`⚠️ خطأ في معالجة الفريق ${index}: ${e.message}`, 'error');
+                }
+            });
+
+            if (standings.length === 0) {
+                addDebugLog(`⚠️ لم يتم العثور على بيانات ترتيب`, 'warning');
+                return { success: false };
             }
 
-            return {
-                success: standings.length > 0,
-                source: 'espn',
-                standings: standings
-            };
+            addDebugLog(`✅ تم تحليل ${standings.length} فريق من ESPN`, 'success');
+            return { success: true, source: 'espn', standings: standings };
         }
 
         // ============ دوال عرض البيانات ============
 
         async function loadMatches() {
-            if (isFetching) return;
+            if (isFetching) {
+                addDebugLog(`⏳ جاري التحميل بالفعل...`, 'warning');
+                return;
+            }
             isFetching = true;
 
             const container = document.getElementById('matchesContainer');
             container.innerHTML = '<div class="loading">⏳ جاري تحميل المباريات...</div>';
+            addDebugLog(`🔄 بدء تحميل المباريات...`, 'info');
 
             try {
                 const result = await fetchWithFallback('matches');
 
-                if (result && result.matches) {
+                if (result && result.matches && result.matches.length > 0) {
                     currentMatches = result.matches;
                     renderMatches(currentMatches);
                     populateCompetitions(currentMatches);
+                    addDebugLog(`✅ تم عرض ${currentMatches.length} مباراة`, 'success');
                 } else {
-                    container.innerHTML = '<div class="error-message">❌ لا توجد مباريات متاحة حالياً</div>';
+                    container.innerHTML = `
+                        <div class="error-message">
+                            ❌ لا توجد مباريات متاحة<br>
+                            <small>تم استلام 0 مباراة من جميع المصادر</small>
+                        </div>
+                    `;
+                    addDebugLog(`❌ لا توجد مباريات في الاستجابة`, 'error');
                 }
             } catch (error) {
                 container.innerHTML = `
@@ -929,7 +1245,7 @@
                         <small>يرجى التحقق من اتصال الإنترنت أو المحاولة لاحقاً</small>
                     </div>
                 `;
-                document.getElementById('dataSource').textContent = 'غير متصل';
+                addDebugLog(`❌ فشل تحميل المباريات: ${error.message}`, 'error');
             }
 
             isFetching = false;
@@ -982,20 +1298,20 @@
                 minute: '2-digit'
             });
 
-            const scoreDisplay = match.score.fullTime.home !== null ?
+            const scoreDisplay = match.score.fullTime.home !== null && match.score.fullTime.away !== null ?
                 `<span class="score-number">${match.score.fullTime.home}</span><span class="score-separator">-</span><span class="score-number">${match.score.fullTime.away}</span>` :
-                '<span class="vs">VS</span>';
+                '<span class="vs">⚽ VS</span>';
 
-            const statusText = match.status === 'LIVE' ? 'مباشر' :
-                match.status === 'FINISHED' ? 'انتهت' : 'قادمة';
+            const statusText = match.status === 'LIVE' ? '🟢 مباشر' :
+                match.status === 'FINISHED' ? '✅ انتهت' : '⏳ قادمة';
 
             return `
                 <div class="match-card ${isLive ? 'live' : ''}">
                     <div class="match-header">
-                        <span class="competition-name">${match.competition.name}</span>
+                        <span class="competition-name">🏆 ${match.competition.name}</span>
                         <span class="match-status ${match.status.toLowerCase()}">${statusText}</span>
                     </div>
-                    <div class="match-date">${dateStr}</div>
+                    <div class="match-date">📅 ${dateStr}</div>
                     <div class="match-body">
                         <div class="team">
                             <div class="team-name">${match.homeTeam.name}</div>
@@ -1014,22 +1330,18 @@
             const select = document.getElementById('competitionSelect');
             const currentValue = select.value;
 
-            const competitions = new Set();
+            const competitions = new Map();
             matches.forEach(m => {
                 if (m.competition && m.competition.code) {
-                    competitions.add(JSON.stringify({
-                        code: m.competition.code,
-                        name: m.competition.name
-                    }));
+                    competitions.set(m.competition.code, m.competition.name);
                 }
             });
 
-            select.innerHTML = '<option value="">جميع البطولات</option>';
-            competitions.forEach(compStr => {
-                const comp = JSON.parse(compStr);
+            select.innerHTML = '<option value="">🏆 جميع البطولات</option>';
+            competitions.forEach((name, code) => {
                 const option = document.createElement('option');
-                option.value = comp.code;
-                option.textContent = comp.name;
+                option.value = code;
+                option.textContent = name;
                 select.appendChild(option);
             });
 
@@ -1053,6 +1365,7 @@
             });
 
             renderMatches(filtered);
+            addDebugLog(`🔍 تم تصفية المباريات: ${filtered.length} من ${currentMatches.length}`, 'info');
         }
 
         // ============ الترتيب ============
@@ -1060,15 +1373,18 @@
         async function loadStandings() {
             const container = document.getElementById('standingsContainer');
             container.innerHTML = '<div class="loading">⏳ جاري تحميل الترتيب...</div>';
+            addDebugLog(`🔄 بدء تحميل الترتيب...`, 'info');
 
             try {
                 const result = await fetchWithFallback('standings');
 
-                if (result && result.standings) {
+                if (result && result.standings && result.standings.length > 0) {
                     currentStandings = result.standings;
                     renderStandings(currentStandings);
+                    addDebugLog(`✅ تم عرض ${currentStandings.length} فريق في الترتيب`, 'success');
                 } else {
                     container.innerHTML = '<div class="empty-state">❌ لا توجد بيانات ترتيب متاحة</div>';
+                    addDebugLog(`❌ لا توجد بيانات ترتيب`, 'error');
                 }
             } catch (error) {
                 container.innerHTML = `
@@ -1077,6 +1393,7 @@
                         <small>يرجى المحاولة لاحقاً</small>
                     </div>
                 `;
+                addDebugLog(`❌ فشل تحميل الترتيب: ${error.message}`, 'error');
             }
         }
 
@@ -1132,10 +1449,19 @@
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
             document.getElementById(tabName + 'Tab').classList.remove('hidden');
-            document.querySelector(`.tab-btn[data-tab="${tabName}"]`).classList.add('active');
+            const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+            if (btn) btn.classList.add('active');
+
+            addDebugLog(`📑 التبديل إلى تبويب: ${tabName}`, 'info');
 
             if (tabName === 'standings') {
                 loadStandings();
+            } else if (tabName === 'debug') {
+                // تحديث إحصائيات Debug
+                document.getElementById('requestCount').textContent = requestCount;
+                document.getElementById('successCount').textContent = successCount;
+                document.getElementById('failCount').textContent = failCount;
+                document.getElementById('currentSource').textContent = activeDataSource || '-';
             }
         }
 
@@ -1150,14 +1476,18 @@
         // ============ التهيئة ============
 
         async function initializeApp() {
+            addDebugLog(`🚀 تهيئة التطبيق...`, 'info');
             await loadMatches();
 
             // تحديث تلقائي كل 60 ثانية
             setInterval(() => {
                 if (!document.getElementById('matchesTab').classList.contains('hidden')) {
+                    addDebugLog(`🔄 تحديث تلقائي للمباريات...`, 'info');
                     loadMatches();
                 }
             }, 60000);
+
+            addDebugLog(`✅ التطبيق جاهز!`, 'success');
         }
 
         // بدء التطبيق

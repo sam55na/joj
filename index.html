@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎡 عجلة الحظ - IChancy</title>
+    <style>
+        /* ============================================================
+                   الأساسيات - الخلفية السوداء العميقة
+                   ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* ============================================================
+                   الحاوية الرئيسية - الإطار الأسود مع الإضاءة الحمراء والذهبية
+                   ============================================================ */
+        .container {
+            background: radial-gradient(ellipse at center, #1a0a0a 0%, #0a0a0a 100%);
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 750px;
+            width: 100%;
+            border: 2px solid #8B0000;
+            box-shadow: 
+                0 0 40px rgba(255, 0, 0, 0.3),
+                0 0 80px rgba(255, 215, 0, 0.15),
+                inset 0 0 40px rgba(255, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* ============================================================
+                   الإطار الخارجي المشع - ذهبي بركاني متحرك
+                   ============================================================ */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 34px;
+            background: conic-gradient(
+                from 0deg,
+                #FFD700, #FF6B00, #FF0000, #8B0000,
+                #FF0000, #FF6B00, #FFD700, #FF6B00,
+                #FF0000, #8B0000, #FFD700
+            );
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: borderGlow 4s ease-in-out infinite;
+            filter: blur(3px);
+        }
+
+        @keyframes borderGlow {
+            0% { transform: rotate(0deg); background-position: 0% 50%; }
+            50% { transform: rotate(180deg); background-position: 100% 50%; }
+            100% { transform: rotate(360deg); background-position: 0% 50%; }
+        }
+
+        /* ============================================================
+                   العنوان - نص ذهبي مشع
+                   ============================================================ */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FFD700, #FF6B00, #FF0000, #FFD700);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textGlow 3s ease-in-out infinite;
+            text-shadow: 0 0 60px rgba(255, 215, 0, 0.2);
+            letter-spacing: 3px;
+        }
+
+        @keyframes textGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-top: 5px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+        }
+
+        .header .subtitle span {
+            color: #FFD700;
+        }
+
+        /* ============================================================
+                   حالة المستخدم - شريط المعلومات
+                   ============================================================ */
+        .user-status {
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid #8B0000;
+            border-radius: 15px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: inset 0 0 30px rgba(139, 0, 0, 0.2);
+        }
+
+        .user-status .user-id {
+            color: #FFD700;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-status .user-id span {
+            color: #fff;
+            font-weight: bold;
+            background: rgba(139, 0, 0, 0.3);
+            padding: 2px 12px;
+            border-radius: 8px;
+            border: 1px solid #8B0000;
+        }
+
+        .user-status .spin-info {
+            color: #aaa;
+            font-size: 13px;
+            text-align: left;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .user-status .spin-info .count {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .user-status .spin-info .wins {
+            color: #FF6B00;
+            font-weight: bold;
+        }
+
+        .user-status .spin-info .deposit-status {
+            color: #FF4444;
+            font-weight: bold;
+        }
+
+        .user-status .spin-info .deposit-status.met {
+            color: #4CAF50;
+        }
+
+        /* ============================================================
+                   لودينغ متقدم - مؤشر 0-100 مع صورة متحركة
+                   ============================================================ */
+        .loading-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 20px;
+            display: none;
+            padding: 15px 20px;
+            background: rgba(10, 10, 10, 0.9);
+            border-radius: 15px;
+            border: 1px solid #8B0000;
+        }
+
+        .loading-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .loader-track {
+            width: 100%;
+            height: 14px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #8B0000;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.7);
+        }
+
+        .loader-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #8B0000, #FF0000, #FFD700, #FF6B00, #8B0000);
+            background-size: 300% 100%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+            animation: loaderShine 1.5s linear infinite;
+            position: relative;
+        }
+
+        @keyframes loaderShine {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 300% 0%; }
+        }
+
+        /* صورة المؤشر المتحركة */
+        .loader-image {
+            position: absolute;
+            top: -25px;
+            left: 0%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #8B0000);
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 0, 0, 0.3);
+            transition: left 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            z-index: 10;
+        }
+
+        /* النسبة المئوية */
+        .loader-percent {
+            text-align: center;
+            color: #FFD700;
+            font-size: 28px;
+            font-weight: 900;
+            margin-top: 10px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+            letter-spacing: 1px;
+        }
+
+        .loader-status {
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .loader-status .highlight {
+            color: #FFD700;
+        }
+
+        /* ============================================================
+                   العجلة - القطعة الرئيسية
+                   ============================================================ */
+        .wheel-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto 20px;
+            aspect-ratio: 1/1;
+        }
+
+        .wheel-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 50px rgba(255, 0, 0, 0.3),
+                0 0 100px rgba(255, 215, 0, 0.15),
+                inset 0 0 50px rgba(255, 0, 0, 0.1);
+            border: 4px solid #8B0000;
+            transition: filter 0.5s ease, transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .wheel-wrapper canvas:hover {
+            transform: scale(1.01);
+        }
+
+        .wheel-wrapper canvas.spinning {
+            filter: brightness(1.4) drop-shadow(0 0 40px rgba(255, 215, 0, 0.6));
+            animation: pulse 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { filter: brightness(1.3) drop-shadow(0 0 30px rgba(255, 215, 0, 0.4)); }
+            to { filter: brightness(1.6) drop-shadow(0 0 60px rgba(255, 215, 0, 0.8)); }
+        }
+
+        /* ============================================================
+                   الأزرار - ذهبية ونارية
+                   ============================================================ */
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 16px 30px;
+            border: none;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-spin {
+            background: linear-gradient(135deg, #8B0000, #FF0000, #8B0000);
+            background-size: 200% 200%;
+            color: #FFD700;
+            box-shadow: 
+                0 0 30px rgba(255, 0, 0, 0.4),
+                inset 0 0 30px rgba(255, 215, 0, 0.1);
+            border: 2px solid #FFD700;
+            animation: btnGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes btnGlow {
+            0% { background-position: 0% 50%; box-shadow: 0 0 30px rgba(255, 0, 0, 0.4); }
+            50% { background-position: 100% 50%; box-shadow: 0 0 60px rgba(255, 215, 0, 0.5); }
+            100% { background-position: 0% 50%; box-shadow: 0 0 30px rgba(255, 0, 0, 0.4); }
+        }
+
+        .btn-spin:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 80px rgba(255, 215, 0, 0.7);
+        }
+
+        .btn-spin:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            animation: none;
+        }
+
+        .btn-spin .icon {
+            margin-left: 10px;
+        }
+
+        .btn-secondary {
+            background: rgba(20, 20, 20, 0.95);
+            color: #FFD700;
+            border: 1px solid #8B0000;
+            font-size: 14px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(40, 40, 40, 0.95);
+            border-color: #FFD700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
+        }
+
+        /* ============================================================
+                   صندوق النتيجة - يظهر عند الفوز
+                   ============================================================ */
+        .result-box {
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid #8B0000;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+            animation: resultPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        @keyframes resultPop {
+            0% { transform: scale(0.7) rotate(-5deg); opacity: 0; }
+            50% { transform: scale(1.05) rotate(1deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .result-box .prize-icon {
+            font-size: 56px;
+            margin-bottom: 5px;
+            animation: iconBounce 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes iconBounce {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .result-box .prize-name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .result-box .prize-desc {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .result-box .prize-value {
+            color: #FF6B00;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 8px;
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
+        }
+
+        .result-box .prize-value.claimed {
+            color: #4CAF50;
+        }
+
+        /* ============================================================
+                   السجل - تاريخ التدويرات
+                   ============================================================ */
+        .history-toggle {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .history-toggle button {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: underline;
+            transition: color 0.3s;
+            padding: 5px 15px;
+        }
+
+        .history-toggle button:hover {
+            color: #FFD700;
+        }
+
+        .history-box {
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.4s ease, padding 0.3s ease;
+            opacity: 0;
+            padding: 0 15px;
+        }
+
+        .history-box.open {
+            max-height: 450px;
+            opacity: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .history-box .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #1a1a1a;
+            color: #ccc;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .history-box .history-item:hover {
+            background: rgba(139, 0, 0, 0.1);
+            padding-left: 5px;
+        }
+
+        .history-box .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-box .history-item .h-prize {
+            color: #FFD700;
+        }
+
+        .history-box .history-item .h-prize .claimed-badge {
+            color: #4CAF50;
+            font-size: 11px;
+            margin-right: 5px;
+        }
+
+        .history-box .history-item .h-date {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* ============================================================
+                   رسائل الخطأ
+                   ============================================================ */
+        .error-msg {
+            background: rgba(139, 0, 0, 0.25);
+            border: 1px solid #8B0000;
+            border-radius: 10px;
+            padding: 14px;
+            color: #FF6B6B;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.1);
+        }
+
+        .error-msg.show {
+            display: block;
+            animation: resultPop 0.4s ease;
+        }
+
+        .error-msg .error-detail {
+            color: #aaa;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* ============================================================
+                   شرط الإيداع - إشعار خاص
+                   ============================================================ */
+        .deposit-notice {
+            background: rgba(139, 0, 0, 0.15);
+            border: 1px solid #8B0000;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .deposit-notice.show {
+            display: block;
+        }
+
+        .deposit-notice .notice-icon {
+            font-size: 24px;
+        }
+
+        .deposit-notice .notice-text {
+            color: #FFD700;
+            font-size: 14px;
+        }
+
+        .deposit-notice .notice-text .amount {
+            color: #FF6B00;
+            font-weight: bold;
+        }
+
+        /* ============================================================
+                   تجاوب مع الشاشات الصغيرة
+                   ============================================================ */
+        @media (max-width: 550px) {
+            .container { padding: 15px; }
+            .header h1 { font-size: 24px; }
+            .btn { font-size: 16px; padding: 14px 18px; }
+            .user-status { flex-direction: column; text-align: center; }
+            .user-status .spin-info { text-align: center; justify-content: center; }
+            .result-box .prize-name { font-size: 20px; }
+            .result-box .prize-icon { font-size: 40px; }
+            .loader-percent { font-size: 22px; }
+        }
+
+        /* ============================================================
+                   سكرول مخصص للسجل
+                   ============================================================ */
+        .history-box::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-box::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+        .history-box::-webkit-scrollbar-thumb {
+            background: #8B0000;
+            border-radius: 10px;
+        }
+        .history-box::-webkit-scrollbar-thumb:hover {
+            background: #FFD700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ===== العنوان ===== -->
+    <div class="header">
+        <h1>🎡 عجلة الحظ</h1>
+        <div class="subtitle">🔥 <span>IChancy</span> - إدارة العجلة المشعة</div>
+    </div>
+
+    <!-- ===== حالة المستخدم ===== -->
+    <div class="user-status" id="userStatus">
+        <div class="user-id">👤 المستخدم: <span id="userIdDisplay">غير محدد</span></div>
+        <div class="spin-info">
+            <span>🎡 <span class="count" id="totalSpins">0</span> تدوير</span>
+            <span>🏆 <span class="wins" id="totalWins">0</span> فوز</span>
+            <span id="depositStatus"></span>
+        </div>
+    </div>
+
+    <!-- ===== لودينغ متقدم ===== -->
+    <div class="loading-container" id="loadingContainer">
+        <div class="loader-track">
+            <div class="loader-bar" id="loaderBar"></div>
+            <div class="loader-image" id="loaderImage">🎯</div>
+        </div>
+        <div class="loader-percent" id="loaderPercent">0%</div>
+        <div class="loader-status" id="loaderStatus">🔄 جاري الاتصال بالخادم...</div>
+    </div>
+
+    <!-- ===== العجلة ===== -->
+    <div class="wheel-wrapper">
+        <canvas id="wheelCanvas" width="600" height="600"></canvas>
+    </div>
+
+    <!-- ===== الأزرار ===== -->
+    <div class="actions">
+        <button class="btn btn-spin" id="spinBtn" disabled>
+            <span class="icon">🎰</span> تدوير العجلة
+        </button>
+        <button class="btn btn-secondary" id="claimBtn" style="display:none;">
+            📦 المطالبة بالجائزة
+        </button>
+    </div>
+
+    <!-- ===== إشعار شرط الإيداع ===== -->
+    <div class="deposit-notice" id="depositNotice">
+        <div class="notice-icon">💰</div>
+        <div class="notice-text">
+            مطلوب إيداع <span class="amount" id="depositMinAmount">1000</span> SYP
+            خلال آخر <span id="depositCheckHours">24</span> ساعة للتدوير
+        </div>
+    </div>
+
+    <!-- ===== النتيجة ===== -->
+    <div class="result-box" id="resultBox">
+        <div class="prize-icon" id="prizeIcon">🎁</div>
+        <div class="prize-name" id="prizeName">جائزة رائعة!</div>
+        <div class="prize-desc" id="prizeDesc">مبروك لك هذا الفوز</div>
+        <div class="prize-value" id="prizeValue"></div>
+    </div>
+
+    <!-- ===== الخطأ ===== -->
+    <div class="error-msg" id="errorMsg">
+        <div id="errorText"></div>
+        <div class="error-detail" id="errorDetail"></div>
+    </div>
+
+    <!-- ===== السجل ===== -->
+    <div class="history-toggle">
+        <button id="historyToggleBtn">📜 عرض السجل</button>
+    </div>
+    <div class="history-box" id="historyBox">
+        <div id="historyList"></div>
+    </div>
+
+</div>
+
+<script>
+// ================================================================
+//                      الإعدادات الأساسية
+// ================================================================
+const API_BASE = window.location.origin;
+const ADMIN_ID = 7011476249;
+let USER_ID = null;
+let isSpinning = false;
+let spinResult = null;
+let prizesCache = [];
+
+// ================================================================
+//                      الحصول على USER_ID
+// ================================================================
+function getUserId() {
+    let id = localStorage.getItem('wheel_user_id');
+    if (id) {
+        USER_ID = parseInt(id);
+        document.getElementById('userIdDisplay').textContent = USER_ID;
+        return USER_ID;
+    }
+    
+    const input = prompt('👤 أدخل معرف المستخدم (Telegram ID):');
+    if (input && !isNaN(input)) {
+        USER_ID = parseInt(input);
+        localStorage.setItem('wheel_user_id', USER_ID);
+        document.getElementById('userIdDisplay').textContent = USER_ID;
+        return USER_ID;
+    }
+    
+    USER_ID = 123456789;
+    document.getElementById('userIdDisplay').textContent = USER_ID + ' (افتراضي)';
+    return USER_ID;
+}
+
+// ================================================================
+//                      رسم العجلة - تصميم محسّن
+// ================================================================
+function drawWheel(prizes, highlightIndex = -1) {
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) / 2 - 12;
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    if (!prizes || prizes.length === 0) {
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('⚠️ لا توجد جوائز', centerX, centerY);
+        return;
+    }
+    
+    const total = prizes.length;
+    const angleStep = (2 * Math.PI) / total;
+    
+    // الألوان المخصصة - أحمر، أسود، ذهبي
+    const colors = [
+        '#8B0000', '#1a1a1a', '#FFD700', '#6B0000', '#2a2a2a',
+        '#FF6B00', '#0a0a0a', '#FF4500', '#1a0a0a', '#DAA520',
+        '#800000', '#222222', '#FFD700', '#5C0000'
+    ];
+    
+    // رسم الشرائح
+    prizes.forEach((prize, i) => {
+        const startAngle = i * angleStep - Math.PI / 2;
+        const endAngle = startAngle + angleStep;
+        const isHighlight = (i === highlightIndex);
+        
+        const colorIndex = i % colors.length;
+        let color = colors[colorIndex];
+        if (isHighlight) {
+            color = '#FFD700';
+        }
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.closePath();
+        
+        // تعبئة الشريحة
+        ctx.fillStyle = color;
+        ctx.fill();
+        
+        // حدود ذهبية مشعة
+        ctx.strokeStyle = isHighlight ? '#FFD700' : '#FFD700';
+        ctx.lineWidth = isHighlight ? 4 : 1.5;
+        ctx.shadowColor = isHighlight ? '#FFD700' : 'rgba(255, 215, 0, 0.3)';
+        ctx.shadowBlur = isHighlight ? 30 : 5;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        
+        // النص داخل الشريحة
+        const midAngle = startAngle + angleStep / 2;
+        const textRadius = radius * 0.6;
+        const x = centerX + Math.cos(midAngle) * textRadius;
+        const y = centerY + Math.sin(midAngle) * textRadius;
+        
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(midAngle + (midAngle > Math.PI / 2 ? Math.PI : 0));
+        
+        ctx.fillStyle = isHighlight ? '#000' : '#fff';
+        ctx.font = isHighlight ? 'bold 14px Arial' : 'bold 11px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowBlur = 6;
+        
+        const label = prize.icon ? `${prize.icon} ${prize.name}` : prize.name;
+        const maxLength = 11;
+        const displayLabel = label.length > maxLength ? label.substring(0, maxLength) + '…' : label;
+        ctx.fillText(displayLabel, 0, 0);
+        ctx.shadowBlur = 0;
+        ctx.restore();
+    });
+    
+    // الدائرة المركزية - ذهبية نارية
+    const gradient = ctx.createRadialGradient(centerX - 10, centerY - 10, 0, centerX, centerY, radius * 0.18);
+    gradient.addColorStop(0, '#FFD700');
+    gradient.addColorStop(0.3, '#FF6B00');
+    gradient.addColorStop(0.7, '#8B0000');
+    gradient.addColorStop(1, '#1a0a0a');
+    
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.18, 0, 2 * Math.PI);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 20;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    
+    // السهم العلوي - مؤشر الجائزة
+    ctx.beginPath();
+    ctx.moveTo(centerX - 18, 12);
+    ctx.lineTo(centerX + 18, 12);
+    ctx.lineTo(centerX, -14);
+    ctx.closePath();
+    ctx.fillStyle = '#FFD700';
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 30;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    
+    // نقطة في السهم
+    ctx.beginPath();
+    ctx.arc(centerX, 8, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = '#FF0000';
+    ctx.shadowColor = '#FF0000';
+    ctx.shadowBlur = 15;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+}
+
+// ================================================================
+//                      تحميل الجوائز من الخادم
+// ================================================================
+async function loadPrizes() {
+    try {
+        const response = await fetch(`${API_BASE}/api/admin/prizes?admin_id=${ADMIN_ID}`);
+        const data = await response.json();
+        if (data.success && data.prizes) {
+            prizesCache = data.prizes;
+            return data.prizes;
+        }
+        return [];
+    } catch (error) {
+        console.error('Error loading prizes:', error);
+        return [];
+    }
+}
+
+// ================================================================
+//                      تحميل حالة المستخدم
+// ================================================================
+async function loadUserStatus() {
+    if (!USER_ID) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/wheel/history/${USER_ID}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('totalSpins').textContent = data.stats.total_spins;
+            document.getElementById('totalWins').textContent = data.stats.wins;
+            
+            // عرض شرط الإيداع
+            const depositNotice = document.getElementById('depositNotice');
+            const depositStatus = document.getElementById('depositStatus');
+            
+            if (data.deposit_requirement && data.deposit_requirement.required) {
+                document.getElementById('depositMinAmount').textContent = data.deposit_requirement.min_amount;
+                document.getElementById('depositCheckHours').textContent = data.deposit_requirement.check_hours;
+                
+                if (data.deposit_requirement.is_met) {
+                    depositNotice.classList.remove('show');
+                    depositStatus.innerHTML = '💰 <span style="color:#4CAF50;">✔ شرط الإيداع مستوفي</span>';
+                } else {
+                    depositNotice.classList.add('show');
+                    const remaining = data.deposit_requirement.min_amount - data.deposit_requirement.current_deposits;
+                    depositStatus.innerHTML = `💰 <span style="color:#FF4444;">مطلوب ${remaining} SYP إضافية</span>`;
+                }
+            } else {
+                depositNotice.classList.remove('show');
+                depositStatus.innerHTML = '';
+            }
+            
+            // تحديث السجل
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            data.history.slice(0, 20).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                const claimedBadge = item.is_claimed ? '✅' : '⏳';
+                div.innerHTML = `
+                    <span class="h-prize">
+                        ${item.icon || '🎁'} ${item.prize_name}
+                        <span class="claimed-badge">${claimedBadge}</span>
+                    </span>
+                    <span class="h-date">${new Date(item.spin_date).toLocaleString('ar')}</span>
+                `;
+                historyList.appendChild(div);
+            });
+            
+            // تحديث حالة زر التدوير
+            const spinBtn = document.getElementById('spinBtn');
+            const canSpin = data.spin_status.can_spin && 
+                           (!data.deposit_requirement?.required || data.deposit_requirement?.is_met);
+            
+            if (canSpin) {
+                spinBtn.disabled = false;
+                spinBtn.innerHTML = '<span class="icon">🎰</span> تدوير العجلة';
+            } else if (!data.spin_status.can_spin) {
+                spinBtn.disabled = true;
+                const h = data.spin_status.remaining_hours;
+                const m = data.spin_status.remaining_minutes;
+                spinBtn.innerHTML = `⏳ انتظر ${h}h ${m}m`;
+            } else if (data.deposit_requirement?.required && !data.deposit_requirement?.is_met) {
+                spinBtn.disabled = true;
+                spinBtn.innerHTML = '💰 مطلوب إيداع';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading user status:', error);
+    }
+}
+
+// ================================================================
+//                      لودينغ متقدم
+// ================================================================
+function showLoading(show, statusText = '🔄 جاري الاتصال بالخادم...') {
+    const container = document.getElementById('loadingContainer');
+    const bar = document.getElementById('loaderBar');
+    const percent = document.getElementById('loaderPercent');
+    const status = document.getElementById('loaderStatus');
+    const image = document.getElementById('loaderImage');
+    
+    if (show) {
+        container.classList.add('active');
+        status.textContent = statusText;
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 2.5 + 0.5;
+            if (progress > 100) progress = 100;
+            bar.style.width = progress + '%';
+            image.style.left = progress + '%';
+            percent.textContent = Math.floor(progress) + '%';
+            
+            if (progress >= 100) {
+                clearInterval(interval);
+            }
+        }, 80);
+        
+        container._interval = interval;
+    } else {
+        container.classList.remove('active');
+        if (container._interval) {
+            clearInterval(container._interval);
+            container._interval = null;
+        }
+        bar.style.width = '0%';
+        image.style.left = '0%';
+        percent.textContent = '0%';
+    }
+}
+
+// ================================================================
+//                      تدوير العجلة
+// ================================================================
+async function spinWheel() {
+    if (isSpinning || !USER_ID) return;
+    if (document.getElementById('spinBtn').disabled) return;
+    
+    isSpinning = true;
+    const spinBtn = document.getElementById('spinBtn');
+    spinBtn.disabled = true;
+    spinBtn.innerHTML = '⏳ جاري التدوير...';
+    
+    // إخفاء النتيجة السابقة
+    document.getElementById('resultBox').classList.remove('show');
+    document.getElementById('errorMsg').classList.remove('show');
+    document.getElementById('claimBtn').style.display = 'none';
+    
+    // إظهار اللودينغ
+    showLoading(true, '🎡 جاري الاتصال بالخادم...');
+    
+    try {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        showLoading(true, '📡 جاري إرسال الطلب...');
+        
+        const response = await fetch(`${API_BASE}/api/wheel/spin`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: USER_ID })
+        });
+        
+        const data = await response.json();
+        
+        showLoading(false);
+        
+        if (data.success) {
+            spinResult = data.spin;
+            const prize = spinResult.prize;
+            
+            // تأثير إضاءة العجلة
+            document.querySelector('.wheel-wrapper canvas').classList.add('spinning');
+            setTimeout(() => {
+                document.querySelector('.wheel-wrapper canvas').classList.remove('spinning');
+            }, 1500);
+            
+            document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
+            document.getElementById('prizeName').textContent = prize.name;
+            document.getElementById('prizeDesc').textContent = prize.description || 'مبروك!';
+            
+            const valueMatch = prize.name.match(/\d+/);
+            if (prize.name.includes('SYP') && valueMatch) {
+                document.getElementById('prizeValue').textContent = `💰 القيمة: ${valueMatch[0]} SYP`;
+                document.getElementById('prizeValue').className = 'prize-value';
+            } else if (prize.name.includes('كود')) {
+                document.getElementById('prizeValue').textContent = '🎫 كود هدية';
+                document.getElementById('prizeValue').className = 'prize-value';
+            } else {
+                document.getElementById('prizeValue').textContent = '🎉 حظاً موفقاً';
+                document.getElementById('prizeValue').className = 'prize-value';
+            }
+            
+            document.getElementById('resultBox').classList.add('show');
+            
+            // زر المطالبة بالجائزة
+            if (!prize.name.includes('حظ سعيد')) {
+                document.getElementById('claimBtn').style.display = 'block';
+                document.getElementById('claimBtn').textContent = '📦 المطالبة بالجائزة';
+                document.getElementById('claimBtn').onclick = () => claimPrize(spinResult.id);
+            }
+            
+            // إعادة رسم العجلة مع إبراز الجائزة
+            const prizes = await loadPrizes();
+            const prizeIndex = prizes.findIndex(p => p.id === prize.id);
+            drawWheel(prizes, prizeIndex);
+            
+            await loadUserStatus();
+            
+        } else if (data.error) {
+            const errorMsg = document.getElementById('errorMsg');
+            document.getElementById('errorText').textContent = `❌ ${data.error}`;
+            document.getElementById('errorDetail').textContent = data.deposit_required ? 
+                `المطلوب: ${data.min_deposit} SYP، المتبقي: ${data.remaining} SYP` : '';
+            errorMsg.classList.add('show');
+            
+            if (data.remaining_hours !== undefined) {
+                const spinBtn2 = document.getElementById('spinBtn');
+                spinBtn2.disabled = true;
+                spinBtn2.innerHTML = `⏳ انتظر ${data.remaining_hours}h ${data.remaining_minutes}m`;
+            }
+        }
+        
+    } catch (error) {
+        showLoading(false);
+        const errorMsg = document.getElementById('errorMsg');
+        document.getElementById('errorText').textContent = `❌ خطأ في الاتصال: ${error.message}`;
+        document.getElementById('errorDetail').textContent = 'تأكد من اتصالك بالإنترنت';
+        errorMsg.classList.add('show');
+    }
+    
+    isSpinning = false;
+    if (!document.getElementById('spinBtn').disabled) {
+        document.getElementById('spinBtn').innerHTML = '<span class="icon">🎰</span> تدوير العجلة';
+    }
+}
+
+// ================================================================
+//                      المطالبة بالجائزة
+// ================================================================
+async function claimPrize(spinId) {
+    const claimBtn = document.getElementById('claimBtn');
+    claimBtn.disabled = true;
+    claimBtn.textContent = '⏳ جاري المطالبة...';
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/wheel/claim/${spinId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: USER_ID })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            claimBtn.textContent = '✅ تمت المطالبة!';
+            claimBtn.style.background = '#1a2a1a';
+            claimBtn.style.color = '#4CAF50';
+            claimBtn.style.borderColor = '#4CAF50';
+            
+            document.getElementById('prizeValue').textContent = '✅ تمت المطالبة بنجاح!';
+            document.getElementById('prizeValue').className = 'prize-value claimed';
+            
+            await loadUserStatus();
+        } else {
+            claimBtn.textContent = '❌ فشل';
+            alert(`❌ ${data.error}`);
+        }
+    } catch (error) {
+        claimBtn.textContent = '❌ خطأ';
+        alert(`❌ خطأ في الاتصال: ${error.message}`);
+    }
+    
+    claimBtn.disabled = false;
+    setTimeout(() => {
+        claimBtn.style.display = 'none';
+    }, 4000);
+}
+
+// ================================================================
+//                      التهيئة
+// ================================================================
+async function init() {
+    getUserId();
+    
+    const prizes = await loadPrizes();
+    drawWheel(prizes);
+    
+    await loadUserStatus();
+    
+    const spinBtn = document.getElementById('spinBtn');
+    if (!spinBtn.disabled) {
+        spinBtn.onclick = spinWheel;
+    }
+    
+    document.getElementById('historyToggleBtn').onclick = () => {
+        document.getElementById('historyBox').classList.toggle('open');
+        const btn = document.getElementById('historyToggleBtn');
+        btn.textContent = document.getElementById('historyBox').classList.contains('open') 
+            ? '📜 إخفاء السجل' 
+            : '📜 عرض السجل';
+    };
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

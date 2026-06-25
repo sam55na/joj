@@ -1,32 +1,50 @@
 const express = require('express');
 const { Pool } = require('pg');
+const path = require('path');
 const app = express();
 const port = process.env.PORT || 5000;
 
-// إعدادات JSON
+// ================================================================
+//                      الإعدادات الأساسية
+// ================================================================
 app.use(express.json());
+app.use(express.static('public'));
 
-// رابط قاعدة البيانات
 const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+    console.error('❌ DATABASE_URL is not set!');
+    process.exit(1);
+}
 
-// إعداد Pool الاتصال
+// ================================================================
+//                      اتصال PostgreSQL
+// ================================================================
 const pool = new Pool({
     connectionString: DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
+    ssl: { rejectUnauthorized: false }
+});
+
+// اختبار الاتصال
+pool.connect((err) => {
+    if (err) {
+        console.error('❌ Database connection error:', err);
+    } else {
+        console.log('✅ Connected to PostgreSQL successfully');
     }
 });
 
-// معرف الأدمن الثابت
+// ================================================================
+//                      المعرفات الثابتة
+// ================================================================
 const ADMIN_ID = 7011476249;
 
-// ==================== نظام الأقفال (Locks) ====================
+// ================================================================
+//                      نظام الأقفال (لمنع التكرار)
+// ================================================================
 const userLocks = new Map();
 
 function acquireLock(userId) {
-    if (userLocks.has(userId)) {
-        return false;
-    }
+    if (userLocks.has(userId)) return false;
     userLocks.set(userId, true);
     return true;
 }
@@ -35,7 +53,19 @@ function releaseLock(userId) {
     userLocks.delete(userId);
 }
 
-// ==================== تهيئة الجداول ====================
+// تنظيف الأقفال القديمة كل 5 دقائق
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, value] of userLocks) {
+        if (value < now - 300000) { // 5 دقائق
+            userLocks.delete(key);
+        }
+    }
+}, 300000);
+
+// ================================================================
+//                      تهيئة الجداول
+// ================================================================
 async function initTables() {
     try {
         // 1. جدول الجوائز
@@ -61,8 +91,7 @@ async function initTables() {
                 prize_name VARCHAR(255),
                 spin_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 is_claimed BOOLEAN DEFAULT FALSE,
-                claimed_date TIMESTAMP,
-                last_spin_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                claimed_date TIMESTAMP
             )
         `);
 
@@ -76,7 +105,7 @@ async function initTables() {
             )
         `);
 
-        // 4. جدول سجل الإيداعات (للبحث عن إيداعات المستخدم)
+        // 4. جدول إيداعات المستخدمين (للتحقق من شرط الإيداع)
         await pool.query(`
             CREATE TABLE IF NOT EXISTS wheel_deposits (
                 id SERIAL PRIMARY KEY,
@@ -87,7 +116,7 @@ async function initTables() {
             )
         `);
 
-        // 5. إضافة جوائز افتراضية
+        // 5. إضافة جوائز افتراضية (إذا لم تكن موجودة)
         const prizesExist = await pool.query('SELECT COUNT(*) FROM wheel_prizes');
         if (parseInt(prizesExist.rows[0].count) === 0) {
             await pool.query(`
@@ -99,6 +128,7 @@ async function initTables() {
                 ('😅 حظ سعيد', 'لا يوجد فوز هذه المرة', 20, '😅'),
                 ('⭐ 50 SYP', 'الفوز بـ 50 ليرة سورية', 5, '⭐')
             `);
+            console.log('✅ Default prizes inserted');
         }
 
         // 6. إعدادات افتراضية
@@ -112,35 +142,237 @@ async function initTables() {
                 ('deposit_min_amount', '1000'),
                 ('deposit_check_hours', '24')
             `);
+            console.log('✅ Default settings inserted');
         }
 
-        console.log('✅ Tables initialized successfully');
+        console.log('✅ All tables initialized successfully');
     } catch (error) {
         console.error('❌ Error initializing tables:', error);
     }
 }
 
-// تشغيل التهيئة
 initTables();
 
-// ==================== خدمة الملفات الثابتة ====================
-app.use(express.static('public'));
+// ================================================================
+//                      المسارات (API Endpoints)
+// ================================================================
 
-// ==================== المسارات (Routes) ====================
-
-// ✅ الصفحة الرئيسية
+// -------------------- الصفحة الرئيسية --------------------
 app.get('/api/status', (req, res) => {
     res.json({
         status: 'running',
-        service: 'Wheel of Fortune Server',
+        service: 'Wheel of Fortune',
         timestamp: new Date().toISOString(),
-        database_configured: Boolean(DATABASE_URL)
+        database: 'connected'
     });
 });
 
-// ==================== مسارات العجلة ====================
+// -------------------- 1. جلب جميع الجوائز --------------------
+app.get('/api/admin/prizes', async (req, res) => {
+    const { admin_id } = req.query;
 
-// 🎡 1. تدوير العجلة
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: 'Unauthorized - Admin only'
+        });
+    }
+
+    try {
+        const result = await pool.query(`
+            SELECT * FROM wheel_prizes 
+            WHERE is_active = true
+            ORDER BY probability DESC
+        `);
+        
+        res.json({
+            success: true,
+            prizes: result.rows
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// -------------------- 2. إضافة جائزة جديدة --------------------
+app.post('/api/admin/prizes', async (req, res) => {
+    const { admin_id, name, description, probability, icon } = req.body;
+
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: 'Unauthorized - Admin only'
+        });
+    }
+
+    if (!name || probability === undefined) {
+        return res.status(400).json({
+            success: false,
+            error: 'Name and probability are required'
+        });
+    }
+
+    try {
+        const result = await pool.query(`
+            INSERT INTO wheel_prizes (name, description, probability, icon)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *
+        `, [name, description || '', probability, icon || '🎁']);
+
+        res.json({
+            success: true,
+            prize: result.rows[0]
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// -------------------- 3. تحديث جائزة --------------------
+app.put('/api/admin/prizes/:prize_id', async (req, res) => {
+    const { prize_id } = req.params;
+    const { admin_id, name, description, probability, icon, is_active } = req.body;
+
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: 'Unauthorized - Admin only'
+        });
+    }
+
+    try {
+        const result = await pool.query(`
+            UPDATE wheel_prizes 
+            SET 
+                name = COALESCE($1, name),
+                description = COALESCE($2, description),
+                probability = COALESCE($3, probability),
+                icon = COALESCE($4, icon),
+                is_active = COALESCE($5, is_active),
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $6
+            RETURNING *
+        `, [name, description, probability, icon, is_active, prize_id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'Prize not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            prize: result.rows[0]
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// -------------------- 4. حذف جائزة --------------------
+app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
+    const { prize_id } = req.params;
+    const { admin_id } = req.body;
+
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: 'Unauthorized - Admin only'
+        });
+    }
+
+    try {
+        await pool.query(
+            'DELETE FROM wheel_prizes WHERE id = $1',
+            [prize_id]
+        );
+
+        res.json({
+            success: true,
+            message: 'Prize deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// -------------------- 5. جلب الإعدادات --------------------
+app.get('/api/admin/settings', async (req, res) => {
+    const { admin_id } = req.query;
+
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: 'Unauthorized - Admin only'
+        });
+    }
+
+    try {
+        const result = await pool.query('SELECT * FROM wheel_settings');
+        const settings = {};
+        result.rows.forEach(row => {
+            settings[row.setting_key] = row.setting_value;
+        });
+
+        res.json({
+            success: true,
+            settings
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// -------------------- 6. تحديث الإعدادات --------------------
+app.put('/api/admin/settings', async (req, res) => {
+    const { admin_id, settings } = req.body;
+
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: 'Unauthorized - Admin only'
+        });
+    }
+
+    try {
+        for (const [key, value] of Object.entries(settings)) {
+            await pool.query(`
+                INSERT INTO wheel_settings (setting_key, setting_value, updated_at)
+                VALUES ($1, $2, CURRENT_TIMESTAMP)
+                ON CONFLICT (setting_key) 
+                DO UPDATE SET setting_value = $2, updated_at = CURRENT_TIMESTAMP
+            `, [key, value]);
+        }
+
+        res.json({
+            success: true,
+            message: 'Settings updated successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// -------------------- 7. تدوير العجلة (الطلب الرئيسي) --------------------
 app.post('/api/wheel/spin', async (req, res) => {
     const { user_id } = req.body;
 
@@ -151,17 +383,17 @@ app.post('/api/wheel/spin', async (req, res) => {
         });
     }
 
-    // ========== التحقق من القفل ==========
+    // ===== القفل =====
     if (!acquireLock(user_id)) {
         return res.status(429).json({
             success: false,
-            error: 'You have an ongoing spin request. Please wait.',
+            error: 'لديك طلب قيد المعالجة، يرجى الانتظار',
             is_processing: true
         });
     }
 
     try {
-        // ========== 1. التحقق من أن العجلة مفعلة ==========
+        // ===== 1. التحقق من تفعيل العجلة =====
         const isActive = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['is_active']
@@ -170,11 +402,11 @@ app.post('/api/wheel/spin', async (req, res) => {
             releaseLock(user_id);
             return res.status(403).json({
                 success: false,
-                error: 'Wheel is currently disabled'
+                error: 'العجلة معطلة حالياً'
             });
         }
 
-        // ========== 2. التحقق من شرط الإيداع ==========
+        // ===== 2. التحقق من شرط الإيداع =====
         const depositRequired = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['deposit_required']
@@ -194,21 +426,20 @@ app.post('/api/wheel/spin', async (req, res) => {
             const minAmountValue = parseFloat(minAmount.rows[0]?.setting_value || 1000);
             const checkHoursValue = parseInt(checkHours.rows[0]?.setting_value || 24);
 
-            // البحث عن إيداعات المستخدم في آخر X ساعة
             const userDeposits = await pool.query(`
-                SELECT COALESCE(SUM(amount), 0) as total_deposits
+                SELECT COALESCE(SUM(amount), 0) as total
                 FROM wheel_deposits
                 WHERE user_id = $1 
                 AND deposit_date >= NOW() - INTERVAL '${checkHoursValue} hours'
             `, [user_id]);
 
-            const totalDeposits = parseFloat(userDeposits.rows[0]?.total_deposits || 0);
+            const totalDeposits = parseFloat(userDeposits.rows[0]?.total || 0);
 
             if (totalDeposits < minAmountValue) {
                 releaseLock(user_id);
                 return res.status(403).json({
                     success: false,
-                    error: `You need to deposit at least ${minAmountValue} SYP in the last ${checkHoursValue} hours to spin`,
+                    error: `مطلوب إيداع ${minAmountValue} SYP خلال آخر ${checkHoursValue} ساعة`,
                     deposit_required: true,
                     min_deposit: minAmountValue,
                     check_hours: checkHoursValue,
@@ -218,7 +449,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
-        // ========== 3. التحقق من آخر تدوير (الفاصل الزمني) ==========
+        // ===== 3. التحقق من آخر تدوير (الفاصل الزمني) =====
         const intervalHours = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['spin_interval_hours']
@@ -244,7 +475,7 @@ app.post('/api/wheel/spin', async (req, res) => {
                 releaseLock(user_id);
                 return res.status(429).json({
                     success: false,
-                    error: `You can spin again in ${remainingHours} hours (${remainingMinutes} minutes)`,
+                    error: `يمكنك التدوير مرة أخرى بعد ${remainingHours} ساعة`,
                     last_spin: lastSpinDate.toISOString(),
                     next_spin_allowed: new Date(lastSpinDate.getTime() + intervalHoursValue * 60 * 60 * 1000).toISOString(),
                     remaining_hours: Math.floor(remainingHours),
@@ -253,25 +484,24 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
-        // ========== 4. اختيار جائزة عشوائية حسب النسب ==========
+        // ===== 4. اختيار جائزة عشوائية =====
         const prizes = await pool.query(`
             SELECT * FROM wheel_prizes 
             WHERE is_active = true
-            ORDER BY probability DESC
         `);
 
         if (prizes.rows.length === 0) {
             releaseLock(user_id);
             return res.status(500).json({
                 success: false,
-                error: 'No prizes available'
+                error: 'لا توجد جوائز متاحة'
             });
         }
 
         // حساب المجموع الكلي للنسب
         const totalProbability = prizes.rows.reduce((sum, p) => sum + parseFloat(p.probability), 0);
         
-        // اختيار جائزة عشوائية
+        // اختيار عشوائي
         let random = Math.random() * totalProbability;
         let selectedPrize = prizes.rows[0];
 
@@ -283,14 +513,14 @@ app.post('/api/wheel/spin', async (req, res) => {
             random -= parseFloat(prize.probability);
         }
 
-        // ========== 5. تسجيل التدوير ==========
+        // ===== 5. تسجيل التدوير =====
         const result = await pool.query(`
-            INSERT INTO wheel_spins (user_id, prize_id, prize_name, last_spin_date)
-            VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+            INSERT INTO wheel_spins (user_id, prize_id, prize_name)
+            VALUES ($1, $2, $3)
             RETURNING id, spin_date
         `, [user_id, selectedPrize.id, selectedPrize.name]);
 
-        // ========== 6. جلب إحصائيات المستخدم ==========
+        // ===== 6. إحصائيات المستخدم =====
         const userStats = await pool.query(`
             SELECT 
                 COUNT(*) as total_spins,
@@ -299,7 +529,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             WHERE user_id = $1
         `, [user_id]);
 
-        // ========== 7. حساب وقت التدوير التالي ==========
+        // ===== 7. وقت التدوير التالي =====
         const nextSpinDate = new Date();
         nextSpinDate.setHours(nextSpinDate.getHours() + intervalHoursValue);
 
@@ -329,12 +559,12 @@ app.post('/api/wheel/spin', async (req, res) => {
     }
 });
 
-// 📊 2. جلب سجل المستخدم
+// -------------------- 8. جلب سجل المستخدم --------------------
 app.get('/api/wheel/history/:user_id', async (req, res) => {
     const { user_id } = req.params;
 
     try {
-        // جلب آخر تدوير
+        // ===== آخر تدوير =====
         const lastSpin = await pool.query(`
             SELECT spin_date FROM wheel_spins 
             WHERE user_id = $1 
@@ -342,14 +572,14 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             LIMIT 1
         `, [user_id]);
 
-        // جلب الإعدادات
+        // ===== الإعدادات =====
         const intervalHours = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['spin_interval_hours']
         );
         const intervalHoursValue = parseInt(intervalHours.rows[0]?.setting_value || 24);
 
-        // جلب إعدادات الإيداع
+        // ===== شرط الإيداع =====
         const depositRequired = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['deposit_required']
@@ -370,7 +600,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             const checkHoursValue = parseInt(checkHours.rows[0]?.setting_value || 24);
 
             const userDeposits = await pool.query(`
-                SELECT COALESCE(SUM(amount), 0) as total_deposits
+                SELECT COALESCE(SUM(amount), 0) as total
                 FROM wheel_deposits
                 WHERE user_id = $1 
                 AND deposit_date >= NOW() - INTERVAL '${checkHoursValue} hours'
@@ -380,12 +610,12 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
                 required: true,
                 min_amount: minAmountValue,
                 check_hours: checkHoursValue,
-                current_deposits: parseFloat(userDeposits.rows[0]?.total_deposits || 0),
-                is_met: parseFloat(userDeposits.rows[0]?.total_deposits || 0) >= minAmountValue
+                current_deposits: parseFloat(userDeposits.rows[0]?.total || 0),
+                is_met: parseFloat(userDeposits.rows[0]?.total || 0) >= minAmountValue
             };
         }
 
-        // حساب الوقت المتبقي
+        // ===== الوقت المتبقي =====
         let can_spin = true;
         let remaining_hours = 0;
         let remaining_minutes = 0;
@@ -404,7 +634,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             }
         }
 
-        // جلب السجل
+        // ===== السجل =====
         const history = await pool.query(`
             SELECT 
                 s.id,
@@ -456,7 +686,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
     }
 });
 
-// 🏆 3. المطالبة بالجائزة
+// -------------------- 9. المطالبة بالجائزة --------------------
 app.put('/api/wheel/claim/:spin_id', async (req, res) => {
     const { spin_id } = req.params;
     const { user_id } = req.body;
@@ -470,21 +700,21 @@ app.put('/api/wheel/claim/:spin_id', async (req, res) => {
         if (spin.rows.length === 0) {
             return res.status(404).json({
                 success: false,
-                error: 'Spin not found'
+                error: 'التدوير غير موجود'
             });
         }
 
         if (spin.rows[0].user_id !== parseInt(user_id)) {
             return res.status(403).json({
                 success: false,
-                error: 'You are not the owner of this spin'
+                error: 'هذه الجائزة ليست لك'
             });
         }
 
         if (spin.rows[0].is_claimed) {
             return res.status(400).json({
                 success: false,
-                error: 'Prize already claimed'
+                error: 'تمت المطالبة بهذه الجائزة مسبقاً'
             });
         }
 
@@ -496,7 +726,7 @@ app.put('/api/wheel/claim/:spin_id', async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Prize claimed successfully!',
+            message: 'تمت المطالبة بالجائزة بنجاح!',
             prize_name: spin.rows[0].prize_name
         });
 
@@ -508,7 +738,7 @@ app.put('/api/wheel/claim/:spin_id', async (req, res) => {
     }
 });
 
-// 💰 4. تسجيل إيداع (يستخدمه البوت الرئيسي أو الأدمن)
+// -------------------- 10. تسجيل إيداع (للبوت الرئيسي) --------------------
 app.post('/api/wheel/deposit', async (req, res) => {
     const { user_id, amount, source } = req.body;
 
@@ -527,7 +757,7 @@ app.post('/api/wheel/deposit', async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Deposit recorded successfully'
+            message: 'تم تسجيل الإيداع بنجاح'
         });
     } catch (error) {
         res.status(500).json({
@@ -537,220 +767,7 @@ app.post('/api/wheel/deposit', async (req, res) => {
     }
 });
 
-// ==================== مسارات الأدمن ====================
-
-// 📋 5. عرض جميع الجوائز
-app.get('/api/admin/prizes', async (req, res) => {
-    const { admin_id } = req.query;
-
-    if (parseInt(admin_id) !== ADMIN_ID) {
-        return res.status(403).json({
-            success: false,
-            error: 'Unauthorized - Admin only'
-        });
-    }
-
-    try {
-        const prizes = await pool.query(`
-            SELECT * FROM wheel_prizes 
-            ORDER BY probability DESC
-        `);
-
-        res.json({
-            success: true,
-            prizes: prizes.rows
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// ➕ 6. إضافة جائزة جديدة
-app.post('/api/admin/prizes', async (req, res) => {
-    const { admin_id, name, description, probability, icon } = req.body;
-
-    if (parseInt(admin_id) !== ADMIN_ID) {
-        return res.status(403).json({
-            success: false,
-            error: 'Unauthorized - Admin only'
-        });
-    }
-
-    if (!name || probability === undefined) {
-        return res.status(400).json({
-            success: false,
-            error: 'Name and probability are required'
-        });
-    }
-
-    try {
-        const result = await pool.query(`
-            INSERT INTO wheel_prizes (name, description, probability, icon)
-            VALUES ($1, $2, $3, $4)
-            RETURNING *
-        `, [name, description || '', probability, icon || '🎁']);
-
-        res.json({
-            success: true,
-            prize: result.rows[0]
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// ✏️ 7. تحديث جائزة
-app.put('/api/admin/prizes/:prize_id', async (req, res) => {
-    const { prize_id } = req.params;
-    const { admin_id, name, description, probability, icon, is_active } = req.body;
-
-    if (parseInt(admin_id) !== ADMIN_ID) {
-        return res.status(403).json({
-            success: false,
-            error: 'Unauthorized - Admin only'
-        });
-    }
-
-    try {
-        const result = await pool.query(`
-            UPDATE wheel_prizes 
-            SET 
-                name = COALESCE($1, name),
-                description = COALESCE($2, description),
-                probability = COALESCE($3, probability),
-                icon = COALESCE($4, icon),
-                is_active = COALESCE($5, is_active),
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = $6
-            RETURNING *
-        `, [name, description, probability, icon, is_active, prize_id]);
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({
-                success: false,
-                error: 'Prize not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            prize: result.rows[0]
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// 🗑️ 8. حذف جائزة
-app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
-    const { prize_id } = req.params;
-    const { admin_id } = req.body;
-
-    if (parseInt(admin_id) !== ADMIN_ID) {
-        return res.status(403).json({
-            success: false,
-            error: 'Unauthorized - Admin only'
-        });
-    }
-
-    try {
-        const result = await pool.query(
-            'DELETE FROM wheel_prizes WHERE id = $1 RETURNING id',
-            [prize_id]
-        );
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({
-                success: false,
-                error: 'Prize not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            message: 'Prize deleted successfully'
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// ⚙️ 9. عرض الإعدادات
-app.get('/api/admin/settings', async (req, res) => {
-    const { admin_id } = req.query;
-
-    if (parseInt(admin_id) !== ADMIN_ID) {
-        return res.status(403).json({
-            success: false,
-            error: 'Unauthorized - Admin only'
-        });
-    }
-
-    try {
-        const settings = await pool.query('SELECT * FROM wheel_settings');
-        const settingsObj = {};
-        settings.rows.forEach(row => {
-            settingsObj[row.setting_key] = row.setting_value;
-        });
-
-        res.json({
-            success: true,
-            settings: settingsObj
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// 🔧 10. تحديث الإعدادات
-app.put('/api/admin/settings', async (req, res) => {
-    const { admin_id, settings } = req.body;
-
-    if (parseInt(admin_id) !== ADMIN_ID) {
-        return res.status(403).json({
-            success: false,
-            error: 'Unauthorized - Admin only'
-        });
-    }
-
-    try {
-        for (const [key, value] of Object.entries(settings)) {
-            await pool.query(`
-                INSERT INTO wheel_settings (setting_key, setting_value, updated_at)
-                VALUES ($1, $2, CURRENT_TIMESTAMP)
-                ON CONFLICT (setting_key) 
-                DO UPDATE SET setting_value = $2, updated_at = CURRENT_TIMESTAMP
-            `, [key, value]);
-        }
-
-        res.json({
-            success: true,
-            message: 'Settings updated successfully'
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// 📊 11. إحصائيات عامة
+// -------------------- 11. الإحصائيات العامة --------------------
 app.get('/api/admin/stats', async (req, res) => {
     const { admin_id } = req.query;
 
@@ -800,9 +817,16 @@ app.get('/api/admin/stats', async (req, res) => {
     }
 });
 
-// ==================== تشغيل الخادم ====================
+// -------------------- 12. مسار الصفحة الرئيسية (للواجهة) --------------------
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ================================================================
+//                      تشغيل الخادم
+// ================================================================
 app.listen(port, () => {
     console.log(`🚀 Wheel of Fortune server running on port ${port}`);
     console.log(`👑 Admin ID: ${ADMIN_ID}`);
-    console.log(`⏰ Default spin interval: 24 hours`);
+    console.log(`📊 Database: ${DATABASE_URL ? 'Connected' : 'Not connected'}`);
 });

@@ -37,8 +37,8 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(ellipse at 30% 50%, rgba(139, 0, 0, 0.15), transparent 60%),
-                        radial-gradient(ellipse at 70% 50%, rgba(255, 215, 0, 0.08), transparent 60%);
+            background: radial-gradient(ellipse at 30% 50%, rgba(139, 0, 0, 0.12), transparent 60%),
+                        radial-gradient(ellipse at 70% 50%, rgba(255, 215, 0, 0.06), transparent 60%);
             animation: bgFloat 20s ease-in-out infinite alternate;
             z-index: 0;
         }
@@ -56,13 +56,13 @@
             z-index: 1;
             background: linear-gradient(145deg, rgba(18, 18, 18, 0.95), rgba(10, 10, 10, 0.98));
             border-radius: 32px;
-            padding: 28px 24px 24px;
+            padding: 24px 20px 20px;
             max-width: 480px;
             width: 100%;
-            border: 1px solid rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.06);
             box-shadow: 
                 0 20px 80px rgba(0, 0, 0, 0.8),
-                0 0 60px rgba(255, 215, 0, 0.03);
+                0 0 60px rgba(255, 215, 0, 0.02);
             backdrop-filter: blur(10px);
         }
 
@@ -71,11 +71,11 @@
                    ============================================================ */
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 900;
             background: linear-gradient(135deg, #FFD700, #FF8C00, #FFD700);
             background-size: 200% 200%;
@@ -92,7 +92,7 @@
 
         .header .subtitle {
             color: #555;
-            font-size: 11px;
+            font-size: 10px;
             letter-spacing: 3px;
             text-transform: uppercase;
             margin-top: 2px;
@@ -103,40 +103,40 @@
         }
 
         /* ============================================================
-                   حالة المستخدم - تصميم أنيق
+                   حالة المستخدم
                    ============================================================ */
         .user-status {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 14px;
-            padding: 10px 16px;
-            margin-bottom: 18px;
+            border-radius: 12px;
+            padding: 8px 14px;
+            margin-bottom: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 4px;
         }
 
         .user-status .user-id {
             color: #666;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .user-status .user-id span {
             color: #FFD700;
             font-weight: 600;
             background: rgba(255, 215, 0, 0.06);
-            padding: 2px 12px;
-            border-radius: 6px;
+            padding: 2px 10px;
+            border-radius: 4px;
             border: 1px solid rgba(255, 215, 0, 0.06);
         }
 
         .user-status .spin-info {
             color: #555;
-            font-size: 12px;
+            font-size: 11px;
             display: flex;
-            gap: 14px;
+            gap: 12px;
         }
 
         .user-status .spin-info .count {
@@ -148,12 +148,12 @@
         }
 
         /* ============================================================
-                   رسالة الخطأ (عدم وجود USER_ID)
+                   رسالة الخطأ
                    ============================================================ */
         .error-container {
             display: none;
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 20px;
         }
 
         .error-container.show {
@@ -167,21 +167,21 @@
         }
 
         .error-container .error-icon {
-            font-size: 52px;
-            margin-bottom: 12px;
+            font-size: 44px;
+            margin-bottom: 10px;
         }
 
         .error-container .error-title {
             color: #FFD700;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .error-container .error-text {
             color: #777;
-            font-size: 14px;
-            line-height: 1.7;
+            font-size: 13px;
+            line-height: 1.6;
         }
 
         .error-container .error-text .highlight {
@@ -189,13 +189,13 @@
         }
 
         .error-container .btn-open-bot {
-            margin-top: 18px;
-            padding: 14px 36px;
+            margin-top: 16px;
+            padding: 12px 32px;
             background: linear-gradient(135deg, #B8860B, #FFD700);
             border: none;
-            border-radius: 14px;
+            border-radius: 12px;
             color: #0a0a0a;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -203,11 +203,11 @@
 
         .error-container .btn-open-bot:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
         }
 
         /* ============================================================
-                   لودينغ - شاشة التحقق من الخادم
+                   شاشة اللودينغ
                    ============================================================ */
         .loading-screen {
             display: none;
@@ -215,7 +215,7 @@
             align-items: center;
             justify-content: center;
             padding: 30px 20px 20px;
-            min-height: 350px;
+            min-height: 320px;
         }
 
         .loading-screen.active {
@@ -224,14 +224,14 @@
         }
 
         .loading-screen .loader-ring {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             border: 3px solid rgba(255, 215, 0, 0.05);
             border-top: 3px solid #FFD700;
             border-bottom: 3px solid #FF8C00;
             animation: spin 1s linear infinite;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.08);
         }
 
         @keyframes spin {
@@ -240,36 +240,36 @@
         }
 
         .loading-screen .loader-icon {
-            margin-top: -55px;
-            font-size: 28px;
+            margin-top: -48px;
+            font-size: 24px;
             animation: pulse 1.5s ease-in-out infinite;
         }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
+            50% { transform: scale(1.1); }
         }
 
         .loading-screen .loader-title {
             color: #FFD700;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
-            margin-top: 20px;
+            margin-top: 16px;
         }
 
         .loading-screen .loader-sub {
             color: #666;
-            font-size: 13px;
-            margin-top: 6px;
+            font-size: 12px;
+            margin-top: 4px;
         }
 
         .loading-screen .loader-progress {
             width: 100%;
-            max-width: 250px;
+            max-width: 200px;
             height: 3px;
             background: rgba(255, 255, 255, 0.04);
             border-radius: 4px;
-            margin-top: 16px;
+            margin-top: 14px;
             overflow: hidden;
         }
 
@@ -283,8 +283,8 @@
 
         .loading-screen .loader-status-text {
             color: #555;
-            font-size: 12px;
-            margin-top: 10px;
+            font-size: 11px;
+            margin-top: 8px;
         }
 
         /* ============================================================
@@ -315,26 +315,26 @@
             height: 100% !important;
             border-radius: 50%;
             box-shadow: 
-                0 0 60px rgba(255, 215, 0, 0.04),
-                inset 0 0 60px rgba(0, 0, 0, 0.3);
+                0 0 60px rgba(255, 215, 0, 0.03),
+                inset 0 0 60px rgba(0, 0, 0, 0.4);
             border: 2px solid rgba(255, 215, 0, 0.06);
             transition: filter 0.5s ease;
         }
 
         .wheel-wrapper canvas.spinning {
-            filter: brightness(1.2) drop-shadow(0 0 50px rgba(255, 215, 0, 0.15));
+            filter: brightness(1.15) drop-shadow(0 0 50px rgba(255, 215, 0, 0.1));
         }
 
         /* ============================================================
-                   المؤشر العلوي (بصورة)
+                   المؤشر العلوي
                    ============================================================ */
         .pointer {
             position: absolute;
-            top: -16px;
+            top: -14px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            font-size: 34px;
+            font-size: 30px;
             filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
             animation: pointerBounce 2s ease-in-out infinite;
             pointer-events: none;
@@ -351,17 +351,17 @@
         .no-prizes {
             display: none;
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 20px;
         }
 
         .no-prizes .icon {
-            font-size: 40px;
-            margin-bottom: 10px;
+            font-size: 36px;
+            margin-bottom: 8px;
         }
 
         .no-prizes .text {
             color: #555;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         /* ============================================================
@@ -370,12 +370,12 @@
         .actions {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 16px;
+            gap: 8px;
+            margin-top: 14px;
         }
 
         .btn {
-            padding: 15px 24px;
+            padding: 14px 20px;
             border: none;
             border-radius: 14px;
             font-size: 16px;
@@ -390,14 +390,14 @@
         .btn-spin {
             background: linear-gradient(135deg, #B8860B, #FFD700);
             color: #0a0a0a;
-            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.1);
-            font-size: 17px;
+            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.08);
+            font-size: 16px;
             letter-spacing: 0.5px;
         }
 
         .btn-spin:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 40px rgba(255, 215, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(255, 215, 0, 0.15);
         }
 
         .btn-spin:disabled {
@@ -408,13 +408,13 @@
 
         .btn-spin .spinner-small {
             display: none;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border: 2px solid rgba(10, 10, 10, 0.1);
             border-top: 2px solid #0a0a0a;
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
-            margin-right: 10px;
+            margin-right: 8px;
             vertical-align: middle;
         }
 
@@ -428,9 +428,9 @@
         .result-box {
             background: rgba(255, 215, 0, 0.02);
             border: 1px solid rgba(255, 215, 0, 0.06);
-            border-radius: 14px;
-            padding: 16px;
-            margin-top: 14px;
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 12px;
             text-align: center;
             display: none;
         }
@@ -446,20 +446,20 @@
         }
 
         .result-box .prize-icon {
-            font-size: 38px;
+            font-size: 34px;
             animation: pulse 1.5s ease-in-out infinite;
         }
 
         .result-box .prize-name {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: #FFD700;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .result-box .prize-desc {
             color: #777;
-            font-size: 13px;
+            font-size: 12px;
             margin-top: 2px;
         }
 
@@ -469,9 +469,9 @@
         .deposit-notice {
             background: rgba(255, 215, 0, 0.03);
             border: 1px solid rgba(255, 215, 0, 0.06);
-            border-radius: 10px;
-            padding: 10px 14px;
-            margin-top: 10px;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 8px;
             text-align: center;
             display: none;
         }
@@ -482,7 +482,7 @@
 
         .deposit-notice .notice-text {
             color: #FF8C00;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .deposit-notice .notice-text .amount {
@@ -491,17 +491,17 @@
         }
 
         /* ============================================================
-                   رسالة الخطأ العامة
+                   رسالة الخطأ
                    ============================================================ */
         .error-msg {
             background: rgba(255, 0, 0, 0.04);
             border: 1px solid rgba(255, 0, 0, 0.06);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 10px;
             color: #FF6B6B;
             text-align: center;
-            font-size: 13px;
-            margin-top: 10px;
+            font-size: 12px;
+            margin-top: 8px;
             display: none;
         }
 
@@ -514,12 +514,12 @@
                    تجاوب
                    ============================================================ */
         @media (max-width: 420px) {
-            .container { padding: 16px; }
-            .header h1 { font-size: 22px; }
-            .btn { font-size: 14px; padding: 13px 18px; }
+            .container { padding: 14px; }
+            .header h1 { font-size: 20px; }
+            .btn { font-size: 14px; padding: 12px 16px; }
             .user-status { flex-direction: column; text-align: center; }
             .user-status .spin-info { justify-content: center; }
-            .pointer { font-size: 28px; top: -12px; }
+            .pointer { font-size: 24px; top: -10px; }
         }
     </style>
 </head>
@@ -543,17 +543,13 @@
         </div>
     </div>
 
-    <!-- ===== رسالة الخطأ (عدم وجود USER_ID) ===== -->
+    <!-- ===== رسالة الخطأ ===== -->
     <div class="error-container" id="errorContainer">
         <div class="error-icon">⚠️</div>
         <div class="error-title">يجب الدخول من البوت</div>
         <div class="error-text">
             لا يمكن الوصول إلى معرف المستخدم.<br>
-            يرجى فتح العجلة من خلال <span class="highlight">بوت IChancy</span>.<br>
-            <br>
-            <span style="color:#555;font-size:13px;">
-                🔗 تأكد من فتح الرابط من داخل البوت
-            </span>
+            يرجى فتح العجلة من خلال <span class="highlight">بوت IChancy</span>.
         </div>
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
@@ -573,7 +569,6 @@
     <!-- ===== العجلة ===== -->
     <div class="wheel-container" id="wheelContainer">
         <div class="wheel-wrapper">
-            <!-- المؤشر العلوي -->
             <div class="pointer" id="pointer">🔽</div>
             <canvas id="wheelCanvas" width="500" height="500"></canvas>
         </div>
@@ -625,6 +620,7 @@ let USER_ID = null;
 let isSpinning = false;
 let prizesCache = [];
 let isReady = false;
+let currentRotation = 0;
 
 // ================================================================
 //                      جلب USER_ID
@@ -659,9 +655,9 @@ function getUserId() {
 }
 
 // ================================================================
-//                      رسم العجلة - تصميم متطور
+//                      رسم العجلة - تصميم محسّن
 // ================================================================
-function drawWheel(prizes, highlightIndex = -1) {
+function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     const canvas = document.getElementById('wheelCanvas');
     const ctx = canvas.getContext('2d');
     const w = canvas.width, h = canvas.height;
@@ -683,15 +679,16 @@ function drawWheel(prizes, highlightIndex = -1) {
     const total = prizes.length;
     const step = (2 * Math.PI) / total;
     
-    // ألوان جذابة
+    // ألوان غامقة وجذابة
     const colors = [
         '#1a1a2e', '#16213e', '#0f3460', '#1a1a2e', 
-        '#2d1b3d', '#1a1a2e', '#16213e', '#0f3460',
-        '#1a0a0a', '#2a1a2a'
+        '#2d1b3d', '#1a0a0a', '#0a1a2e', '#2a1a2a',
+        '#1a2a1a', '#2a1a3a'
     ];
     
+    // رسم الشرائح
     prizes.forEach((p, i) => {
-        const start = i * step - Math.PI/2;
+        const start = i * step + rotation;
         const end = start + step;
         const isHighlight = (i === highlightIndex);
         
@@ -700,7 +697,7 @@ function drawWheel(prizes, highlightIndex = -1) {
         ctx.arc(cx, cy, r, start, end);
         ctx.closePath();
         
-        // تدرج لوني لكل شريحة
+        // تدرج لوني
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
         const color1 = isHighlight ? '#FFD700' : colors[i % colors.length];
         const color2 = isHighlight ? '#FF8C00' : colors[(i + 3) % colors.length];
@@ -709,22 +706,19 @@ function drawWheel(prizes, highlightIndex = -1) {
         ctx.fillStyle = grad;
         ctx.fill();
         
-        // توهج للشريحة المميزة
-        if (isHighlight) {
-            ctx.shadowColor = '#FFD700';
-            ctx.shadowBlur = 40;
-        } else {
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-        }
-        
-        // حدود ذهبية خفيفة
-        ctx.strokeStyle = isHighlight ? '#FFD700' : 'rgba(255,215,0,0.06)';
-        ctx.lineWidth = isHighlight ? 2.5 : 0.5;
+        // ===== خطوط ذهبية متوهجة بين الأقسام =====
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = isHighlight ? 25 : 8;
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = isHighlight ? 3 : 1.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, start);
+        ctx.lineTo(cx + r * Math.cos(start), cy + r * Math.sin(start));
         ctx.stroke();
         ctx.shadowBlur = 0;
         
-        // النص - أيقونة + اسم الجائزة
+        // ===== النص - فقط اسم الجائزة (حجم كبير وواضح) =====
         const mid = start + step/2;
         const tr = r * 0.65;
         const x = cx + Math.cos(mid) * tr;
@@ -734,28 +728,36 @@ function drawWheel(prizes, highlightIndex = -1) {
         ctx.translate(x, y);
         ctx.rotate(mid + (mid > Math.PI/2 ? Math.PI : 0));
         
-        // الأيقونة
-        ctx.fillStyle = isHighlight ? '#0a0a0a' : '#fff';
-        ctx.font = isHighlight ? 'bold 16px sans-serif' : '14px sans-serif';
+        // اسم الجائزة بحجم كبير
+        ctx.fillStyle = isHighlight ? '#0a0a0a' : '#ffffff';
+        ctx.font = isHighlight ? 'bold 16px sans-serif' : 'bold 14px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0,0,0,0.7)';
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
         ctx.shadowBlur = 6;
-        ctx.fillText(p.icon || '🎁', 0, -8);
         
-        // اسم الجائزة (مختصر)
-        ctx.font = isHighlight ? 'bold 9px sans-serif' : '8px sans-serif';
-        const name = p.name.length > 10 ? p.name.substring(0, 10) + '…' : p.name;
-        ctx.fillText(name, 0, 12);
+        // عرض اسم الجائزة بدون إيموجي
+        let displayName = p.name;
+        // إزالة الإيموجيات من البداية
+        displayName = displayName.replace(/^[\u{1F000}-\u{1FFFF}]|^[\u2600}-\u{27BF}]|^[\u{1F300}-\u{1F5FF}]|^[\u{1F600}-\u{1F64F}]|^[\u{1F680}-\u{1F6FF}]|^[\u{1F700}-\u{1F77F}]|^[\u{1F780}-\u{1F7FF}]|^[\u{1F800}-\u{1F8FF}]|^[\u{1F900}-\u{1F9FF}]|^[\u{1FA00}-\u{1FA6F}]|^[\u{1FA70}-\u{1FAFF}]|^[\u{1FB00}-\u{1FBFF}]|^[\u{1FC00}-\u{1FCFF}]|^[\u{1FD00}-\u{1FDFF}]|^[\u{1FE00}-\u{1FEFF}]|^[\u{1FF00}-\u{1FFFF}]|^\p{Emoji}/u, '').trim();
+        
+        // تقسيم النص إلى سطرين إذا كان طويلاً
+        if (displayName.length > 12) {
+            const midIdx = Math.floor(displayName.length / 2);
+            const part1 = displayName.substring(0, midIdx);
+            const part2 = displayName.substring(midIdx);
+            ctx.fillText(part1, 0, -10);
+            ctx.fillText(part2, 0, 14);
+        } else {
+            ctx.fillText(displayName, 0, 0);
+        }
         
         ctx.shadowBlur = 0;
         ctx.restore();
     });
     
-    // ===== الدائرة المركزية مع صورة =====
-    const centerR = r * 0.14;
-    
-    // خلفية ذهبية مشعة
+    // ===== الدائرة المركزية =====
+    const centerR = r * 0.13;
     const grad = ctx.createRadialGradient(cx-4, cy-4, 0, cx, cy, centerR);
     grad.addColorStop(0, '#FFD700');
     grad.addColorStop(0.5, '#FF8C00');
@@ -764,14 +766,14 @@ function drawWheel(prizes, highlightIndex = -1) {
     ctx.beginPath();
     ctx.arc(cx, cy, centerR, 0, 2 * Math.PI);
     ctx.fillStyle = grad;
-    ctx.shadowColor = 'rgba(255, 215, 0, 0.4)';
-    ctx.shadowBlur = 30;
+    ctx.shadowColor = 'rgba(255, 215, 0, 0.3)';
+    ctx.shadowBlur = 25;
     ctx.fill();
     ctx.shadowBlur = 0;
     
-    // صورة في المركز (يمكن تغييرها)
+    // صورة في المركز
     ctx.fillStyle = '#0a0a0a';
-    ctx.font = '22px sans-serif';
+    ctx.font = '20px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.5)';
@@ -782,8 +784,15 @@ function drawWheel(prizes, highlightIndex = -1) {
     // حلقة ذهبية حول المركز
     ctx.beginPath();
     ctx.arc(cx, cy, centerR + 4, 0, 2 * Math.PI);
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.15)';
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.12)';
     ctx.lineWidth = 1.5;
+    ctx.stroke();
+    
+    // ===== حلقة خارجية ذهبية =====
+    ctx.beginPath();
+    ctx.arc(cx, cy, r - 2, 0, 2 * Math.PI);
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.08)';
+    ctx.lineWidth = 1;
     ctx.stroke();
 }
 
@@ -916,24 +925,55 @@ async function spinWheel() {
         
         if (data.success) {
             const prize = data.spin.prize;
+            const prizeIndex = prizesCache.findIndex(p => p.id === prize.id);
             
-            // تأثير دوران العجلة
-            const canvas = document.querySelector('.wheel-wrapper canvas');
+            // ===== حساب زاوية التوقف =====
+            // زاوية كل قسم
+            const step = (2 * Math.PI) / prizesCache.length;
+            // زاوية منتصف القسم الفائز (بالنسبة للمؤشر العلوي)
+            const targetAngle = prizeIndex * step + step / 2;
+            // دوران عشوائي (5-8 دورات كاملة) + زاوية الهدف
+            const extraSpins = 5 + Math.random() * 3;
+            const targetRotation = extraSpins * 2 * Math.PI + (2 * Math.PI - targetAngle);
+            
+            // ===== تأثير دوران العجلة =====
+            const canvas = document.getElementById('wheelCanvas');
             canvas.classList.add('spinning');
-            setTimeout(() => {
-                canvas.classList.remove('spinning');
-            }, 1200);
             
-            // عرض النتيجة
-            document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
-            document.getElementById('prizeName').textContent = prize.name;
-            document.getElementById('prizeDesc').textContent = prize.description || 'مبروك!';
-            document.getElementById('resultBox').classList.add('show');
+            // دوران تدريجي
+            const startRotation = currentRotation;
+            const endRotation = startRotation + targetRotation;
+            const duration = 3000 + Math.random() * 1000; // 3-4 ثواني
+            const startTime = Date.now();
             
-            // إبراز الجائزة
-            const idx = prizesCache.findIndex(p => p.id === prize.id);
-            drawWheel(prizesCache, idx);
-            await loadUserStatus();
+            function animateRotation() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // دالة تسارع (ease-out)
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentAngle = startRotation + targetRotation * eased;
+                
+                drawWheel(prizesCache, -1, currentAngle);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateRotation);
+                } else {
+                    currentRotation = endRotation;
+                    canvas.classList.remove('spinning');
+                    
+                    // ===== عرض النتيجة =====
+                    document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
+                    document.getElementById('prizeName').textContent = prize.name;
+                    document.getElementById('prizeDesc').textContent = prize.description || 'مبروك!';
+                    document.getElementById('resultBox').classList.add('show');
+                    
+                    // إبراز الجائزة
+                    drawWheel(prizesCache, prizeIndex, endRotation);
+                    await loadUserStatus();
+                }
+            }
+            
+            animateRotation();
             
         } else {
             showError(data.error || 'حدث خطأ');
@@ -966,10 +1006,9 @@ function showError(msg) {
 }
 
 // ================================================================
-//                      التهيئة - التحقق من الخادم
+//                      التهيئة
 // ================================================================
 async function init() {
-    // 1. الحصول على USER_ID
     USER_ID = getUserId();
     
     if (!USER_ID) {
@@ -980,12 +1019,10 @@ async function init() {
     
     document.getElementById('userIdDisplay').textContent = USER_ID;
     
-    // 2. إظهار شاشة اللودينغ
     showLoading(true);
     updateLoading(10, 'جاري التحقق من الخادم...');
     
     try {
-        // 3. التحقق من الخادم
         await new Promise(r => setTimeout(r, 500));
         updateLoading(30, 'جاري الاتصال بقاعدة البيانات...');
         
@@ -998,14 +1035,10 @@ async function init() {
         }
         
         updateLoading(70, 'جاري تحميل الجوائز...');
-        
-        // 4. تحميل الجوائز
         const prizes = await loadPrizes();
         drawWheel(prizes);
         
         updateLoading(85, 'جاري تحميل بيانات المستخدم...');
-        
-        // 5. تحميل حالة المستخدم
         await loadUserStatus();
         
         updateLoading(100, '✅ جاهز!');
@@ -1015,13 +1048,10 @@ async function init() {
         console.error('Init error:', e);
         updateLoading(100, '⚠️ فشل الاتصال');
         await new Promise(r => setTimeout(r, 600));
-        showError('فشل الاتصال بالخادم، تأكد من اتصالك بالإنترنت');
+        showError('فشل الاتصال بالخادم');
     }
     
-    // 6. إخفاء اللودينغ وإظهار العجلة
     showLoading(false);
-    
-    // 7. ربط زر التدوير
     document.getElementById('spinBtn').onclick = spinWheel;
 }
 

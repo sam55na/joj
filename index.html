@@ -29,7 +29,6 @@
             overflow: hidden;
         }
 
-        /* خلفية متحركة */
         body::before {
             content: '';
             position: fixed;
@@ -48,9 +47,6 @@
             100% { transform: translate(2%, 3%) rotate(3deg); }
         }
 
-        /* ============================================================
-                   الحاوية الرئيسية
-                   ============================================================ */
         .container {
             position: relative;
             z-index: 1;
@@ -66,9 +62,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* ============================================================
-                   العنوان
-                   ============================================================ */
         .header {
             text-align: center;
             margin-bottom: 20px;
@@ -102,9 +95,6 @@
             color: #FFD700;
         }
 
-        /* ============================================================
-                   حالة المستخدم - تصميم أنيق
-                   ============================================================ */
         .user-status {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -147,9 +137,6 @@
             color: #FF8C00;
         }
 
-        /* ============================================================
-                   رسالة الخطأ (عدم وجود USER_ID)
-                   ============================================================ */
         .error-container {
             display: none;
             text-align: center;
@@ -206,9 +193,6 @@
             box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
         }
 
-        /* ============================================================
-                   لودينغ - شاشة التحقق من الخادم
-                   ============================================================ */
         .loading-screen {
             display: none;
             flex-direction: column;
@@ -287,9 +271,6 @@
             margin-top: 10px;
         }
 
-        /* ============================================================
-                   العجلة
-                   ============================================================ */
         .wheel-container {
             display: none;
             position: relative;
@@ -325,9 +306,6 @@
             filter: brightness(1.2) drop-shadow(0 0 50px rgba(255, 215, 0, 0.15));
         }
 
-        /* ============================================================
-                   المؤشر العلوي (بصورة)
-                   ============================================================ */
         .pointer {
             position: absolute;
             top: -16px;
@@ -345,9 +323,6 @@
             50% { transform: translateX(-50%) translateY(-4px); }
         }
 
-        /* ============================================================
-                   لا توجد جوائز
-                   ============================================================ */
         .no-prizes {
             display: none;
             text-align: center;
@@ -364,9 +339,6 @@
             font-size: 14px;
         }
 
-        /* ============================================================
-                   الأزرار
-                   ============================================================ */
         .actions {
             display: flex;
             flex-direction: column;
@@ -422,9 +394,6 @@
             display: inline-block;
         }
 
-        /* ============================================================
-                   النتيجة
-                   ============================================================ */
         .result-box {
             background: rgba(255, 215, 0, 0.02);
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -463,9 +432,6 @@
             margin-top: 2px;
         }
 
-        /* ============================================================
-                   شرط الإيداع
-                   ============================================================ */
         .deposit-notice {
             background: rgba(255, 215, 0, 0.03);
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -490,9 +456,6 @@
             font-weight: 700;
         }
 
-        /* ============================================================
-                   رسالة الخطأ العامة
-                   ============================================================ */
         .error-msg {
             background: rgba(255, 0, 0, 0.04);
             border: 1px solid rgba(255, 0, 0, 0.06);
@@ -510,9 +473,6 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* ============================================================
-                   تجاوب
-                   ============================================================ */
         @media (max-width: 420px) {
             .container { padding: 16px; }
             .header h1 { font-size: 22px; }
@@ -527,13 +487,11 @@
 
 <div class="container" id="app">
 
-    <!-- ===== العنوان ===== -->
     <div class="header">
         <h1>🎡 عجلة الحظ</h1>
         <div class="subtitle"><span>IChancy</span> · دور واربح</div>
     </div>
 
-    <!-- ===== حالة المستخدم ===== -->
     <div class="user-status" id="userStatus">
         <div class="user-id">👤 <span id="userIdDisplay">---</span></div>
         <div class="spin-info">
@@ -543,7 +501,6 @@
         </div>
     </div>
 
-    <!-- ===== رسالة الخطأ (عدم وجود USER_ID) ===== -->
     <div class="error-container" id="errorContainer">
         <div class="error-icon">⚠️</div>
         <div class="error-title">يجب الدخول من البوت</div>
@@ -558,7 +515,6 @@
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
 
-    <!-- ===== شاشة اللودينغ ===== -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loader-ring"></div>
         <div class="loader-icon">🎯</div>
@@ -570,22 +526,18 @@
         <div class="loader-status-text" id="loaderStatusText">0%</div>
     </div>
 
-    <!-- ===== العجلة ===== -->
     <div class="wheel-container" id="wheelContainer">
         <div class="wheel-wrapper">
-            <!-- المؤشر العلوي -->
             <div class="pointer" id="pointer">🔽</div>
             <canvas id="wheelCanvas" width="500" height="500"></canvas>
         </div>
     </div>
 
-    <!-- ===== لا توجد جوائز ===== -->
     <div class="no-prizes" id="noPrizes">
         <div class="icon">⚠️</div>
         <div class="text">لا توجد جوائز متاحة</div>
     </div>
 
-    <!-- ===== الأزرار ===== -->
     <div class="actions">
         <button class="btn btn-spin" id="spinBtn" disabled>
             <span class="spinner-small"></span>
@@ -593,7 +545,6 @@
         </button>
     </div>
 
-    <!-- ===== شرط الإيداع ===== -->
     <div class="deposit-notice" id="depositNotice">
         <div class="notice-text">
             💰 مطلوب إيداع <span class="amount" id="depositMinAmount">0</span> SYP
@@ -601,12 +552,10 @@
         </div>
     </div>
 
-    <!-- ===== الخطأ ===== -->
     <div class="error-msg" id="errorMsg">
         <span id="errorText"></span>
     </div>
 
-    <!-- ===== النتيجة ===== -->
     <div class="result-box" id="resultBox">
         <div class="prize-icon" id="prizeIcon">🎁</div>
         <div class="prize-name" id="prizeName">جائزة!</div>
@@ -625,6 +574,7 @@ let USER_ID = null;
 let isSpinning = false;
 let prizesCache = [];
 let isReady = false;
+let currentRotation = 0;
 
 // ================================================================
 //                      جلب USER_ID
@@ -659,9 +609,9 @@ function getUserId() {
 }
 
 // ================================================================
-//                      رسم العجلة - تصميم متطور
+//                      رسم العجلة مع دوران
 // ================================================================
-function drawWheel(prizes, highlightIndex = -1) {
+function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     const canvas = document.getElementById('wheelCanvas');
     const ctx = canvas.getContext('2d');
     const w = canvas.width, h = canvas.height;
@@ -683,7 +633,6 @@ function drawWheel(prizes, highlightIndex = -1) {
     const total = prizes.length;
     const step = (2 * Math.PI) / total;
     
-    // ألوان جذابة
     const colors = [
         '#1a1a2e', '#16213e', '#0f3460', '#1a1a2e', 
         '#2d1b3d', '#1a1a2e', '#16213e', '#0f3460',
@@ -691,7 +640,7 @@ function drawWheel(prizes, highlightIndex = -1) {
     ];
     
     prizes.forEach((p, i) => {
-        const start = i * step - Math.PI/2;
+        const start = i * step + rotation - Math.PI/2;
         const end = start + step;
         const isHighlight = (i === highlightIndex);
         
@@ -700,7 +649,6 @@ function drawWheel(prizes, highlightIndex = -1) {
         ctx.arc(cx, cy, r, start, end);
         ctx.closePath();
         
-        // تدرج لوني لكل شريحة
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
         const color1 = isHighlight ? '#FFD700' : colors[i % colors.length];
         const color2 = isHighlight ? '#FF8C00' : colors[(i + 3) % colors.length];
@@ -709,7 +657,6 @@ function drawWheel(prizes, highlightIndex = -1) {
         ctx.fillStyle = grad;
         ctx.fill();
         
-        // توهج للشريحة المميزة
         if (isHighlight) {
             ctx.shadowColor = '#FFD700';
             ctx.shadowBlur = 40;
@@ -718,13 +665,11 @@ function drawWheel(prizes, highlightIndex = -1) {
             ctx.shadowBlur = 0;
         }
         
-        // حدود ذهبية خفيفة
         ctx.strokeStyle = isHighlight ? '#FFD700' : 'rgba(255,215,0,0.06)';
         ctx.lineWidth = isHighlight ? 2.5 : 0.5;
         ctx.stroke();
         ctx.shadowBlur = 0;
         
-        // النص - أيقونة + اسم الجائزة
         const mid = start + step/2;
         const tr = r * 0.65;
         const x = cx + Math.cos(mid) * tr;
@@ -734,7 +679,6 @@ function drawWheel(prizes, highlightIndex = -1) {
         ctx.translate(x, y);
         ctx.rotate(mid + (mid > Math.PI/2 ? Math.PI : 0));
         
-        // الأيقونة
         ctx.fillStyle = isHighlight ? '#0a0a0a' : '#fff';
         ctx.font = isHighlight ? 'bold 16px sans-serif' : '14px sans-serif';
         ctx.textAlign = 'center';
@@ -743,7 +687,6 @@ function drawWheel(prizes, highlightIndex = -1) {
         ctx.shadowBlur = 6;
         ctx.fillText(p.icon || '🎁', 0, -8);
         
-        // اسم الجائزة (مختصر)
         ctx.font = isHighlight ? 'bold 9px sans-serif' : '8px sans-serif';
         const name = p.name.length > 10 ? p.name.substring(0, 10) + '…' : p.name;
         ctx.fillText(name, 0, 12);
@@ -752,10 +695,8 @@ function drawWheel(prizes, highlightIndex = -1) {
         ctx.restore();
     });
     
-    // ===== الدائرة المركزية مع صورة =====
+    // مركز العجلة
     const centerR = r * 0.14;
-    
-    // خلفية ذهبية مشعة
     const grad = ctx.createRadialGradient(cx-4, cy-4, 0, cx, cy, centerR);
     grad.addColorStop(0, '#FFD700');
     grad.addColorStop(0.5, '#FF8C00');
@@ -769,7 +710,6 @@ function drawWheel(prizes, highlightIndex = -1) {
     ctx.fill();
     ctx.shadowBlur = 0;
     
-    // صورة في المركز (يمكن تغييرها)
     ctx.fillStyle = '#0a0a0a';
     ctx.font = '22px sans-serif';
     ctx.textAlign = 'center';
@@ -779,12 +719,46 @@ function drawWheel(prizes, highlightIndex = -1) {
     ctx.fillText('⭐', cx, cy + 1);
     ctx.shadowBlur = 0;
     
-    // حلقة ذهبية حول المركز
     ctx.beginPath();
     ctx.arc(cx, cy, centerR + 4, 0, 2 * Math.PI);
     ctx.strokeStyle = 'rgba(255, 215, 0, 0.15)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
+}
+
+// ================================================================
+//                      دوران العجلة مع تأثير سلس
+// ================================================================
+function animateSpin(targetRotation, duration, callback) {
+    const canvas = document.getElementById('wheelCanvas');
+    canvas.classList.add('spinning');
+    
+    const startRotation = currentRotation;
+    const startTime = performance.now();
+    
+    function animate(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // منحنى تسارع وتباطؤ
+        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+        const easedProgress = easeOutCubic;
+        
+        const currentAngle = startRotation + (targetRotation - startRotation) * easedProgress;
+        currentRotation = currentAngle;
+        
+        drawWheel(prizesCache, -1, currentAngle);
+        
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            currentRotation = targetRotation;
+            canvas.classList.remove('spinning');
+            if (callback) callback();
+        }
+    }
+    
+    requestAnimationFrame(animate);
 }
 
 // ================================================================
@@ -885,7 +859,7 @@ function showLoading(show) {
 }
 
 // ================================================================
-//                      تدوير العجلة
+//                      تدوير العجلة - مع حركة
 // ================================================================
 async function spinWheel() {
     if (isSpinning || !USER_ID) return;
@@ -917,23 +891,36 @@ async function spinWheel() {
         if (data.success) {
             const prize = data.spin.prize;
             
-            // تأثير دوران العجلة
-            const canvas = document.querySelector('.wheel-wrapper canvas');
-            canvas.classList.add('spinning');
-            setTimeout(() => {
-                canvas.classList.remove('spinning');
-            }, 1200);
-            
-            // عرض النتيجة
-            document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
-            document.getElementById('prizeName').textContent = prize.name;
-            document.getElementById('prizeDesc').textContent = prize.description || 'مبروك!';
-            document.getElementById('resultBox').classList.add('show');
-            
-            // إبراز الجائزة
-            const idx = prizesCache.findIndex(p => p.id === prize.id);
-            drawWheel(prizesCache, idx);
-            await loadUserStatus();
+            // حساب الزاوية المستهدفة - 3 لفات كاملة + زاوية الجائزة
+            const prizeIndex = prizesCache.findIndex(p => p.id === prize.id);
+            if (prizeIndex === -1) {
+                // إذا لم يتم العثور على الجائزة، نختار عشوائي
+                const randomIndex = Math.floor(Math.random() * prizesCache.length);
+                const targetAngle = (randomIndex / prizesCache.length) * 2 * Math.PI;
+                const totalRotation = currentRotation + (3 * 2 * Math.PI) + (2 * Math.PI - targetAngle);
+                
+                animateSpin(totalRotation, 3000, () => {
+                    drawWheel(prizesCache, randomIndex, totalRotation);
+                    document.getElementById('prizeIcon').textContent = prizesCache[randomIndex].icon || '🎁';
+                    document.getElementById('prizeName').textContent = prizesCache[randomIndex].name;
+                    document.getElementById('prizeDesc').textContent = prizesCache[randomIndex].description || 'مبروك!';
+                    document.getElementById('resultBox').classList.add('show');
+                    loadUserStatus();
+                });
+            } else {
+                const targetAngle = (prizeIndex / prizesCache.length) * 2 * Math.PI;
+                // 3 لفات كاملة + زاوية الجائزة
+                const totalRotation = currentRotation + (3 * 2 * Math.PI) + (2 * Math.PI - targetAngle);
+                
+                animateSpin(totalRotation, 3000, () => {
+                    drawWheel(prizesCache, prizeIndex, totalRotation);
+                    document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
+                    document.getElementById('prizeName').textContent = prize.name;
+                    document.getElementById('prizeDesc').textContent = prize.description || 'مبروك!';
+                    document.getElementById('resultBox').classList.add('show');
+                    loadUserStatus();
+                });
+            }
             
         } else {
             showError(data.error || 'حدث خطأ');
@@ -942,11 +929,14 @@ async function spinWheel() {
                 btn.disabled = true;
                 document.getElementById('spinBtnText').textContent = `⏳ ${data.remaining_hours}h ${data.remaining_minutes}m`;
             }
+            // إعادة رسم العجلة بدون تغيير
+            drawWheel(prizesCache, -1, currentRotation);
         }
         
     } catch(e) {
         spinBtn.classList.remove('loading');
         showError('خطأ في الاتصال: ' + e.message);
+        drawWheel(prizesCache, -1, currentRotation);
     }
     
     isSpinning = false;
@@ -966,10 +956,9 @@ function showError(msg) {
 }
 
 // ================================================================
-//                      التهيئة - التحقق من الخادم
+//                      التهيئة
 // ================================================================
 async function init() {
-    // 1. الحصول على USER_ID
     USER_ID = getUserId();
     
     if (!USER_ID) {
@@ -979,13 +968,10 @@ async function init() {
     }
     
     document.getElementById('userIdDisplay').textContent = USER_ID;
-    
-    // 2. إظهار شاشة اللودينغ
     showLoading(true);
     updateLoading(10, 'جاري التحقق من الخادم...');
     
     try {
-        // 3. التحقق من الخادم
         await new Promise(r => setTimeout(r, 500));
         updateLoading(30, 'جاري الاتصال بقاعدة البيانات...');
         
@@ -998,14 +984,10 @@ async function init() {
         }
         
         updateLoading(70, 'جاري تحميل الجوائز...');
-        
-        // 4. تحميل الجوائز
         const prizes = await loadPrizes();
-        drawWheel(prizes);
+        drawWheel(prizes, -1, 0);
         
         updateLoading(85, 'جاري تحميل بيانات المستخدم...');
-        
-        // 5. تحميل حالة المستخدم
         await loadUserStatus();
         
         updateLoading(100, '✅ جاهز!');
@@ -1018,10 +1000,7 @@ async function init() {
         showError('فشل الاتصال بالخادم، تأكد من اتصالك بالإنترنت');
     }
     
-    // 6. إخفاء اللودينغ وإظهار العجلة
     showLoading(false);
-    
-    // 7. ربط زر التدوير
     document.getElementById('spinBtn').onclick = spinWheel;
 }
 
@@ -1030,4 +1009,3 @@ document.addEventListener('DOMContentLoaded', init);
 
 </body>
 </html>
-

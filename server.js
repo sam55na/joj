@@ -39,6 +39,7 @@ const pool = new Pool({
 });
 
 const ADMIN_ID = 7011476249;
+let dbReady = false;
 
 // ================================================================
 //                      إنشاء الجداول
@@ -112,12 +113,8 @@ const DEFAULT_SETTINGS = [
     { key: 'deposit_check_hours', value: '24' },
     { key: 'center_icon', value: '⭐' },
     { key: 'bg_image_url', value: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80' },
-    { key: 'banner_text', value: '🎡 IChancy · عجلة الحظ' },
-    { key: 'spin_duration', value: '3500' },
-    { key: 'spins_before_cooldown', value: '5' }
+    { key: 'spin_duration', value: '3500' }
 ];
-
-let dbReady = false;
 
 // ================================================================
 //                      تهيئة قاعدة البيانات
@@ -224,6 +221,51 @@ app.get('/api/status', (req, res) => {
     });
 });
 
+// -------------------- الحصول على النص العلوي --------------------
+app.get('/api/banner', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT text FROM wheel_banner ORDER BY id DESC LIMIT 1');
+        res.json({
+            success: true,
+            text: result.rows[0]?.text || '🎡 IChancy · عجلة الحظ'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// -------------------- تحديث النص العلوي --------------------
+app.put('/api/banner', async (req, res) => {
+    const { admin_id, text } = req.body;
+
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: 'Unauthorized - Admin only'
+        });
+    }
+
+    try {
+        await pool.query(`
+            INSERT INTO wheel_banner (text, updated_at)
+            VALUES ($1, CURRENT_TIMESTAMP)
+        `, [text]);
+
+        res.json({
+            success: true,
+            message: 'Banner updated successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 // -------------------- الحصول على الإعدادات --------------------
 app.get('/api/admin/settings', async (req, res) => {
     const { admin_id } = req.query;
@@ -258,9 +300,9 @@ app.get('/api/admin/settings', async (req, res) => {
     }
 });
 
-// -------------------- تحديث الإعدادات --------------------
-app.put('/api/admin/settings', async (req, res) => {
-    const { admin_id, settings } = req.body;
+// -------------------- تحديث إعداد واحد --------------------
+app.put('/api/admin/setting', async (req, res) => {
+    const { admin_id, key, value } = req.body;
 
     if (parseInt(admin_id) !== ADMIN_ID) {
         return res.status(403).json({
@@ -269,26 +311,31 @@ app.put('/api/admin/settings', async (req, res) => {
         });
     }
 
+    if (!key) {
+        return res.status(400).json({
+            success: false,
+            error: 'Key is required'
+        });
+    }
+
     try {
-        for (const [key, value] of Object.entries(settings)) {
-            if (key === 'banner_text') {
-                await pool.query(`
-                    INSERT INTO wheel_banner (text, updated_at)
-                    VALUES ($1, CURRENT_TIMESTAMP)
-                `, [value]);
-            } else {
-                await pool.query(`
-                    INSERT INTO wheel_settings (setting_key, setting_value, updated_at)
-                    VALUES ($1, $2, CURRENT_TIMESTAMP)
-                    ON CONFLICT (setting_key) 
-                    DO UPDATE SET setting_value = $2, updated_at = CURRENT_TIMESTAMP
-                `, [key, value]);
-            }
+        if (key === 'banner_text') {
+            await pool.query(`
+                INSERT INTO wheel_banner (text, updated_at)
+                VALUES ($1, CURRENT_TIMESTAMP)
+            `, [value]);
+        } else {
+            await pool.query(`
+                INSERT INTO wheel_settings (setting_key, setting_value, updated_at)
+                VALUES ($1, $2, CURRENT_TIMESTAMP)
+                ON CONFLICT (setting_key) 
+                DO UPDATE SET setting_value = $2, updated_at = CURRENT_TIMESTAMP
+            `, [key, value]);
         }
 
         res.json({
             success: true,
-            message: 'Settings updated successfully'
+            message: 'Setting updated successfully'
         });
     } catch (error) {
         res.status(500).json({
@@ -312,6 +359,27 @@ app.get('/api/admin/prizes', async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT * FROM wheel_prizes 
+            ORDER BY probability DESC
+        `);
+        
+        res.json({
+            success: true,
+            prizes: result.rows
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// -------------------- الحصول على الجوائز النشطة للعجلة --------------------
+app.get('/api/prizes', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT * FROM wheel_prizes 
+            WHERE is_active = true
             ORDER BY probability DESC
         `);
         
@@ -632,9 +700,6 @@ app.post('/api/wheel/spin', async (req, res) => {
             WHERE user_id = $1
         `, [user_id]);
 
-        const nextSpinDate = new Date();
-        nextSpinDate.setHours(nextSpinDate.getHours() + intervalHoursValue);
-
         res.json({
             success: true,
             spin: {
@@ -645,8 +710,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             stats: {
                 total_spins: parseInt(userStats.rows[0].total_spins),
                 wins: parseInt(userStats.rows[0].wins)
-            },
-            next_spin_allowed: nextSpinDate.toISOString()
+            }
         });
 
     } catch (error) {

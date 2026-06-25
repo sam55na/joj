@@ -12,26 +12,252 @@ app.use(express.static('public'));
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
-    console.error('❌ DATABASE_URL is not set!');
+    console.error('❌ FATAL: DATABASE_URL is not set!');
     process.exit(1);
 }
 
+console.log('📊 DATABASE_URL:', DATABASE_URL.replace(/:[^:]*@/, ':****@'));
+
 // ================================================================
-//                      اتصال PostgreSQL
+//                      اتصال PostgreSQL مع إعادة المحاولة
 // ================================================================
 const pool = new Pool({
     connectionString: DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000
 });
 
-// اختبار الاتصال
-pool.connect((err) => {
-    if (err) {
-        console.error('❌ Database connection error:', err);
-    } else {
-        console.log('✅ Connected to PostgreSQL successfully');
+// اختبار الاتصال مع إعادة المحاولة
+async function testConnection(retries = 5, delay = 2000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const client = await pool.connect();
+            const result = await client.query('SELECT NOW()');
+            client.release();
+            console.log(`✅ Connected to PostgreSQL (${i + 1}/${retries})`);
+            console.log(`🕐 Server time: ${result.rows[0].now}`);
+            return true;
+        } catch (err) {
+            console.log(`⚠️ Connection attempt ${i + 1}/${retries} failed: ${err.message}`);
+            if (i < retries - 1) {
+                console.log(`⏳ Retrying in ${delay/1000}s...`);
+                await new Promise(r => setTimeout(r, delay));
+            }
+        }
     }
-});
+    console.error('❌ FATAL: Could not connect to PostgreSQL after multiple attempts');
+    return false;
+}
+
+// ================================================================
+//                      فحص الجداول وإنشاؤها
+// ================================================================
+const REQUIRED_TABLES = [
+    'wheel_prizes',
+    'wheel_spins',
+    'wheel_settings',
+    'wheel_deposits'
+];
+
+const TABLE_SCHEMAS = {
+    wheel_prizes: `
+        CREATE TABLE IF NOT EXISTS wheel_prizes (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            description TEXT,
+            probability DECIMAL(5,2) NOT NULL DEFAULT 0,
+            icon VARCHAR(50),
+            is_active BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `,
+    wheel_spins: `
+        CREATE TABLE IF NOT EXISTS wheel_spins (
+            id SERIAL PRIMARY KEY,
+            user_id BIGINT NOT NULL,
+            prize_id INTEGER REFERENCES wheel_prizes(id),
+            prize_name VARCHAR(255),
+            spin_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            is_claimed BOOLEAN DEFAULT FALSE,
+            claimed_date TIMESTAMP
+        )
+    `,
+    wheel_settings: `
+        CREATE TABLE IF NOT EXISTS wheel_settings (
+            id SERIAL PRIMARY KEY,
+            setting_key VARCHAR(100) UNIQUE NOT NULL,
+            setting_value TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `,
+    wheel_deposits: `
+        CREATE TABLE IF NOT EXISTS wheel_deposits (
+            id SERIAL PRIMARY KEY,
+            user_id BIGINT NOT NULL,
+            amount DECIMAL(20,2) NOT NULL,
+            deposit_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            source VARCHAR(100)
+        )
+    `
+};
+
+const DEFAULT_PRIZES = [
+    { name: '🎁 1000 SYP', description: 'الفوز بـ 1000 ليرة سورية', probability: 15, icon: '🎁' },
+    { name: '🎁 500 SYP', description: 'الفوز بـ 500 ليرة سورية', probability: 20, icon: '🎁' },
+    { name: '🎁 200 SYP', description: 'الفوز بـ 200 ليرة سورية', probability: 30, icon: '🎁' },
+    { name: '🎫 كود هدية', description: 'كود هدية بقيمة 50 SYP', probability: 10, icon: '🎫' },
+    { name: '😅 حظ سعيد', description: 'لا يوجد فوز هذه المرة', probability: 20, icon: '😅' },
+    { name: '⭐ 50 SYP', description: 'الفوز بـ 50 ليرة سورية', probability: 5, icon: '⭐' }
+];
+
+const DEFAULT_SETTINGS = [
+    { key: 'spin_interval_hours', value: '24' },
+    { key: 'is_active', value: 'true' },
+    { key: 'deposit_required', value: 'false' },
+    { key: 'deposit_min_amount', value: '1000' },
+    { key: 'deposit_check_hours', value: '24' }
+];
+
+// ================================================================
+//                      وظيفة إنشاء الجداول والتحقق
+// ================================================================
+async function ensureTables() {
+    const results = {
+        connection: false,
+        tables: {},
+        prizes: false,
+        settings: false,
+        errors: []
+    };
+
+    console.log('\n📋 ===== فحص قاعدة البيانات =====');
+
+    // 1. التحقق من الاتصال
+    results.connection = await testConnection();
+    if (!results.connection) {
+        results.errors.push('❌ فشل الاتصال بقاعدة البيانات');
+        return results;
+    }
+
+    const client = await pool.connect();
+
+    try {
+        // 2. إنشاء الجداول المطلوبة
+        console.log('\n📋 إنشاء الجداول المطلوبة...');
+        for (const table of REQUIRED_TABLES) {
+            try {
+                await client.query(TABLE_SCHEMAS[table]);
+                results.tables[table] = true;
+                console.log(`   ✅ جدول ${table}: تم إنشاؤه/تأكيده`);
+            } catch (err) {
+                results.tables[table] = false;
+                results.errors.push(`❌ فشل إنشاء جدول ${table}: ${err.message}`);
+                console.log(`   ❌ جدول ${table}: فشل - ${err.message}`);
+            }
+        }
+
+        // 3. التحقق من وجود الجداول بعد الإنشاء
+        console.log('\n📋 التحقق من وجود الجداول...');
+        for (const table of REQUIRED_TABLES) {
+            const check = await client.query(`
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name = $1
+                )
+            `, [table]);
+            const exists = check.rows[0].exists;
+            console.log(`   ${exists ? '✅' : '❌'} جدول ${table}: ${exists ? 'موجود' : 'غير موجود'}`);
+            if (!exists) {
+                results.errors.push(`❌ جدول ${table} غير موجود بعد الإنشاء`);
+            }
+        }
+
+        // 4. إضافة الجوائز الافتراضية (إذا لم تكن موجودة)
+        console.log('\n📋 فحص الجوائز...');
+        const prizesCount = await client.query('SELECT COUNT(*) FROM wheel_prizes');
+        const count = parseInt(prizesCount.rows[0].count);
+        
+        if (count === 0) {
+            console.log('   ⚠️ لا توجد جوائز، جاري إضافة الجوائز الافتراضية...');
+            for (const prize of DEFAULT_PRIZES) {
+                await client.query(`
+                    INSERT INTO wheel_prizes (name, description, probability, icon)
+                    VALUES ($1, $2, $3, $4)
+                `, [prize.name, prize.description, prize.probability, prize.icon]);
+            }
+            results.prizes = true;
+            console.log(`   ✅ تم إضافة ${DEFAULT_PRIZES.length} جائزة افتراضية`);
+        } else {
+            results.prizes = true;
+            console.log(`   ✅ يوجد ${count} جوائز في قاعدة البيانات`);
+        }
+
+        // 5. إضافة الإعدادات الافتراضية (إذا لم تكن موجودة)
+        console.log('\n📋 فحص الإعدادات...');
+        const settingsCount = await client.query('SELECT COUNT(*) FROM wheel_settings');
+        const settingsCountVal = parseInt(settingsCount.rows[0].count);
+        
+        if (settingsCountVal === 0) {
+            console.log('   ⚠️ لا توجد إعدادات، جاري إضافة الإعدادات الافتراضية...');
+            for (const setting of DEFAULT_SETTINGS) {
+                await client.query(`
+                    INSERT INTO wheel_settings (setting_key, setting_value)
+                    VALUES ($1, $2)
+                `, [setting.key, setting.value]);
+            }
+            results.settings = true;
+            console.log(`   ✅ تم إضافة ${DEFAULT_SETTINGS.length} إعداد افتراضي`);
+        } else {
+            results.settings = true;
+            console.log(`   ✅ يوجد ${settingsCountVal} إعداد في قاعدة البيانات`);
+        }
+
+        // 6. عرض ملخص الجداول والمحتوى
+        console.log('\n📋 ===== ملخص قاعدة البيانات =====');
+        for (const table of REQUIRED_TABLES) {
+            const countResult = await client.query(`SELECT COUNT(*) FROM ${table}`);
+            const rowCount = parseInt(countResult.rows[0].count);
+            console.log(`   📊 ${table}: ${rowCount} سجل`);
+        }
+
+        console.log('\n✅ ===== قاعدة البيانات جاهزة! =====');
+
+    } catch (err) {
+        console.error('❌ خطأ أثناء تهيئة قاعدة البيانات:', err);
+        results.errors.push(`❌ خطأ عام: ${err.message}`);
+    } finally {
+        client.release();
+    }
+
+    return results;
+}
+
+// ================================================================
+//                      تشغيل التهيئة عند بدء الخادم
+// ================================================================
+let dbReady = false;
+let dbStatus = null;
+
+async function initializeDatabase() {
+    dbStatus = await ensureTables();
+    dbReady = dbStatus.connection && 
+              Object.values(dbStatus.tables).every(v => v === true) &&
+              dbStatus.prizes &&
+              dbStatus.settings;
+    
+    if (dbReady) {
+        console.log('\n🚀 قاعدة البيانات جاهزة للعمل!');
+    } else {
+        console.log('\n⚠️ تحذير: بعض الجداول غير جاهزة!');
+        console.log('📋 الأخطاء:', dbStatus.errors);
+    }
+    
+    return dbReady;
+}
 
 // ================================================================
 //                      المعرفات الثابتة
@@ -39,13 +265,13 @@ pool.connect((err) => {
 const ADMIN_ID = 7011476249;
 
 // ================================================================
-//                      نظام الأقفال (لمنع التكرار)
+//                      نظام الأقفال
 // ================================================================
 const userLocks = new Map();
 
 function acquireLock(userId) {
     if (userLocks.has(userId)) return false;
-    userLocks.set(userId, true);
+    userLocks.set(userId, Date.now());
     return true;
 }
 
@@ -57,114 +283,124 @@ function releaseLock(userId) {
 setInterval(() => {
     const now = Date.now();
     for (const [key, value] of userLocks) {
-        if (value < now - 300000) { // 5 دقائق
+        if (value < now - 300000) {
             userLocks.delete(key);
         }
     }
 }, 300000);
 
 // ================================================================
-//                      تهيئة الجداول
-// ================================================================
-async function initTables() {
-    try {
-        // 1. جدول الجوائز
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS wheel_prizes (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                description TEXT,
-                probability DECIMAL(5,2) NOT NULL DEFAULT 0,
-                icon VARCHAR(50),
-                is_active BOOLEAN DEFAULT TRUE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-
-        // 2. جدول سجل التدوير
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS wheel_spins (
-                id SERIAL PRIMARY KEY,
-                user_id BIGINT NOT NULL,
-                prize_id INTEGER REFERENCES wheel_prizes(id),
-                prize_name VARCHAR(255),
-                spin_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                is_claimed BOOLEAN DEFAULT FALSE,
-                claimed_date TIMESTAMP
-            )
-        `);
-
-        // 3. جدول الإعدادات
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS wheel_settings (
-                id SERIAL PRIMARY KEY,
-                setting_key VARCHAR(100) UNIQUE NOT NULL,
-                setting_value TEXT,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-
-        // 4. جدول إيداعات المستخدمين (للتحقق من شرط الإيداع)
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS wheel_deposits (
-                id SERIAL PRIMARY KEY,
-                user_id BIGINT NOT NULL,
-                amount DECIMAL(20,2) NOT NULL,
-                deposit_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                source VARCHAR(100)
-            )
-        `);
-
-        // 5. إضافة جوائز افتراضية (إذا لم تكن موجودة)
-        const prizesExist = await pool.query('SELECT COUNT(*) FROM wheel_prizes');
-        if (parseInt(prizesExist.rows[0].count) === 0) {
-            await pool.query(`
-                INSERT INTO wheel_prizes (name, description, probability, icon) VALUES
-                ('🎁 1000 SYP', 'الفوز بـ 1000 ليرة سورية', 15, '🎁'),
-                ('🎁 500 SYP', 'الفوز بـ 500 ليرة سورية', 20, '🎁'),
-                ('🎁 200 SYP', 'الفوز بـ 200 ليرة سورية', 30, '🎁'),
-                ('🎫 كود هدية', 'كود هدية بقيمة 50 SYP', 10, '🎫'),
-                ('😅 حظ سعيد', 'لا يوجد فوز هذه المرة', 20, '😅'),
-                ('⭐ 50 SYP', 'الفوز بـ 50 ليرة سورية', 5, '⭐')
-            `);
-            console.log('✅ Default prizes inserted');
-        }
-
-        // 6. إعدادات افتراضية
-        const settingsExist = await pool.query('SELECT COUNT(*) FROM wheel_settings');
-        if (parseInt(settingsExist.rows[0].count) === 0) {
-            await pool.query(`
-                INSERT INTO wheel_settings (setting_key, setting_value) VALUES
-                ('spin_interval_hours', '24'),
-                ('is_active', 'true'),
-                ('deposit_required', 'false'),
-                ('deposit_min_amount', '1000'),
-                ('deposit_check_hours', '24')
-            `);
-            console.log('✅ Default settings inserted');
-        }
-
-        console.log('✅ All tables initialized successfully');
-    } catch (error) {
-        console.error('❌ Error initializing tables:', error);
-    }
-}
-
-initTables();
-
-// ================================================================
 //                      المسارات (API Endpoints)
 // ================================================================
 
-// -------------------- الصفحة الرئيسية --------------------
+// -------------------- فحص حالة الخادم وقاعدة البيانات --------------------
 app.get('/api/status', (req, res) => {
     res.json({
         status: 'running',
         service: 'Wheel of Fortune',
         timestamp: new Date().toISOString(),
-        database: 'connected'
+        database: {
+            ready: dbReady,
+            status: dbStatus
+        }
     });
+});
+
+// -------------------- فحص تفصيلي لقاعدة البيانات --------------------
+app.get('/api/admin/diagnose', async (req, res) => {
+    const { admin_id } = req.query;
+
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: 'Unauthorized - Admin only'
+        });
+    }
+
+    try {
+        const client = await pool.connect();
+        const result = {
+            tables: {},
+            counts: {},
+            settings: {}
+        };
+
+        for (const table of REQUIRED_TABLES) {
+            const check = await client.query(`
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name = $1
+                )
+            `, [table]);
+            result.tables[table] = check.rows[0].exists;
+            
+            if (result.tables[table]) {
+                const count = await client.query(`SELECT COUNT(*) FROM ${table}`);
+                result.counts[table] = parseInt(count.rows[0].count);
+            }
+        }
+
+        // جلب الإعدادات
+        const settings = await client.query('SELECT * FROM wheel_settings');
+        settings.rows.forEach(row => {
+            result.settings[row.setting_key] = row.setting_value;
+        });
+
+        // جلب الجوائز
+        const prizes = await client.query('SELECT * FROM wheel_prizes ORDER BY probability DESC');
+        result.prizes = prizes.rows;
+
+        client.release();
+
+        res.json({
+            success: true,
+            diagnosis: result,
+            db_ready: dbReady,
+            message: dbReady ? '✅ قاعدة البيانات جاهزة' : '⚠️ قاعدة البيانات غير جاهزة'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// -------------------- تعبئة الجوائز الافتراضية --------------------
+app.post('/api/admin/seed-prizes', async (req, res) => {
+    const { admin_id } = req.body;
+
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: 'Unauthorized - Admin only'
+        });
+    }
+
+    try {
+        await pool.query('DELETE FROM wheel_prizes');
+        
+        for (const prize of DEFAULT_PRIZES) {
+            await pool.query(`
+                INSERT INTO wheel_prizes (name, description, probability, icon, is_active)
+                VALUES ($1, $2, $3, $4, true)
+            `, [prize.name, prize.description, prize.probability, prize.icon]);
+        }
+
+        const result = await pool.query('SELECT * FROM wheel_prizes');
+
+        res.json({
+            success: true,
+            message: '✅ تم تعبئة الجوائز الافتراضية بنجاح!',
+            prizes: result.rows
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
 });
 
 // -------------------- 1. جلب جميع الجوائز --------------------
@@ -372,7 +608,7 @@ app.put('/api/admin/settings', async (req, res) => {
     }
 });
 
-// -------------------- 7. تدوير العجلة (الطلب الرئيسي) --------------------
+// -------------------- 7. تدوير العجلة --------------------
 app.post('/api/wheel/spin', async (req, res) => {
     const { user_id } = req.body;
 
@@ -383,7 +619,13 @@ app.post('/api/wheel/spin', async (req, res) => {
         });
     }
 
-    // ===== القفل =====
+    if (!dbReady) {
+        return res.status(503).json({
+            success: false,
+            error: 'Database is not ready. Please try again later.'
+        });
+    }
+
     if (!acquireLock(user_id)) {
         return res.status(429).json({
             success: false,
@@ -393,7 +635,7 @@ app.post('/api/wheel/spin', async (req, res) => {
     }
 
     try {
-        // ===== 1. التحقق من تفعيل العجلة =====
+        // التحقق من تفعيل العجلة
         const isActive = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['is_active']
@@ -406,7 +648,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             });
         }
 
-        // ===== 2. التحقق من شرط الإيداع =====
+        // التحقق من شرط الإيداع
         const depositRequired = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['deposit_required']
@@ -449,7 +691,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
-        // ===== 3. التحقق من آخر تدوير (الفاصل الزمني) =====
+        // التحقق من آخر تدوير
         const intervalHours = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['spin_interval_hours']
@@ -484,7 +726,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
-        // ===== 4. اختيار جائزة عشوائية =====
+        // اختيار جائزة عشوائية
         const prizes = await pool.query(`
             SELECT * FROM wheel_prizes 
             WHERE is_active = true
@@ -498,10 +740,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             });
         }
 
-        // حساب المجموع الكلي للنسب
         const totalProbability = prizes.rows.reduce((sum, p) => sum + parseFloat(p.probability), 0);
-        
-        // اختيار عشوائي
         let random = Math.random() * totalProbability;
         let selectedPrize = prizes.rows[0];
 
@@ -513,14 +752,13 @@ app.post('/api/wheel/spin', async (req, res) => {
             random -= parseFloat(prize.probability);
         }
 
-        // ===== 5. تسجيل التدوير =====
+        // تسجيل التدوير
         const result = await pool.query(`
             INSERT INTO wheel_spins (user_id, prize_id, prize_name)
             VALUES ($1, $2, $3)
             RETURNING id, spin_date
         `, [user_id, selectedPrize.id, selectedPrize.name]);
 
-        // ===== 6. إحصائيات المستخدم =====
         const userStats = await pool.query(`
             SELECT 
                 COUNT(*) as total_spins,
@@ -529,7 +767,6 @@ app.post('/api/wheel/spin', async (req, res) => {
             WHERE user_id = $1
         `, [user_id]);
 
-        // ===== 7. وقت التدوير التالي =====
         const nextSpinDate = new Date();
         nextSpinDate.setHours(nextSpinDate.getHours() + intervalHoursValue);
 
@@ -563,8 +800,14 @@ app.post('/api/wheel/spin', async (req, res) => {
 app.get('/api/wheel/history/:user_id', async (req, res) => {
     const { user_id } = req.params;
 
+    if (!dbReady) {
+        return res.status(503).json({
+            success: false,
+            error: 'Database is not ready. Please try again later.'
+        });
+    }
+
     try {
-        // ===== آخر تدوير =====
         const lastSpin = await pool.query(`
             SELECT spin_date FROM wheel_spins 
             WHERE user_id = $1 
@@ -572,14 +815,12 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             LIMIT 1
         `, [user_id]);
 
-        // ===== الإعدادات =====
         const intervalHours = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['spin_interval_hours']
         );
         const intervalHoursValue = parseInt(intervalHours.rows[0]?.setting_value || 24);
 
-        // ===== شرط الإيداع =====
         const depositRequired = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['deposit_required']
@@ -615,7 +856,6 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             };
         }
 
-        // ===== الوقت المتبقي =====
         let can_spin = true;
         let remaining_hours = 0;
         let remaining_minutes = 0;
@@ -634,7 +874,6 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             }
         }
 
-        // ===== السجل =====
         const history = await pool.query(`
             SELECT 
                 s.id,
@@ -691,6 +930,13 @@ app.put('/api/wheel/claim/:spin_id', async (req, res) => {
     const { spin_id } = req.params;
     const { user_id } = req.body;
 
+    if (!dbReady) {
+        return res.status(503).json({
+            success: false,
+            error: 'Database is not ready. Please try again later.'
+        });
+    }
+
     try {
         const spin = await pool.query(
             'SELECT * FROM wheel_spins WHERE id = $1',
@@ -738,7 +984,7 @@ app.put('/api/wheel/claim/:spin_id', async (req, res) => {
     }
 });
 
-// -------------------- 10. تسجيل إيداع (للبوت الرئيسي) --------------------
+// -------------------- 10. تسجيل إيداع --------------------
 app.post('/api/wheel/deposit', async (req, res) => {
     const { user_id, amount, source } = req.body;
 
@@ -746,6 +992,13 @@ app.post('/api/wheel/deposit', async (req, res) => {
         return res.status(400).json({
             success: false,
             error: 'user_id and amount are required'
+        });
+    }
+
+    if (!dbReady) {
+        return res.status(503).json({
+            success: false,
+            error: 'Database is not ready. Please try again later.'
         });
     }
 
@@ -775,6 +1028,13 @@ app.get('/api/admin/stats', async (req, res) => {
         return res.status(403).json({
             success: false,
             error: 'Unauthorized - Admin only'
+        });
+    }
+
+    if (!dbReady) {
+        return res.status(503).json({
+            success: false,
+            error: 'Database is not ready. Please try again later.'
         });
     }
 
@@ -817,7 +1077,7 @@ app.get('/api/admin/stats', async (req, res) => {
     }
 });
 
-// -------------------- 12. مسار الصفحة الرئيسية (للواجهة) --------------------
+// -------------------- الصفحة الرئيسية --------------------
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -825,8 +1085,26 @@ app.get('/', (req, res) => {
 // ================================================================
 //                      تشغيل الخادم
 // ================================================================
-app.listen(port, () => {
-    console.log(`🚀 Wheel of Fortune server running on port ${port}`);
-    console.log(`👑 Admin ID: ${ADMIN_ID}`);
-    console.log(`📊 Database: ${DATABASE_URL ? 'Connected' : 'Not connected'}`);
+async function startServer() {
+    console.log('\n🚀 ===== بدء تشغيل الخادم =====');
+    console.log(`📡 المنفذ: ${port}`);
+    console.log(`👑 المدير: ${ADMIN_ID}`);
+    
+    // تهيئة قاعدة البيانات
+    await initializeDatabase();
+    
+    // بدء الخادم
+    app.listen(port, () => {
+        console.log(`\n✅ الخادم يعمل على المنفذ ${port}`);
+        console.log(`🔗 رابط الواجهة: http://localhost:${port}/`);
+        console.log(`🔗 فحص الحالة: http://localhost:${port}/api/status`);
+        console.log(`🔗 تشخيص DB: http://localhost:${port}/api/admin/diagnose?admin_id=${ADMIN_ID}`);
+        console.log('\n📋 ===== جاهز! =====\n');
+    });
+}
+
+// تشغيل الخادم
+startServer().catch(err => {
+    console.error('❌ فشل تشغيل الخادم:', err);
+    process.exit(1);
 });

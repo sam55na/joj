@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>🎡 عجلة الحظ</title>
+    <title>🎡 عجلة الحظ - IChancy</title>
     
     <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -75,7 +75,7 @@
         }
 
         .header h1 {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 900;
             background: linear-gradient(135deg, #FFD700, #FF8C00, #FFD700);
             background-size: 200% 200%;
@@ -92,7 +92,7 @@
 
         .header .subtitle {
             color: #555;
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: 3px;
             text-transform: uppercase;
             margin-top: 2px;
@@ -109,34 +109,34 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 12px;
-            padding: 8px 14px;
-            margin-bottom: 14px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 4px;
+            gap: 6px;
         }
 
         .user-status .user-id {
             color: #666;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .user-status .user-id span {
             color: #FFD700;
             font-weight: 600;
             background: rgba(255, 215, 0, 0.06);
-            padding: 2px 10px;
-            border-radius: 4px;
+            padding: 2px 12px;
+            border-radius: 6px;
             border: 1px solid rgba(255, 215, 0, 0.06);
         }
 
         .user-status .spin-info {
             color: #555;
-            font-size: 11px;
+            font-size: 12px;
             display: flex;
-            gap: 12px;
+            gap: 14px;
         }
 
         .user-status .spin-info .count {
@@ -148,12 +148,12 @@
         }
 
         /* ============================================================
-                   رسالة الخطأ
+                   رسالة الخطأ (عدم وجود USER_ID)
                    ============================================================ */
         .error-container {
             display: none;
             text-align: center;
-            padding: 30px 20px;
+            padding: 40px 20px;
         }
 
         .error-container.show {
@@ -167,21 +167,21 @@
         }
 
         .error-container .error-icon {
-            font-size: 44px;
-            margin-bottom: 10px;
+            font-size: 52px;
+            margin-bottom: 12px;
         }
 
         .error-container .error-title {
             color: #FFD700;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .error-container .error-text {
             color: #777;
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 14px;
+            line-height: 1.7;
         }
 
         .error-container .error-text .highlight {
@@ -189,13 +189,13 @@
         }
 
         .error-container .btn-open-bot {
-            margin-top: 16px;
-            padding: 12px 32px;
+            margin-top: 18px;
+            padding: 14px 36px;
             background: linear-gradient(135deg, #B8860B, #FFD700);
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             color: #0a0a0a;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -515,7 +515,7 @@
                    ============================================================ */
         @media (max-width: 420px) {
             .container { padding: 14px; }
-            .header h1 { font-size: 20px; }
+            .header h1 { font-size: 22px; }
             .btn { font-size: 14px; padding: 12px 16px; }
             .user-status { flex-direction: column; text-align: center; }
             .user-status .spin-info { justify-content: center; }
@@ -543,13 +543,18 @@
         </div>
     </div>
 
-    <!-- ===== رسالة الخطأ ===== -->
+    <!-- ===== رسالة الخطأ (عدم وجود USER_ID) ===== -->
     <div class="error-container" id="errorContainer">
         <div class="error-icon">⚠️</div>
         <div class="error-title">يجب الدخول من البوت</div>
         <div class="error-text">
             لا يمكن الوصول إلى معرف المستخدم.<br>
-            يرجى فتح العجلة من خلال <span class="highlight">بوت IChancy</span>.
+            يرجى فتح العجلة من خلال <span class="highlight">بوت IChancy</span>.<br>
+            <br>
+            <span style="color:#555;font-size:13px;">
+                🔗 تأكد من فتح الرابط من داخل البوت<br>
+                📱 أو استخدم الرابط مع <code style="color:#FFD700;">?user_id=</code>
+            </span>
         </div>
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
@@ -619,43 +624,63 @@ const ADMIN_ID = 7011476249;
 let USER_ID = null;
 let isSpinning = false;
 let prizesCache = [];
-let isReady = false;
 let currentRotation = 0;
 
 // ================================================================
 //                      جلب USER_ID
 // ================================================================
 function getUserId() {
+    console.log('🔍 === بدء البحث عن USER_ID ===');
+    
+    // 1. قراءة user_id من معلمات الرابط
     const params = new URLSearchParams(window.location.search);
+    console.log('📌 URL parameters:', window.location.search);
+    
     let id = params.get('user_id') || params.get('userId') || params.get('id');
+    console.log('📌 Extracted ID from URL:', id);
+    
     if (id && !isNaN(id)) {
         USER_ID = parseInt(id);
         localStorage.setItem('wheel_user_id', USER_ID);
         document.getElementById('userIdDisplay').textContent = USER_ID;
+        console.log('✅ USER_ID من الرابط:', USER_ID);
         return USER_ID;
     }
+    
+    // 2. محاولة من Telegram WebApp
     try {
         if (window.Telegram && window.Telegram.WebApp) {
             const user = window.Telegram.WebApp.initDataUnsafe?.user;
+            console.log('📌 Telegram user:', user);
             if (user && user.id) {
                 USER_ID = user.id;
                 localStorage.setItem('wheel_user_id', USER_ID);
                 document.getElementById('userIdDisplay').textContent = USER_ID;
+                console.log('✅ USER_ID من Telegram:', USER_ID);
                 return USER_ID;
             }
         }
-    } catch(e) {}
+    } catch(e) {
+        console.log('⚠️ Telegram WebApp not available');
+    }
+    
+    // 3. محاولة من localStorage
     id = localStorage.getItem('wheel_user_id');
+    console.log('📌 ID from localStorage:', id);
     if (id) {
         USER_ID = parseInt(id);
         document.getElementById('userIdDisplay').textContent = USER_ID;
+        console.log('✅ USER_ID من localStorage:', USER_ID);
         return USER_ID;
     }
+    
+    // 4. لم يتم العثور على ID
+    console.log('❌ لم يتم العثور على USER_ID');
     return null;
 }
 
 // ================================================================
-//                      رسم العجلة - تصميم محسّن
+//                      رسم العجلة
 // ================================================================
 function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     const canvas = document.getElementById('wheelCanvas');
@@ -706,7 +731,7 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
         ctx.fillStyle = grad;
         ctx.fill();
         
-        // ===== خطوط ذهبية متوهجة بين الأقسام =====
+        // ===== خطوط ذهبية متوهجة =====
         ctx.shadowColor = '#FFD700';
         ctx.shadowBlur = isHighlight ? 25 : 8;
         ctx.strokeStyle = '#FFD700';
@@ -718,7 +743,7 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
         ctx.stroke();
         ctx.shadowBlur = 0;
         
-        // ===== النص - فقط اسم الجائزة (حجم كبير وواضح) =====
+        // ===== النص =====
         const mid = start + step/2;
         const tr = r * 0.65;
         const x = cx + Math.cos(mid) * tr;
@@ -728,7 +753,6 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
         ctx.translate(x, y);
         ctx.rotate(mid + (mid > Math.PI/2 ? Math.PI : 0));
         
-        // اسم الجائزة بحجم كبير
         ctx.fillStyle = isHighlight ? '#0a0a0a' : '#ffffff';
         ctx.font = isHighlight ? 'bold 16px sans-serif' : 'bold 14px sans-serif';
         ctx.textAlign = 'center';
@@ -736,18 +760,14 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
         ctx.shadowColor = 'rgba(0,0,0,0.8)';
         ctx.shadowBlur = 6;
         
-        // عرض اسم الجائزة بدون إيموجي
-        let displayName = p.name;
-        // إزالة الإيموجيات من البداية
-        displayName = displayName.replace(/^[\u{1F000}-\u{1FFFF}]|^[\u2600}-\u{27BF}]|^[\u{1F300}-\u{1F5FF}]|^[\u{1F600}-\u{1F64F}]|^[\u{1F680}-\u{1F6FF}]|^[\u{1F700}-\u{1F77F}]|^[\u{1F780}-\u{1F7FF}]|^[\u{1F800}-\u{1F8FF}]|^[\u{1F900}-\u{1F9FF}]|^[\u{1FA00}-\u{1FA6F}]|^[\u{1FA70}-\u{1FAFF}]|^[\u{1FB00}-\u{1FBFF}]|^[\u{1FC00}-\u{1FCFF}]|^[\u{1FD00}-\u{1FDFF}]|^[\u{1FE00}-\u{1FEFF}]|^[\u{1FF00}-\u{1FFFF}]|^\p{Emoji}/u, '').trim();
+        // إزالة الإيموجيات
+        let displayName = p.name.replace(/^[\u{1F000}-\u{1FFFF}]|^[\u2600}-\u{27BF}]|^[\u{1F300}-\u{1F5FF}]|^[\u{1F600}-\u{1F64F}]|^[\u{1F680}-\u{1F6FF}]|^[\u{1F700}-\u{1F77F}]|^[\u{1F780}-\u{1F7FF}]|^[\u{1F800}-\u{1F8FF}]|^[\u{1F900}-\u{1F9FF}]|^[\u{1FA00}-\u{1FA6F}]|^[\u{1FA70}-\u{1FAFF}]|^[\u{1FB00}-\u{1FBFF}]|^[\u{1FC00}-\u{1FCFF}]|^[\u{1FD00}-\u{1FDFF}]|^[\u{1FE00}-\u{1FEFF}]|^[\u{1FF00}-\u{1FFFF}]|^\p{Emoji}/u, '').trim();
         
-        // تقسيم النص إلى سطرين إذا كان طويلاً
+        // تقسيم النص إذا كان طويلاً
         if (displayName.length > 12) {
             const midIdx = Math.floor(displayName.length / 2);
-            const part1 = displayName.substring(0, midIdx);
-            const part2 = displayName.substring(midIdx);
-            ctx.fillText(part1, 0, -10);
-            ctx.fillText(part2, 0, 14);
+            ctx.fillText(displayName.substring(0, midIdx), 0, -10);
+            ctx.fillText(displayName.substring(midIdx), 0, 14);
         } else {
             ctx.fillText(displayName, 0, 0);
         }
@@ -788,10 +808,10 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     ctx.lineWidth = 1.5;
     ctx.stroke();
     
-    // ===== حلقة خارجية ذهبية =====
+    // حلقة خارجية
     ctx.beginPath();
     ctx.arc(cx, cy, r - 2, 0, 2 * Math.PI);
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.08)';
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.06)';
     ctx.lineWidth = 1;
     ctx.stroke();
 }
@@ -803,6 +823,7 @@ async function loadPrizes() {
     try {
         const res = await fetch(`${API_BASE}/api/admin/prizes?admin_id=${ADMIN_ID}`);
         const data = await res.json();
+        console.log('📌 Prizes response:', data);
         if (data.success && data.prizes && data.prizes.length > 0) {
             prizesCache = data.prizes;
             return data.prizes;
@@ -822,6 +843,7 @@ async function loadUserStatus() {
     try {
         const res = await fetch(`${API_BASE}/api/wheel/history/${USER_ID}`);
         const data = await res.json();
+        console.log('📌 User status:', data);
         if (data.success) {
             document.getElementById('totalSpins').textContent = data.stats?.total_spins || 0;
             document.getElementById('totalWins').textContent = data.stats?.wins || 0;
@@ -922,34 +944,29 @@ async function spinWheel() {
         
         const data = await response.json();
         spinBtn.classList.remove('loading');
+        console.log('📌 Spin response:', data);
         
         if (data.success) {
             const prize = data.spin.prize;
             const prizeIndex = prizesCache.findIndex(p => p.id === prize.id);
             
-            // ===== حساب زاوية التوقف =====
-            // زاوية كل قسم
+            // حساب زاوية التوقف
             const step = (2 * Math.PI) / prizesCache.length;
-            // زاوية منتصف القسم الفائز (بالنسبة للمؤشر العلوي)
             const targetAngle = prizeIndex * step + step / 2;
-            // دوران عشوائي (5-8 دورات كاملة) + زاوية الهدف
             const extraSpins = 5 + Math.random() * 3;
             const targetRotation = extraSpins * 2 * Math.PI + (2 * Math.PI - targetAngle);
             
-            // ===== تأثير دوران العجلة =====
             const canvas = document.getElementById('wheelCanvas');
             canvas.classList.add('spinning');
             
-            // دوران تدريجي
             const startRotation = currentRotation;
             const endRotation = startRotation + targetRotation;
-            const duration = 3000 + Math.random() * 1000; // 3-4 ثواني
+            const duration = 3000 + Math.random() * 1000;
             const startTime = Date.now();
             
             function animateRotation() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                // دالة تسارع (ease-out)
                 const eased = 1 - Math.pow(1 - progress, 3);
                 const currentAngle = startRotation + targetRotation * eased;
                 
@@ -961,13 +978,11 @@ async function spinWheel() {
                     currentRotation = endRotation;
                     canvas.classList.remove('spinning');
                     
-                    // ===== عرض النتيجة =====
                     document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
                     document.getElementById('prizeName').textContent = prize.name;
                     document.getElementById('prizeDesc').textContent = prize.description || 'مبروك!';
                     document.getElementById('resultBox').classList.add('show');
                     
-                    // إبراز الجائزة
                     drawWheel(prizesCache, prizeIndex, endRotation);
                     await loadUserStatus();
                 }
@@ -1009,7 +1024,10 @@ function showError(msg) {
 //                      التهيئة
 // ================================================================
 async function init() {
+    console.log('🚀 === بدء التهيئة ===');
+    
     USER_ID = getUserId();
+    console.log('📌 USER_ID النهائي:', USER_ID);
     
     if (!USER_ID) {
         document.getElementById('errorContainer').classList.add('show');
@@ -1028,6 +1046,7 @@ async function init() {
         
         const statusRes = await fetch(`${API_BASE}/api/status`);
         const statusData = await statusRes.json();
+        console.log('📌 Server status:', statusData);
         
         if (!statusData.database?.ready) {
             updateLoading(60, 'قاعدة البيانات غير جاهزة، جاري التهيئة...');
@@ -1036,6 +1055,7 @@ async function init() {
         
         updateLoading(70, 'جاري تحميل الجوائز...');
         const prizes = await loadPrizes();
+        console.log('📌 Prizes loaded:', prizes.length);
         drawWheel(prizes);
         
         updateLoading(85, 'جاري تحميل بيانات المستخدم...');
@@ -1045,7 +1065,7 @@ async function init() {
         await new Promise(r => setTimeout(r, 400));
         
     } catch(e) {
-        console.error('Init error:', e);
+        console.error('❌ Init error:', e);
         updateLoading(100, '⚠️ فشل الاتصال');
         await new Promise(r => setTimeout(r, 600));
         showError('فشل الاتصال بالخادم');
@@ -1053,6 +1073,7 @@ async function init() {
     
     showLoading(false);
     document.getElementById('spinBtn').onclick = spinWheel;
+    console.log('✅ === انتهت التهيئة ===');
 }
 
 document.addEventListener('DOMContentLoaded', init);

@@ -26,47 +26,11 @@
             align-items: center;
             padding: 16px;
             background: #0a0a0a;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        /* خلفية متحركة */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(ellipse at 30% 50%, rgba(139, 0, 0, 0.15), transparent 60%),
-                        radial-gradient(ellipse at 70% 50%, rgba(255, 215, 0, 0.08), transparent 60%);
-            animation: bgFloat 20s ease-in-out infinite alternate;
-            z-index: 0;
-        }
-
-        @keyframes bgFloat {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(2%, 3%) rotate(3deg); }
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            background: linear-gradient(145deg, rgba(18, 18, 18, 0.95), rgba(10, 10, 10, 0.98));
-            border-radius: 32px;
-            padding: 28px 24px 24px;
-            max-width: 480px;
-            width: 100%;
-            border: 1px solid rgba(255, 215, 0, 0.08);
-            box-shadow: 
-                0 20px 80px rgba(0, 0, 0, 0.8),
-                0 0 60px rgba(255, 215, 0, 0.03);
-            backdrop-filter: blur(10px);
-        }
-
-        /* ============================================================
-                   خلفية متحركة للعجلة
-                   ============================================================ */
-        .bg-image-container {
+        /* خلفية ثابتة - يتم تحميلها من الإعدادات */
+        .bg-image-fixed {
             position: fixed;
             top: 0;
             left: 0;
@@ -78,7 +42,7 @@
             overflow: hidden;
         }
 
-        .bg-image-container img {
+        .bg-image-fixed img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -87,78 +51,47 @@
 
         @keyframes slowZoom {
             0% { transform: scale(1); }
-            100% { transform: scale(1.1); }
+            100% { transform: scale(1.05); }
         }
 
-        /* ============================================================
-                   صور البanner
-                   ============================================================ */
-        .banner-container {
-            width: 100%;
-            margin-bottom: 16px;
-            border-radius: 16px;
-            overflow: hidden;
+        .container {
             position: relative;
-            aspect-ratio: 16/5;
-            background: linear-gradient(135deg, #1a0a0a, #2a1a0a);
-            border: 1px solid rgba(255, 215, 0, 0.06);
-        }
-
-        .banner-container img {
+            z-index: 1;
+            background: linear-gradient(145deg, rgba(18, 18, 18, 0.95), rgba(10, 10, 10, 0.98));
+            border-radius: 32px;
+            padding: 20px 20px 24px;
+            max-width: 480px;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.5s ease;
-        }
-
-        .banner-container .banner-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 8px 16px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            color: #FFD700;
-            font-size: 12px;
-            text-align: center;
-            letter-spacing: 2px;
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         /* ============================================================
-                   العنوان
+                   النص العلوي - يقدر الأدمن تعديله
                    ============================================================ */
-        .header {
+        .banner-text {
             text-align: center;
-            margin-bottom: 16px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #FFD700, #FF8C00, #FFD700);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: goldShine 3s ease-in-out infinite;
-            letter-spacing: 1px;
-        }
-
-        @keyframes goldShine {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .header .subtitle {
-            color: #555;
-            font-size: 11px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-top: 2px;
-        }
-
-        .header .subtitle span {
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            background: rgba(255, 215, 0, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            font-size: 18px;
+            font-weight: 700;
             color: #FFD700;
+            letter-spacing: 1px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .banner-text .edit-hint {
+            font-size: 11px;
+            color: #444;
+            font-weight: 400;
+            margin-right: 10px;
         }
 
         /* ============================================================
@@ -168,34 +101,43 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 14px;
-            padding: 10px 16px;
-            margin-bottom: 18px;
+            padding: 8px 14px;
+            margin-bottom: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 4px;
         }
 
         .user-status .user-id {
             color: #666;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .user-status .user-id span {
             color: #FFD700;
             font-weight: 600;
             background: rgba(255, 215, 0, 0.06);
-            padding: 2px 12px;
+            padding: 2px 10px;
             border-radius: 6px;
             border: 1px solid rgba(255, 215, 0, 0.06);
         }
 
+        .user-status .user-id .admin-badge {
+            background: #FFD700;
+            color: #0a0a0a;
+            font-size: 8px;
+            padding: 1px 8px;
+            border-radius: 10px;
+            margin-right: 4px;
+        }
+
         .user-status .spin-info {
             color: #555;
-            font-size: 12px;
+            font-size: 11px;
             display: flex;
-            gap: 14px;
+            gap: 12px;
         }
 
         .user-status .spin-info .count {
@@ -207,153 +149,13 @@
         }
 
         /* ============================================================
-                   رسالة الخطأ
-                   ============================================================ */
-        .error-container {
-            display: none;
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .error-container.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .error-container .error-icon {
-            font-size: 52px;
-            margin-bottom: 12px;
-        }
-
-        .error-container .error-title {
-            color: #FFD700;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .error-container .error-text {
-            color: #777;
-            font-size: 14px;
-            line-height: 1.7;
-        }
-
-        .error-container .error-text .highlight {
-            color: #FFD700;
-        }
-
-        .error-container .btn-open-bot {
-            margin-top: 18px;
-            padding: 14px 36px;
-            background: linear-gradient(135deg, #B8860B, #FFD700);
-            border: none;
-            border-radius: 14px;
-            color: #0a0a0a;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .error-container .btn-open-bot:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
-        }
-
-        /* ============================================================
-                   لودينغ
-                   ============================================================ */
-        .loading-screen {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px 20px 20px;
-            min-height: 350px;
-        }
-
-        .loading-screen.active {
-            display: flex;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .loading-screen .loader-ring {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 3px solid rgba(255, 215, 0, 0.05);
-            border-top: 3px solid #FFD700;
-            border-bottom: 3px solid #FF8C00;
-            animation: spin 1s linear infinite;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-screen .loader-icon {
-            margin-top: -55px;
-            font-size: 28px;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-        }
-
-        .loading-screen .loader-title {
-            color: #FFD700;
-            font-size: 18px;
-            font-weight: 700;
-            margin-top: 20px;
-        }
-
-        .loading-screen .loader-sub {
-            color: #666;
-            font-size: 13px;
-            margin-top: 6px;
-        }
-
-        .loading-screen .loader-progress {
-            width: 100%;
-            max-width: 250px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 4px;
-            margin-top: 16px;
-            overflow: hidden;
-        }
-
-        .loading-screen .loader-progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #FFD700, #FF8C00);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .loading-screen .loader-status-text {
-            color: #555;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-
-        /* ============================================================
                    العجلة
                    ============================================================ */
         .wheel-container {
             display: none;
             position: relative;
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             margin: 0 auto;
             aspect-ratio: 1/1;
         }
@@ -373,9 +175,7 @@
             width: 100% !important;
             height: 100% !important;
             border-radius: 50%;
-            box-shadow: 
-                0 0 60px rgba(255, 215, 0, 0.04),
-                inset 0 0 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.04), inset 0 0 60px rgba(0, 0, 0, 0.3);
             border: 2px solid rgba(255, 215, 0, 0.06);
             transition: filter 0.5s ease;
         }
@@ -384,16 +184,13 @@
             filter: brightness(1.2) drop-shadow(0 0 50px rgba(255, 215, 0, 0.15));
         }
 
-        /* ============================================================
-                   المؤشر العلوي
-                   ============================================================ */
         .pointer {
             position: absolute;
-            top: -16px;
+            top: -14px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            font-size: 34px;
+            font-size: 30px;
             filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
             animation: pointerBounce 2s ease-in-out infinite;
             pointer-events: none;
@@ -404,6 +201,11 @@
             50% { transform: translateX(-50%) translateY(-4px); }
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         /* ============================================================
                    لا توجد جوائز
                    ============================================================ */
@@ -411,14 +213,6 @@
             display: none;
             text-align: center;
             padding: 40px 20px;
-        }
-
-        .no-prizes .icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .no-prizes .text {
             color: #555;
             font-size: 14px;
         }
@@ -430,11 +224,11 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-top: 16px;
+            margin-top: 14px;
         }
 
         .btn {
-            padding: 15px 24px;
+            padding: 14px 20px;
             border: none;
             border-radius: 14px;
             font-size: 16px;
@@ -443,7 +237,6 @@
             transition: all 0.3s ease;
             width: 100%;
             position: relative;
-            overflow: hidden;
         }
 
         .btn-spin {
@@ -451,7 +244,6 @@
             color: #0a0a0a;
             box-shadow: 0 4px 30px rgba(255, 215, 0, 0.1);
             font-size: 17px;
-            letter-spacing: 0.5px;
         }
 
         .btn-spin:hover:not(:disabled) {
@@ -481,166 +273,9 @@
             display: inline-block;
         }
 
-        /* ============================================================
-                   النتيجة - تأثيرات مميزة للفوز
-                   ============================================================ */
-        .result-box {
-            background: rgba(255, 215, 0, 0.02);
-            border: 1px solid rgba(255, 215, 0, 0.06);
-            border-radius: 14px;
-            padding: 16px;
-            margin-top: 14px;
-            text-align: center;
-            display: none;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.5s ease;
-        }
-
-        .result-box.show {
-            display: block;
-            animation: resultPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes resultPop {
-            0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-
-        /* ===== تأثير الفوز الكبير ===== */
-        .result-box.winner {
-            border-color: #FFD700;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 100, 0, 0.05));
-            animation: winGlow 1s ease-in-out infinite alternate;
-            box-shadow: 0 0 80px rgba(255, 215, 0, 0.1);
-        }
-
-        @keyframes winGlow {
-            0% { 
-                box-shadow: 0 0 40px rgba(255, 215, 0, 0.05);
-                border-color: rgba(255, 215, 0, 0.3);
-            }
-            100% { 
-                box-shadow: 0 0 100px rgba(255, 215, 0, 0.2);
-                border-color: #FFD700;
-            }
-        }
-
-        /* ===== انفجار الكونفيتي ===== */
-        .confetti-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .confetti-piece {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            opacity: 0;
-            animation: confettiFall 2.5s ease-in forwards;
-        }
-
-        @keyframes confettiFall {
-            0% {
-                opacity: 1;
-                transform: translateY(-30px) rotate(0deg) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(300px) rotate(720deg) scale(0.3);
-            }
-        }
-
-        /* ===== أيقونة الجائزة ===== */
-        .result-box .prize-icon {
-            font-size: 38px;
-            animation: pulse 1.5s ease-in-out infinite;
-            display: inline-block;
-            transition: all 0.5s ease;
-        }
-
-        .result-box .prize-icon.big-win {
-            font-size: 64px;
-            animation: bigWinPulse 0.6s ease-in-out infinite alternate;
-        }
-
-        @keyframes bigWinPulse {
-            0% { 
-                transform: scale(1) rotate(-8deg);
-                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
-            }
-            100% { 
-                transform: scale(1.3) rotate(8deg);
-                filter: drop-shadow(0 0 50px rgba(255, 215, 0, 0.6));
-            }
-        }
-
-        /* ===== اسم الجائزة ===== */
-        .result-box .prize-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: #FFD700;
-            margin-top: 4px;
-            transition: all 0.5s ease;
-        }
-
-        .result-box .prize-name.win-text {
-            background: linear-gradient(135deg, #FFD700, #FF6B00, #FF0080, #FFD700);
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rainbowShine 1.5s ease-in-out infinite;
-            font-size: 26px;
-        }
-
-        @keyframes rainbowShine {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .result-box .prize-desc {
-            color: #777;
-            font-size: 13px;
-            margin-top: 2px;
-        }
-
-        /* ===== شريط الإشعار ===== */
-        .notification-bar {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #FFD700, #FF8C00);
-            color: #0a0a0a;
-            padding: 16px 32px;
-            border-radius: 16px;
-            font-size: 18px;
-            font-weight: 700;
-            z-index: 1000;
-            box-shadow: 0 10px 60px rgba(255, 215, 0, 0.3);
-            animation: notifSlideDown 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .notification-bar.show {
-            display: block;
-        }
-
-        @keyframes notifSlideDown {
-            0% { 
-                transform: translateX(-50%) translateY(-100px);
-                opacity: 0;
-            }
-            100% { 
-                transform: translateX(-50%) translateY(0);
-                opacity: 1;
-            }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* ============================================================
@@ -670,14 +305,129 @@
             font-weight: 700;
         }
 
+        .deposit-notice .notice-status {
+            font-size: 12px;
+            margin-top: 4px;
+            color: #666;
+        }
+
+        .deposit-notice .notice-status .met {
+            color: #00FF88;
+        }
+
+        .deposit-notice .notice-status .not-met {
+            color: #FF4444;
+        }
+
         /* ============================================================
-                   رسالة الخطأ
+                   النتيجة
+                   ============================================================ */
+        .result-box {
+            background: rgba(255, 215, 0, 0.02);
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            border-radius: 14px;
+            padding: 14px;
+            margin-top: 12px;
+            text-align: center;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: resultPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes resultPop {
+            0% { transform: scale(0.8) rotate(-3deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .result-box.winner {
+            border-color: rgba(255, 215, 0, 0.3);
+            background: rgba(255, 215, 0, 0.05);
+            animation: winGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes winGlow {
+            0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.05); }
+            100% { box-shadow: 0 0 80px rgba(255, 215, 0, 0.15); }
+        }
+
+        .result-box .confetti-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .result-box .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            animation: confettiFall 2s ease-in forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { opacity: 1; transform: translateY(-20px) rotate(0deg) scale(1); }
+            100% { opacity: 0; transform: translateY(200px) rotate(720deg) scale(0); }
+        }
+
+        .result-box .prize-icon {
+            font-size: 36px;
+            display: inline-block;
+        }
+
+        .result-box .prize-icon.big-win {
+            font-size: 50px;
+            animation: bigWinPulse 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes bigWinPulse {
+            0% { transform: scale(1) rotate(-5deg); }
+            100% { transform: scale(1.2) rotate(5deg); }
+        }
+
+        .result-box .prize-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFD700;
+            margin-top: 4px;
+        }
+
+        .result-box .prize-name.win-text {
+            background: linear-gradient(135deg, #FFD700, #FF6B00, #FFD700);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: goldShine 1.5s ease-in-out infinite;
+            font-size: 22px;
+        }
+
+        @keyframes goldShine {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .result-box .prize-desc {
+            color: #777;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        /* ============================================================
+                   رسائل الخطأ
                    ============================================================ */
         .error-msg {
             background: rgba(255, 0, 0, 0.04);
             border: 1px solid rgba(255, 0, 0, 0.06);
             border-radius: 10px;
-            padding: 12px;
+            padding: 10px;
             color: #FF6B6B;
             text-align: center;
             font-size: 13px;
@@ -691,58 +441,507 @@
         }
 
         /* ============================================================
+                   شاشة اللودينغ
+                   ============================================================ */
+        .loading-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            min-height: 300px;
+        }
+
+        .loading-screen.active {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .loading-screen .loader-ring {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 215, 0, 0.05);
+            border-top: 3px solid #FFD700;
+            border-bottom: 3px solid #FF8C00;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-screen .loader-icon {
+            margin-top: -45px;
+            font-size: 24px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .loading-screen .loader-title {
+            color: #FFD700;
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 16px;
+        }
+
+        .loading-screen .loader-sub {
+            color: #666;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .loading-screen .loader-progress {
+            width: 100%;
+            max-width: 200px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .loading-screen .loader-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #FFD700, #FF8C00);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .loading-screen .loader-status-text {
+            color: #555;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        /* ============================================================
                    إعدادات الصوت
                    ============================================================ */
         .sound-settings {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 12px;
-            padding: 8px;
+            gap: 16px;
+            margin-top: 10px;
+            padding: 6px 12px;
             background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .sound-settings label {
             color: #666;
-            font-size: 12px;
+            font-size: 11px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             cursor: pointer;
         }
 
         .sound-settings input[type="checkbox"] {
+            accent-color: #FFD700;
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+        }
+
+        .sound-settings .sound-indicator {
+            color: #FFD700;
+            font-size: 12px;
+        }
+
+        /* ============================================================
+                   لوحة الإدارة
+                   ============================================================ */
+        .admin-panel {
+            display: none;
+            background: rgba(255, 215, 0, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 14px;
+        }
+
+        .admin-panel.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .admin-panel .panel-title {
+            color: #FFD700;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-panel .panel-title .badge {
+            background: #FFD700;
+            color: #0a0a0a;
+            font-size: 9px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .admin-panel .prize-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .admin-panel .prize-item .prize-icon-small {
+            font-size: 20px;
+            width: 30px;
+            text-align: center;
+        }
+
+        .admin-panel .prize-item .prize-info {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .admin-panel .prize-item .prize-info .name {
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .admin-panel .prize-item .prize-info .desc {
+            color: #666;
+            font-size: 10px;
+        }
+
+        .admin-panel .prize-item .prize-prob {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .admin-panel .prize-item .prize-prob input {
+            width: 50px;
+            padding: 3px 4px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: #FFD700;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .admin-panel .prize-item .prize-prob input:focus {
+            outline: none;
+            border-color: #FFD700;
+        }
+
+        .admin-panel .prize-item .prize-prob .prob-label {
+            color: #555;
+            font-size: 10px;
+        }
+
+        .admin-panel .prize-item .prize-colors {
+            display: flex;
+            gap: 4px;
+        }
+
+        .admin-panel .prize-item .prize-colors input[type="color"] {
+            width: 28px;
+            height: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 2px;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .admin-panel .prize-item .prize-colors input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .admin-panel .prize-item .prize-colors input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 2px;
+        }
+
+        .admin-panel .prize-item .btn-delete {
+            background: rgba(255, 0, 0, 0.1);
+            border: none;
+            color: #FF4444;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-panel .prize-item .btn-delete:hover {
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        .admin-panel .add-prize-form {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-panel .add-prize-form input {
+            flex: 1;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 11px;
+            min-width: 60px;
+        }
+
+        .admin-panel .add-prize-form input:focus {
+            outline: none;
+            border-color: #FFD700;
+        }
+
+        .admin-panel .add-prize-form input::placeholder {
+            color: #555;
+        }
+
+        .admin-panel .add-prize-form .btn-add {
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #B8860B, #FFD700);
+            border: none;
+            border-radius: 6px;
+            color: #0a0a0a;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-panel .add-prize-form .btn-add:hover {
+            transform: scale(1.05);
+        }
+
+        .admin-panel .panel-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-panel .panel-actions .btn-action {
+            padding: 5px 12px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.02);
+            color: #FFD700;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-panel .panel-actions .btn-action:hover {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: #FFD700;
+        }
+
+        .admin-panel .panel-actions .btn-action.danger {
+            color: #FF4444;
+            border-color: rgba(255, 0, 0, 0.1);
+        }
+
+        .admin-panel .panel-actions .btn-action.danger:hover {
+            background: rgba(255, 0, 0, 0.05);
+            border-color: #FF4444;
+        }
+
+        .admin-panel .settings-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .admin-panel .settings-section .setting-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .admin-panel .settings-section .setting-row label {
+            color: #888;
+            font-size: 11px;
+            min-width: 80px;
+        }
+
+        .admin-panel .settings-section .setting-row input,
+        .admin-panel .settings-section .setting-row textarea {
+            flex: 1;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 11px;
+        }
+
+        .admin-panel .settings-section .setting-row input:focus,
+        .admin-panel .settings-section .setting-row textarea:focus {
+            outline: none;
+            border-color: #FFD700;
+        }
+
+        .admin-panel .settings-section .setting-row textarea {
+            min-height: 40px;
+            resize: vertical;
+        }
+
+        .admin-panel .settings-section .setting-row .btn-save {
+            padding: 4px 12px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 4px;
+            color: #FFD700;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-panel .settings-section .setting-row .btn-save:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .admin-panel .settings-section .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .admin-panel .settings-section .toggle-row label {
+            color: #888;
+            font-size: 11px;
+        }
+
+        .admin-panel .settings-section .toggle-row input[type="checkbox"] {
             accent-color: #FFD700;
             width: 16px;
             height: 16px;
             cursor: pointer;
         }
 
-        .sound-settings .sound-indicator {
+        /* ============================================================
+                   رسالة الخطأ الأولية
+                   ============================================================ */
+        .error-container {
+            display: none;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .error-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .error-container .error-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .error-container .error-title {
             color: #FFD700;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .error-container .error-text {
+            color: #777;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .error-container .error-text .highlight {
+            color: #FFD700;
+        }
+
+        .error-container .btn-open-bot {
+            margin-top: 14px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #B8860B, #FFD700);
+            border: none;
+            border-radius: 12px;
+            color: #0a0a0a;
             font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .error-container .btn-open-bot:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+        }
+
+        /* ============================================================
+                   إشعار منبثق
+                   ============================================================ */
+        .notification-bar {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #FFD700, #FF8C00);
+            color: #0a0a0a;
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            z-index: 1000;
+            box-shadow: 0 10px 60px rgba(255, 215, 0, 0.3);
+            animation: notifSlideDown 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .notification-bar.show {
+            display: block;
+        }
+
+        @keyframes notifSlideDown {
+            0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+            100% { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
 
         /* ============================================================
                    تجاوب
                    ============================================================ */
         @media (max-width: 420px) {
-            .container { padding: 16px; }
-            .header h1 { font-size: 22px; }
-            .btn { font-size: 14px; padding: 13px 18px; }
+            .container { padding: 12px; }
+            .banner-text { font-size: 14px; padding: 8px 12px; }
+            .btn { font-size: 14px; padding: 12px 16px; }
             .user-status { flex-direction: column; text-align: center; }
             .user-status .spin-info { justify-content: center; }
-            .pointer { font-size: 28px; top: -12px; }
-            .banner-container { aspect-ratio: 16/4; }
+            .pointer { font-size: 24px; top: -10px; }
+            .admin-panel .prize-item { flex-direction: column; align-items: stretch; }
+            .admin-panel .prize-item .prize-colors { justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-<!-- ===== خلفية الصور ===== -->
-<div class="bg-image-container" id="bgImageContainer">
+<!-- ===== خلفية ثابتة ===== -->
+<div class="bg-image-fixed">
     <img id="bgImage" src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80" alt="Background">
 </div>
 
@@ -753,25 +952,21 @@
 
 <div class="container" id="app">
 
-    <!-- ===== صورة البanner ===== -->
-    <div class="banner-container" id="bannerContainer">
-        <img id="bannerImage" src="https://via.placeholder.com/800x200/1a0a0a/FFD700?text=🎡+IChancy+Wheel" alt="Banner">
-        <div class="banner-overlay">🎡 IChancy · عجلة الحظ</div>
-    </div>
-
-    <!-- ===== العنوان ===== -->
-    <div class="header">
-        <h1>🎡 عجلة الحظ</h1>
-        <div class="subtitle"><span>IChancy</span> · دور واربح</div>
+    <!-- ===== النص العلوي - يقدر الأدمن تعديله ===== -->
+    <div class="banner-text" id="bannerText">
+        🎡 IChancy · عجلة الحظ
+        <span class="edit-hint" id="editHint">(👑 يمكنك تعديله من الإدارة)</span>
     </div>
 
     <!-- ===== حالة المستخدم ===== -->
     <div class="user-status" id="userStatus">
-        <div class="user-id">👤 <span id="userIdDisplay">---</span></div>
+        <div class="user-id">
+            👤 <span id="userIdDisplay">---</span>
+            <span class="admin-badge" id="adminBadge" style="display:none;">👑 مدير</span>
+        </div>
         <div class="spin-info">
             <span>🎡 <span class="count" id="totalSpins">0</span></span>
             <span>🏆 <span class="wins" id="totalWins">0</span></span>
-            <span id="depositStatus"></span>
         </div>
     </div>
 
@@ -781,11 +976,7 @@
         <div class="error-title">يجب الدخول من البوت</div>
         <div class="error-text">
             لا يمكن الوصول إلى معرف المستخدم.<br>
-            يرجى فتح العجلة من خلال <span class="highlight">بوت IChancy</span>.<br>
-            <br>
-            <span style="color:#555;font-size:13px;">
-                🔗 تأكد من فتح الرابط من داخل البوت
-            </span>
+            يرجى فتح العجلة من خلال <span class="highlight">بوت IChancy</span>.
         </div>
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
@@ -830,25 +1021,9 @@
             💰 مطلوب إيداع <span class="amount" id="depositMinAmount">0</span> SYP
             خلال <span id="depositCheckHours">24</span> ساعة
         </div>
-    </div>
-
-    <!-- ===== إعدادات الصوت ===== -->
-    <div class="sound-settings">
-        <label>
-            <span class="sound-indicator">🔊</span>
-            <input type="checkbox" id="soundToggle" checked>
-            المؤثرات الصوتية
-        </label>
-        <label>
-            <span class="sound-indicator">🎵</span>
-            <input type="checkbox" id="musicToggle" checked>
-            موسيقى
-        </label>
-    </div>
-
-    <!-- ===== الخطأ ===== -->
-    <div class="error-msg" id="errorMsg">
-        <span id="errorText"></span>
+        <div class="notice-status" id="depositStatus">
+            الحالة: <span class="not-met">❌ غير مكتمل</span>
+        </div>
     </div>
 
     <!-- ===== النتيجة ===== -->
@@ -857,6 +1032,104 @@
         <div class="prize-icon" id="prizeIcon">🎁</div>
         <div class="prize-name" id="prizeName">جائزة!</div>
         <div class="prize-desc" id="prizeDesc"></div>
+    </div>
+
+    <!-- ===== إعدادات الصوت ===== -->
+    <div class="sound-settings">
+        <label>
+            <span class="sound-indicator">🔊</span>
+            <input type="checkbox" id="soundToggle" checked>
+            مؤثرات
+        </label>
+        <label>
+            <span class="sound-indicator">🎵</span>
+            <input type="checkbox" id="musicToggle" checked>
+            موسيقى
+        </label>
+    </div>
+
+    <!-- ===== لوحة الإدارة ===== -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="panel-title">
+            ⚙️ لوحة الإدارة
+            <span class="badge">ADMIN</span>
+        </div>
+        
+        <!-- الجوائز -->
+        <div id="prizesList"></div>
+        
+        <!-- إضافة جائزة -->
+        <div class="add-prize-form">
+            <input type="text" id="newPrizeName" placeholder="الاسم">
+            <input type="text" id="newPrizeIcon" placeholder="🎁" style="max-width:40px;">
+            <input type="number" id="newPrizeProb" placeholder="نسبة %" style="max-width:60px;">
+            <input type="color" id="newPrizeColor" value="#1a1a2e" style="max-width:36px;padding:2px;">
+            <input type="color" id="newPrizeColor2" value="#16213e" style="max-width:36px;padding:2px;">
+            <button class="btn-add" id="addPrizeBtn">➕</button>
+        </div>
+        
+        <div class="panel-actions">
+            <button class="btn-action" id="refreshPrizesBtn">🔄 تحديث</button>
+            <button class="btn-action danger" id="resetPrizesBtn">🗑️ إعادة تعيين</button>
+        </div>
+
+        <!-- الإعدادات العامة -->
+        <div class="settings-section">
+            <div class="setting-row">
+                <label>النص العلوي</label>
+                <input type="text" id="editBannerText" placeholder="النص الذي يظهر في الأعلى">
+                <button class="btn-save" data-setting="banner_text">حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>صورة الخلفية</label>
+                <input type="text" id="editBgImage" placeholder="رابط الصورة">
+                <button class="btn-save" data-setting="bg_image_url">حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>مركز العجلة</label>
+                <input type="text" id="editCenterIcon" placeholder="🎯" style="max-width:60px;">
+                <button class="btn-save" data-setting="center_icon">حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>مدة التدوير</label>
+                <input type="number" id="editSpinDuration" placeholder="3500" style="max-width:80px;">
+                <span style="color:#555;font-size:11px;">مللي ثانية</span>
+                <button class="btn-save" data-setting="spin_duration">حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>فترة التبريد</label>
+                <input type="number" id="editIntervalHours" placeholder="24" style="max-width:60px;">
+                <span style="color:#555;font-size:11px;">ساعة</span>
+                <button class="btn-save" data-setting="spin_interval_hours">حفظ</button>
+            </div>
+            <div class="toggle-row">
+                <label>تفعيل العجلة</label>
+                <input type="checkbox" id="editIsActive">
+                <button class="btn-save" data-setting="is_active">حفظ</button>
+            </div>
+            <div class="toggle-row">
+                <label>تفعيل شرط الإيداع</label>
+                <input type="checkbox" id="editDepositRequired">
+                <button class="btn-save" data-setting="deposit_required">حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>الحد الأدنى للإيداع</label>
+                <input type="number" id="editDepositMin" placeholder="1000" style="max-width:80px;">
+                <span style="color:#555;font-size:11px;">SYP</span>
+                <button class="btn-save" data-setting="deposit_min_amount">حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>مدة صلاحية الإيداع</label>
+                <input type="number" id="editDepositHours" placeholder="24" style="max-width:60px;">
+                <span style="color:#555;font-size:11px;">ساعة</span>
+                <button class="btn-save" data-setting="deposit_check_hours">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== الخطأ ===== -->
+    <div class="error-msg" id="errorMsg">
+        <span id="errorText"></span>
     </div>
 
 </div>
@@ -873,51 +1146,8 @@ let prizesCache = [];
 let currentRotation = 0;
 let soundEnabled = true;
 let musicEnabled = true;
-
-// ================================================================
-//                      إعدادات الصور
-// ================================================================
-// صور البanner
-const BANNER_IMAGES = [
-    'https://images.unsplash.com/photo-1607344645866-009c320d53d0?w=800&h=200&fit=crop',
-    'https://images.unsplash.com/photo-1607344645866-009c320d53d0?w=800&h=200&fit=crop&auto=format',
-    'https://images.unsplash.com/photo-1607344645866-009c320d53d0?w=800&h=200&fit=crop&auto=format'
-];
-
-// صور الخلفية
-const BG_IMAGES = [
-    'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80',
-    'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80',
-    'https://images.unsplash.com/photo-1470071459604-7b40ec10c5b1?w=1920&q=80'
-];
-
-// صورة مركز العجلة
-const CENTER_IMAGES = [
-    '⭐',
-    '🎯',
-    '💎',
-    '🌟'
-];
-
-let currentBannerIndex = 0;
-let currentBgIndex = 0;
-let centerImageIndex = 0;
-
-function changeBanner() {
-    const img = document.getElementById('bannerImage');
-    currentBannerIndex = (currentBannerIndex + 1) % BANNER_IMAGES.length;
-    img.src = BANNER_IMAGES[currentBannerIndex];
-}
-
-function changeBackground() {
-    const img = document.getElementById('bgImage');
-    currentBgIndex = (currentBgIndex + 1) % BG_IMAGES.length;
-    img.src = BG_IMAGES[currentBgIndex];
-}
-
-// تغيير الصور كل 10 ثواني
-setInterval(changeBanner, 10000);
-setInterval(changeBackground, 15000);
+let settingsCache = {};
+let spinDuration = 3500;
 
 // ================================================================
 //                      نظام الصوت المتطور
@@ -926,8 +1156,7 @@ class SoundManager {
     constructor() {
         this.initialized = false;
         this.audioContext = null;
-        this.oscillators = [];
-        this.gainNodes = [];
+        this.bgInterval = null;
     }
 
     init() {
@@ -940,15 +1169,15 @@ class SoundManager {
         }
     }
 
-    // صوت دوران حماسي
+    // ===== صوت دوران حماسي =====
     playSpinSound() {
         if (!soundEnabled || !this.initialized) return;
         try {
             const ctx = this.audioContext;
             const now = ctx.currentTime;
             
-            // نغمات تصاعدية سريعة مع تأثير الطبول
-            const notes = [150, 180, 210, 250, 300, 360, 420, 500, 600, 720, 850, 1000];
+            // نغمات تصاعدية سريعة
+            const notes = [150, 180, 210, 250, 300, 360, 420, 500, 600, 720, 850, 1000, 1200];
             
             notes.forEach((freq, i) => {
                 const osc = ctx.createOscillator();
@@ -956,31 +1185,30 @@ class SoundManager {
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 
-                osc.frequency.setValueAtTime(freq * 0.8, now + i * 0.06);
-                osc.frequency.exponentialRampToValueAtTime(freq, now + i * 0.06 + 0.04);
+                osc.frequency.setValueAtTime(freq * 0.7, now + i * 0.05);
+                osc.frequency.exponentialRampToValueAtTime(freq * 1.2, now + i * 0.05 + 0.03);
                 osc.type = i % 2 === 0 ? 'sawtooth' : 'square';
                 
-                gain.gain.setValueAtTime(0.08, now + i * 0.06);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.08);
+                gain.gain.setValueAtTime(0.06, now + i * 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.06);
                 
-                osc.start(now + i * 0.06);
-                osc.stop(now + i * 0.06 + 0.08);
-                this.oscillators.push(osc);
-                this.gainNodes.push(gain);
+                osc.start(now + i * 0.05);
+                osc.stop(now + i * 0.05 + 0.06);
             });
             
-            // تأثير الطبول
-            for (let i = 0; i < 5; i++) {
+            // تأثير طبول متسارع
+            for (let i = 0; i < 10; i++) {
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.connect(gain);
                 gain.connect(ctx.destination);
-                osc.frequency.setValueAtTime(80 + Math.random() * 40, now + i * 0.15);
+                osc.frequency.setValueAtTime(60 + i * 8, now + i * 0.08);
                 osc.type = 'square';
-                gain.gain.setValueAtTime(0.04, now + i * 0.15);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.05);
-                osc.start(now + i * 0.15);
-                osc.stop(now + i * 0.15 + 0.05);
+                const vol = 0.03 + (i / 10) * 0.05;
+                gain.gain.setValueAtTime(vol, now + i * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.04);
+                osc.start(now + i * 0.08);
+                osc.stop(now + i * 0.08 + 0.04);
             }
             
         } catch(e) {
@@ -988,18 +1216,19 @@ class SoundManager {
         }
     }
 
-    // صوت فوز حماسي (نغمات احتفالية)
+    // ===== صوت فوز حماسي مع نغمات احتفالية =====
     playWinSound() {
         if (!soundEnabled || !this.initialized) return;
         try {
             const ctx = this.audioContext;
             const now = ctx.currentTime;
             
-            // لحن احتفالي
+            // لحن احتفالي سريع
             const melody = [
-                [523, 0.15], [659, 0.15], [784, 0.15], [1047, 0.2],
-                [784, 0.15], [880, 0.15], [1047, 0.15], [1319, 0.25],
-                [1047, 0.15], [1175, 0.15], [1319, 0.15], [1568, 0.3]
+                [523, 0.1], [587, 0.1], [659, 0.1], [784, 0.15],
+                [659, 0.1], [880, 0.1], [988, 0.1], [1175, 0.2],
+                [1047, 0.1], [1175, 0.1], [1319, 0.1], [1568, 0.25],
+                [1319, 0.1], [1175, 0.1], [1047, 0.1], [880, 0.3]
             ];
             
             melody.forEach(([freq, dur], i) => {
@@ -1008,67 +1237,82 @@ class SoundManager {
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 
-                osc.frequency.setValueAtTime(freq, now + i * 0.1);
+                osc.frequency.setValueAtTime(freq, now + i * 0.08);
                 osc.type = i % 3 === 0 ? 'sine' : 'triangle';
                 
-                gain.gain.setValueAtTime(0.12, now + i * 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + dur);
+                gain.gain.setValueAtTime(0.1, now + i * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + dur);
                 
-                osc.start(now + i * 0.1);
-                osc.stop(now + i * 0.1 + dur);
+                osc.start(now + i * 0.08);
+                osc.stop(now + i * 0.08 + dur);
             });
             
-            // وتر احتفالي كبير
+            // وتر احتفالي كبير مع تأثير
             setTimeout(() => {
-                const chords = [523, 659, 784];
+                const chords = [523, 659, 784, 1047];
                 chords.forEach((freq, i) => {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.connect(gain);
                     gain.connect(ctx.destination);
-                    osc.frequency.setValueAtTime(freq, now + 1.2);
+                    osc.frequency.setValueAtTime(freq, now + 1.3 + i * 0.05);
                     osc.type = 'sine';
-                    gain.gain.setValueAtTime(0.06, now + 1.2);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
-                    osc.start(now + 1.2);
-                    osc.stop(now + 1.8);
+                    gain.gain.setValueAtTime(0.05, now + 1.3 + i * 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8 + i * 0.05);
+                    osc.start(now + 1.3 + i * 0.05);
+                    osc.stop(now + 1.8 + i * 0.05);
                 });
-            }, 1000);
+            }, 800);
             
         } catch(e) {
             console.warn('Sound error:', e);
         }
     }
 
-    // صوت خسارة بسيط
+    // ===== صوت خسارة =====
     playLoseSound() {
         if (!soundEnabled || !this.initialized) return;
         try {
             const ctx = this.audioContext;
             const now = ctx.currentTime;
             
-            // نغمة هبوطية
+            // نغمة هبوطية حزينة
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.connect(gain);
             gain.connect(ctx.destination);
             
-            osc.frequency.setValueAtTime(400, now);
-            osc.frequency.exponentialRampToValueAtTime(150, now + 0.4);
+            osc.frequency.setValueAtTime(500, now);
+            osc.frequency.exponentialRampToValueAtTime(120, now + 0.5);
             osc.type = 'sawtooth';
             
-            gain.gain.setValueAtTime(0.08, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
             
             osc.start(now);
-            osc.stop(now + 0.4);
+            osc.stop(now + 0.5);
+            
+            // نغمة إضافية
+            setTimeout(() => {
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.frequency.setValueAtTime(300, now + 0.3);
+                osc2.frequency.exponentialRampToValueAtTime(100, now + 0.6);
+                osc2.type = 'square';
+                gain2.gain.setValueAtTime(0.04, now + 0.3);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                osc2.start(now + 0.3);
+                osc2.stop(now + 0.6);
+            }, 200);
             
         } catch(e) {
             console.warn('Sound error:', e);
         }
     }
 
-    // موسيقى خلفية حماسية
+    // ===== موسيقى خلفية =====
     playBackgroundMusic() {
         if (!musicEnabled || !this.initialized) return;
         try {
@@ -1082,7 +1326,7 @@ class SoundManager {
                 gain.connect(ctx.destination);
                 osc.frequency.setValueAtTime(freq, time);
                 osc.type = type;
-                gain.gain.setValueAtTime(vol || 0.03, time);
+                gain.gain.setValueAtTime(vol || 0.025, time);
                 gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
                 osc.start(time);
                 osc.stop(time + dur);
@@ -1090,25 +1334,26 @@ class SoundManager {
             
             // لحن خلفي جذاب
             const pattern = [
-                [262, 0.3, 0.025], [330, 0.3, 0.025], [392, 0.3, 0.025], [523, 0.4, 0.03],
-                [330, 0.3, 0.025], [392, 0.3, 0.025], [523, 0.3, 0.025], [659, 0.4, 0.03]
+                [262, 0.25, 0.02], [330, 0.25, 0.02], [392, 0.25, 0.02], [523, 0.35, 0.025],
+                [330, 0.25, 0.02], [392, 0.25, 0.02], [523, 0.25, 0.02], [659, 0.35, 0.025],
+                [392, 0.25, 0.02], [523, 0.25, 0.02], [659, 0.25, 0.02], [784, 0.35, 0.025]
             ];
             
             pattern.forEach(([freq, dur, vol], i) => {
-                const time = now + i * 0.35;
+                const time = now + i * 0.3;
                 playNote(freq, time, dur, vol, i % 2 === 0 ? 'sine' : 'triangle');
             });
             
-            // Bass خط
+            // Bass
             if (this.bgInterval) clearInterval(this.bgInterval);
             this.bgInterval = setInterval(() => {
                 if (!musicEnabled) return;
                 const t = ctx.currentTime;
-                const bassNotes = [131, 165, 196, 262];
+                const bassNotes = [131, 165, 196, 262, 196, 165];
                 bassNotes.forEach((freq, i) => {
-                    playNote(freq, t + i * 0.3, 0.25, 0.02, 'square');
+                    playNote(freq, t + i * 0.25, 0.2, 0.015, 'square');
                 });
-            }, 1200);
+            }, 1500);
             
         } catch(e) {
             console.warn('Music error:', e);
@@ -1126,90 +1371,6 @@ class SoundManager {
 const soundManager = new SoundManager();
 
 // ================================================================
-//                      تأثيرات الاحتفال المتطورة
-// ================================================================
-function createConfetti(count = 50) {
-    const container = document.getElementById('confettiContainer');
-    container.innerHTML = '';
-    
-    const colors = ['#FFD700', '#FF6B00', '#FF0000', '#00FF00', '#00BFFF', '#FF00FF', '#FF69B4', '#FF4500', '#7CFC00'];
-    const shapes = ['circle', 'square', 'triangle'];
-    
-    for (let i = 0; i < count; i++) {
-        const el = document.createElement('div');
-        el.className = 'confetti-piece';
-        const size = 6 + Math.random() * 14;
-        el.style.width = size + 'px';
-        el.style.height = size + 'px';
-        el.style.background = colors[Math.floor(Math.random() * colors.length)];
-        el.style.left = Math.random() * 100 + '%';
-        el.style.top = Math.random() * 40 + '%';
-        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-        el.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
-        el.style.animationDelay = Math.random() * 0.8 + 's';
-        
-        // أشكال مختلفة
-        if (shapes[Math.floor(Math.random() * shapes.length)] === 'triangle') {
-            el.style.width = '0';
-            el.style.height = '0';
-            el.style.background = 'transparent';
-            el.style.borderLeft = size/2 + 'px solid transparent';
-            el.style.borderRight = size/2 + 'px solid transparent';
-            el.style.borderBottom = size + 'px solid ' + colors[Math.floor(Math.random() * colors.length)];
-        }
-        
-        container.appendChild(el);
-    }
-    
-    setTimeout(() => {
-        container.innerHTML = '';
-    }, 3500);
-}
-
-function createWinEffects(prizeName) {
-    const resultBox = document.getElementById('resultBox');
-    resultBox.classList.add('winner');
-    
-    // أيقونة كبيرة
-    const icon = document.getElementById('prizeIcon');
-    icon.classList.add('big-win');
-    
-    // نص متلألئ
-    const name = document.getElementById('prizeName');
-    name.classList.add('win-text');
-    
-    // كونفيتي
-    createConfetti(60);
-    
-    // إشعار منبثق
-    showNotification(`🎉 مبروك! لقد فزت بـ ${prizeName}!`);
-}
-
-function clearWinEffects() {
-    const resultBox = document.getElementById('resultBox');
-    resultBox.classList.remove('winner');
-    
-    const icon = document.getElementById('prizeIcon');
-    icon.classList.remove('big-win');
-    
-    const name = document.getElementById('prizeName');
-    name.classList.remove('win-text');
-}
-
-// ================================================================
-//                      إشعار الفوز
-// ================================================================
-function showNotification(message) {
-    const bar = document.getElementById('notificationBar');
-    document.getElementById('notifPrizeName').textContent = message.replace('🎉 مبروك! لقد فزت بـ ', '').replace('!', '');
-    bar.classList.add('show');
-    
-    setTimeout(() => {
-        bar.classList.remove('show');
-    }, 4000);
-}
-
-// ================================================================
 //                      جلب USER_ID
 // ================================================================
 function getUserId() {
@@ -1218,7 +1379,6 @@ function getUserId() {
     if (id && !isNaN(id)) {
         USER_ID = parseInt(id);
         localStorage.setItem('wheel_user_id', USER_ID);
-        document.getElementById('userIdDisplay').textContent = USER_ID;
         return USER_ID;
     }
     try {
@@ -1227,7 +1387,6 @@ function getUserId() {
             if (user && user.id) {
                 USER_ID = user.id;
                 localStorage.setItem('wheel_user_id', USER_ID);
-                document.getElementById('userIdDisplay').textContent = USER_ID;
                 return USER_ID;
             }
         }
@@ -1235,14 +1394,13 @@ function getUserId() {
     id = localStorage.getItem('wheel_user_id');
     if (id) {
         USER_ID = parseInt(id);
-        document.getElementById('userIdDisplay').textContent = USER_ID;
         return USER_ID;
     }
     return null;
 }
 
 // ================================================================
-//                      رسم العجلة مع صورة المركز
+//                      رسم العجلة
 // ================================================================
 function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     const canvas = document.getElementById('wheelCanvas');
@@ -1266,12 +1424,6 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     const total = prizes.length;
     const step = (2 * Math.PI) / total;
     
-    const colors = [
-        '#1a1a2e', '#16213e', '#0f3460', '#1a1a2e', 
-        '#2d1b3d', '#1a1a2e', '#16213e', '#0f3460',
-        '#1a0a0a', '#2a1a2a'
-    ];
-    
     prizes.forEach((p, i) => {
         const start = i * step + rotation - Math.PI/2;
         const end = start + step;
@@ -1282,11 +1434,19 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
         ctx.arc(cx, cy, r, start, end);
         ctx.closePath();
         
+        // استخدام الألوان المخصصة من قاعدة البيانات
+        const color1 = p.color || '#1a1a2e';
+        const color2 = p.color2 || '#16213e';
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-        const color1 = isHighlight ? '#FFD700' : colors[i % colors.length];
-        const color2 = isHighlight ? '#FF8C00' : colors[(i + 3) % colors.length];
-        grad.addColorStop(0, color1);
-        grad.addColorStop(1, color2);
+        
+        if (isHighlight) {
+            grad.addColorStop(0, '#FFD700');
+            grad.addColorStop(0.5, '#FF8C00');
+            grad.addColorStop(1, '#B8860B');
+        } else {
+            grad.addColorStop(0, color1);
+            grad.addColorStop(1, color2);
+        }
         ctx.fillStyle = grad;
         ctx.fill();
         
@@ -1328,10 +1488,10 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
         ctx.restore();
     });
     
-    // ===== مركز العجلة مع صورة متحركة =====
+    // ===== مركز العجلة =====
     const centerR = r * 0.16;
+    const centerIcon = settingsCache.center_icon || '⭐';
     
-    // خلفية ذهبية مشعة
     const grad = ctx.createRadialGradient(cx-4, cy-4, 0, cx, cy, centerR);
     grad.addColorStop(0, '#FFD700');
     grad.addColorStop(0.3, '#FFA500');
@@ -1346,27 +1506,20 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     ctx.fill();
     ctx.shadowBlur = 0;
     
-    // حلقة ذهبية خارجية
     ctx.beginPath();
     ctx.arc(cx, cy, centerR + 5, 0, 2 * Math.PI);
     ctx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // صورة المركز (أيقونة متحركة)
     ctx.fillStyle = '#0a0a0a';
-    ctx.font = '26px sans-serif';
+    ctx.font = '28px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.5)';
     ctx.shadowBlur = 8;
-    ctx.fillText(CENTER_IMAGES[centerImageIndex % CENTER_IMAGES.length], cx, cy + 1);
+    ctx.fillText(centerIcon, cx, cy + 1);
     ctx.shadowBlur = 0;
-    
-    // تغيير صورة المركز كل 3 ثواني
-    setTimeout(() => {
-        centerImageIndex++;
-    }, 3000);
 }
 
 // ================================================================
@@ -1403,6 +1556,251 @@ function animateSpin(targetRotation, duration, callback) {
 }
 
 // ================================================================
+//                      دوال الإدارة
+// ================================================================
+async function loadSettings() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/settings?admin_id=${ADMIN_ID}`);
+        const data = await res.json();
+        if (data.success) {
+            settingsCache = data.settings;
+            
+            // تحديث النص العلوي
+            if (settingsCache.banner_text) {
+                document.getElementById('bannerText').innerHTML = settingsCache.banner_text + 
+                    ' <span class="edit-hint" id="editHint">(👑 يمكنك تعديله من الإدارة)</span>';
+            }
+            
+            // تحديث صورة الخلفية
+            if (settingsCache.bg_image_url) {
+                document.getElementById('bgImage').src = settingsCache.bg_image_url;
+            }
+            
+            // تحديث مدة التدوير
+            if (settingsCache.spin_duration) {
+                spinDuration = parseInt(settingsCache.spin_duration) || 3500;
+            }
+            
+            // تحديث حقول الإدارة
+            document.getElementById('editBannerText').value = settingsCache.banner_text || '';
+            document.getElementById('editBgImage').value = settingsCache.bg_image_url || '';
+            document.getElementById('editCenterIcon').value = settingsCache.center_icon || '⭐';
+            document.getElementById('editSpinDuration').value = settingsCache.spin_duration || 3500;
+            document.getElementById('editIntervalHours').value = settingsCache.spin_interval_hours || 24;
+            document.getElementById('editIsActive').checked = settingsCache.is_active === 'true';
+            document.getElementById('editDepositRequired').checked = settingsCache.deposit_required === 'true';
+            document.getElementById('editDepositMin').value = settingsCache.deposit_min_amount || 1000;
+            document.getElementById('editDepositHours').value = settingsCache.deposit_check_hours || 24;
+            
+            return data.settings;
+        }
+        return {};
+    } catch(e) {
+        console.error('Error loading settings:', e);
+        return {};
+    }
+}
+
+async function saveSetting(key, value) {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/settings`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                admin_id: ADMIN_ID,
+                settings: { [key]: value }
+            })
+        });
+        const data = await res.json();
+        return data.success;
+    } catch(e) {
+        console.error('Error saving setting:', e);
+        return false;
+    }
+}
+
+async function loadAdminPrizes() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/prizes?admin_id=${ADMIN_ID}`);
+        const data = await res.json();
+        if (data.success) {
+            return data.prizes || [];
+        }
+        return [];
+    } catch(e) {
+        console.error('Error loading admin prizes:', e);
+        return [];
+    }
+}
+
+async function updatePrize(prizeId, data) {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                admin_id: ADMIN_ID,
+                ...data
+            })
+        });
+        const result = await res.json();
+        return result.success;
+    } catch(e) {
+        console.error('Error updating prize:', e);
+        return false;
+    }
+}
+
+async function deletePrize(prizeId) {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ admin_id: ADMIN_ID })
+        });
+        const data = await res.json();
+        return data.success;
+    } catch(e) {
+        console.error('Error deleting prize:', e);
+        return false;
+    }
+}
+
+async function addPrize(name, icon, probability, color, color2) {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/prizes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                admin_id: ADMIN_ID,
+                name: name,
+                icon: icon || '🎁',
+                probability: parseFloat(probability) || 10,
+                color: color || '#1a1a2e',
+                color2: color2 || '#16213e',
+                description: ''
+            })
+        });
+        const data = await res.json();
+        return data.success;
+    } catch(e) {
+        console.error('Error adding prize:', e);
+        return false;
+    }
+}
+
+async function resetPrizes() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/seed-prizes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ admin_id: ADMIN_ID })
+        });
+        const data = await res.json();
+        return data.success;
+    } catch(e) {
+        console.error('Error resetting prizes:', e);
+        return false;
+    }
+}
+
+// ================================================================
+//                      عرض لوحة الإدارة
+// ================================================================
+async function renderAdminPanel() {
+    const panel = document.getElementById('adminPanel');
+    const list = document.getElementById('prizesList');
+    
+    if (USER_ID !== ADMIN_ID) {
+        panel.classList.remove('show');
+        document.getElementById('adminBadge').style.display = 'none';
+        document.getElementById('editHint').style.display = 'none';
+        return;
+    }
+    
+    panel.classList.add('show');
+    document.getElementById('adminBadge').style.display = 'inline';
+    document.getElementById('editHint').style.display = 'inline';
+    
+    const prizes = await loadAdminPrizes();
+    if (!prizes || prizes.length === 0) {
+        list.innerHTML = '<div style="color:#555;font-size:13px;text-align:center;padding:10px;">لا توجد جوائز</div>';
+        return;
+    }
+    
+    list.innerHTML = prizes.map(p => `
+        <div class="prize-item" data-id="${p.id}">
+            <div class="prize-icon-small">${p.icon || '🎁'}</div>
+            <div class="prize-info">
+                <div class="name">${p.name}</div>
+                <div class="desc">${p.description || ''}</div>
+            </div>
+            <div class="prize-prob">
+                <input type="number" class="prob-input" value="${p.probability}" min="0" max="100" step="0.1">
+                <span class="prob-label">%</span>
+            </div>
+            <div class="prize-colors">
+                <input type="color" class="color-input" value="${p.color || '#1a1a2e'}" data-field="color">
+                <input type="color" class="color-input" value="${p.color2 || '#16213e'}" data-field="color2">
+            </div>
+            <button class="btn-delete" data-id="${p.id}">✕</button>
+        </div>
+    `).join('');
+    
+    // أحداث تحديث النسبة
+    list.querySelectorAll('.prob-input').forEach(input => {
+        input.addEventListener('change', async function() {
+            const item = this.closest('.prize-item');
+            const id = parseInt(item.dataset.id);
+            const val = parseFloat(this.value);
+            if (isNaN(val) || val < 0) {
+                this.value = 0;
+                return;
+            }
+            const success = await updatePrize(id, { probability: val });
+            if (success) {
+                await refreshAll();
+            } else {
+                showError('فشل تحديث النسبة');
+            }
+        });
+    });
+    
+    // أحداث تحديث الألوان
+    list.querySelectorAll('.color-input').forEach(input => {
+        input.addEventListener('change', async function() {
+            const item = this.closest('.prize-item');
+            const id = parseInt(item.dataset.id);
+            const field = this.dataset.field;
+            const value = this.value;
+            const updateData = {};
+            updateData[field] = value;
+            const success = await updatePrize(id, updateData);
+            if (success) {
+                await refreshAll();
+            } else {
+                showError('فشل تحديث اللون');
+            }
+        });
+    });
+    
+    // أحداث الحذف
+    list.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const id = parseInt(this.dataset.id);
+            if (confirm('هل أنت متأكد من حذف هذه الجائزة؟')) {
+                const success = await deletePrize(id);
+                if (success) {
+                    await refreshAll();
+                } else {
+                    showError('فشل حذف الجائزة');
+                }
+            }
+        });
+    });
+}
+
+// ================================================================
 //                      تحميل الجوائز
 // ================================================================
 async function loadPrizes() {
@@ -1436,18 +1834,22 @@ async function loadUserStatus() {
             const depositStatus = document.getElementById('depositStatus');
             
             if (data.deposit_requirement?.required) {
-                document.getElementById('depositMinAmount').textContent = data.deposit_requirement.min_amount || 0;
-                document.getElementById('depositCheckHours').textContent = data.deposit_requirement.check_hours || 24;
-                if (data.deposit_requirement.is_met) {
-                    depositNotice.classList.remove('show');
-                    depositStatus.innerHTML = '💰 ✔';
+                const minAmount = data.deposit_requirement.min_amount || 0;
+                const checkHours = data.deposit_requirement.check_hours || 24;
+                const currentDeposits = data.deposit_requirement.current_deposits || 0;
+                const isMet = data.deposit_requirement.is_met || false;
+                
+                document.getElementById('depositMinAmount').textContent = minAmount;
+                document.getElementById('depositCheckHours').textContent = checkHours;
+                
+                depositNotice.classList.add('show');
+                if (isMet) {
+                    depositStatus.innerHTML = `الحالة: <span class="met">✅ مكتمل (${currentDeposits} SYP)</span>`;
                 } else {
-                    depositNotice.classList.add('show');
-                    depositStatus.innerHTML = '💰 ⚠️';
+                    depositStatus.innerHTML = `الحالة: <span class="not-met">❌ غير مكتمل (${currentDeposits}/${minAmount} SYP)</span>`;
                 }
             } else {
                 depositNotice.classList.remove('show');
-                depositStatus.innerHTML = '';
             }
             
             const spinBtn = document.getElementById('spinBtn');
@@ -1473,6 +1875,78 @@ async function loadUserStatus() {
     } catch(e) {
         console.error('Error loading user status:', e);
     }
+}
+
+// ================================================================
+//                      تحديث كل شيء
+// ================================================================
+async function refreshAll() {
+    await loadSettings();
+    const prizes = await loadPrizes();
+    drawWheel(prizes, -1, currentRotation);
+    await loadUserStatus();
+    await renderAdminPanel();
+}
+
+// ================================================================
+//                      تأثيرات الاحتفال
+// ================================================================
+function createConfetti(count = 50) {
+    const container = document.getElementById('confettiContainer');
+    container.innerHTML = '';
+    
+    const colors = ['#FFD700', '#FF6B00', '#FF0000', '#00FF00', '#00BFFF', '#FF00FF', '#FF69B4', '#FF4500', '#7CFC00'];
+    
+    for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        const size = 6 + Math.random() * 14;
+        el.style.width = size + 'px';
+        el.style.height = size + 'px';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.left = Math.random() * 100 + '%';
+        el.style.top = Math.random() * 40 + '%';
+        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        el.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+        el.style.animationDelay = Math.random() * 0.8 + 's';
+        container.appendChild(el);
+    }
+    
+    setTimeout(() => {
+        container.innerHTML = '';
+    }, 3500);
+}
+
+function createWinEffects(prizeName) {
+    const resultBox = document.getElementById('resultBox');
+    resultBox.classList.add('winner');
+    
+    const icon = document.getElementById('prizeIcon');
+    icon.classList.add('big-win');
+    
+    const name = document.getElementById('prizeName');
+    name.classList.add('win-text');
+    
+    createConfetti(60);
+    showNotification(`🎉 مبروك! لقد فزت بـ ${prizeName}!`);
+}
+
+function clearWinEffects() {
+    const resultBox = document.getElementById('resultBox');
+    resultBox.classList.remove('winner');
+    const icon = document.getElementById('prizeIcon');
+    icon.classList.remove('big-win');
+    const name = document.getElementById('prizeName');
+    name.classList.remove('win-text');
+}
+
+function showNotification(message) {
+    const bar = document.getElementById('notificationBar');
+    document.getElementById('notifPrizeName').textContent = message.replace('🎉 مبروك! لقد فزت بـ ', '').replace('!', '');
+    bar.classList.add('show');
+    setTimeout(() => {
+        bar.classList.remove('show');
+    }, 4000);
 }
 
 // ================================================================
@@ -1520,7 +1994,6 @@ async function spinWheel() {
     document.getElementById('errorMsg').classList.remove('show');
     clearWinEffects();
     
-    // تشغيل صوت الدوران
     soundManager.init();
     soundManager.playSpinSound();
     soundManager.playBackgroundMusic();
@@ -1547,7 +2020,7 @@ async function spinWheel() {
                 const targetAngle = (randomIndex / prizesCache.length) * 2 * Math.PI;
                 const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step / 2));
                 
-                animateSpin(totalRotation, 3500, () => {
+                animateSpin(totalRotation, spinDuration, () => {
                     drawWheel(prizesCache, randomIndex, totalRotation);
                     showResult(prizesCache[randomIndex], isWin);
                 });
@@ -1555,7 +2028,7 @@ async function spinWheel() {
                 const targetAngle = (prizeIndex / prizesCache.length) * 2 * Math.PI;
                 const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step / 2));
                 
-                animateSpin(totalRotation, 3500, () => {
+                animateSpin(totalRotation, spinDuration, () => {
                     drawWheel(prizesCache, prizeIndex, totalRotation);
                     showResult(prize, isWin);
                 });
@@ -1584,7 +2057,7 @@ async function spinWheel() {
 }
 
 // ================================================================
-//                      عرض النتيجة مع التأثيرات
+//                      عرض النتيجة
 // ================================================================
 function showResult(prize, isWin) {
     document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
@@ -1593,22 +2066,10 @@ function showResult(prize, isWin) {
     document.getElementById('resultBox').classList.add('show');
     
     if (isWin) {
-        // فوز - تأثيرات احتفالية قوية
         createWinEffects(prize.name);
         soundManager.playWinSound();
         soundManager.stopBackgroundMusic();
-        
-        // تغيير البanner مؤقتاً للاحتفال
-        const img = document.getElementById('bannerImage');
-        img.src = 'https://images.unsplash.com/photo-1607344645866-009c320d53d0?w=800&h=200&fit=crop&auto=format';
-        img.style.transform = 'scale(1.05)';
-        setTimeout(() => {
-            img.style.transform = 'scale(1)';
-            img.src = BANNER_IMAGES[currentBannerIndex];
-        }, 5000);
-        
     } else {
-        // خسارة (حظ سعيد)
         soundManager.playLoseSound();
         soundManager.stopBackgroundMusic();
     }
@@ -1627,8 +2088,101 @@ function showError(msg) {
 }
 
 // ================================================================
-//                      إعدادات الصوت
+//                      أحداث الإدارة
 // ================================================================
+// حفظ الإعدادات
+document.querySelectorAll('.btn-save').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const key = this.dataset.setting;
+        let value = '';
+        
+        switch(key) {
+            case 'banner_text':
+                value = document.getElementById('editBannerText').value;
+                break;
+            case 'bg_image_url':
+                value = document.getElementById('editBgImage').value;
+                break;
+            case 'center_icon':
+                value = document.getElementById('editCenterIcon').value;
+                break;
+            case 'spin_duration':
+                value = document.getElementById('editSpinDuration').value;
+                break;
+            case 'spin_interval_hours':
+                value = document.getElementById('editIntervalHours').value;
+                break;
+            case 'is_active':
+                value = document.getElementById('editIsActive').checked ? 'true' : 'false';
+                break;
+            case 'deposit_required':
+                value = document.getElementById('editDepositRequired').checked ? 'true' : 'false';
+                break;
+            case 'deposit_min_amount':
+                value = document.getElementById('editDepositMin').value;
+                break;
+            case 'deposit_check_hours':
+                value = document.getElementById('editDepositHours').value;
+                break;
+            default:
+                return;
+        }
+        
+        const success = await saveSetting(key, value);
+        if (success) {
+            await refreshAll();
+            showNotification('✅ تم حفظ الإعدادات');
+        } else {
+            showError('فشل حفظ الإعدادات');
+        }
+    });
+});
+
+// تحديث الجوائز
+document.getElementById('refreshPrizesBtn').addEventListener('click', async function() {
+    await refreshAll();
+    showNotification('🔄 تم تحديث الجوائز');
+});
+
+// إعادة تعيين الجوائز
+document.getElementById('resetPrizesBtn').addEventListener('click', async function() {
+    if (confirm('⚠️ هل أنت متأكد من إعادة تعيين جميع الجوائز إلى الإعدادات الافتراضية؟')) {
+        const success = await resetPrizes();
+        if (success) {
+            await refreshAll();
+            showNotification('✅ تم إعادة تعيين الجوائز');
+        } else {
+            showError('فشل إعادة التعيين');
+        }
+    }
+});
+
+// إضافة جائزة
+document.getElementById('addPrizeBtn').addEventListener('click', async function() {
+    const name = document.getElementById('newPrizeName').value.trim();
+    const icon = document.getElementById('newPrizeIcon').value.trim() || '🎁';
+    const prob = parseFloat(document.getElementById('newPrizeProb').value) || 10;
+    const color = document.getElementById('newPrizeColor').value || '#1a1a2e';
+    const color2 = document.getElementById('newPrizeColor2').value || '#16213e';
+    
+    if (!name) {
+        showError('الرجاء إدخال اسم الجائزة');
+        return;
+    }
+    
+    const success = await addPrize(name, icon, prob, color, color2);
+    if (success) {
+        document.getElementById('newPrizeName').value = '';
+        document.getElementById('newPrizeIcon').value = '';
+        document.getElementById('newPrizeProb').value = '';
+        await refreshAll();
+        showNotification(`✅ تم إضافة "${name}"`);
+    } else {
+        showError('فشل إضافة الجائزة');
+    }
+});
+
+// إعدادات الصوت
 document.getElementById('soundToggle').addEventListener('change', function() {
     soundEnabled = this.checked;
     if (!soundEnabled) {
@@ -1677,17 +2231,22 @@ async function init() {
             await new Promise(r => setTimeout(r, 800));
         }
         
-        updateLoading(70, 'جاري تحميل الجوائز...');
+        updateLoading(70, 'جاري تحميل الإعدادات...');
+        await loadSettings();
+        
+        updateLoading(80, 'جاري تحميل الجوائز...');
         const prizes = await loadPrizes();
         drawWheel(prizes, -1, 0);
         
-        updateLoading(85, 'جاري تحميل بيانات المستخدم...');
+        updateLoading(90, 'جاري تحميل بيانات المستخدم...');
         await loadUserStatus();
+        
+        updateLoading(95, 'جاري تحميل لوحة الإدارة...');
+        await renderAdminPanel();
         
         updateLoading(100, '✅ جاهز!');
         await new Promise(r => setTimeout(r, 400));
         
-        // تشغيل الموسيقى
         soundManager.init();
         soundManager.playBackgroundMusic();
         

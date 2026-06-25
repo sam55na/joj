@@ -890,7 +890,7 @@ async function spinWheel() {
         
         if (data.success) {
             const prize = data.spin.prize;
-            
+            const step = (2 * Math.PI) / prizesCache.length;
             // حساب الزاوية المستهدفة - 3 لفات كاملة + زاوية الجائزة
             const prizeIndex = prizesCache.findIndex(p => p.id === prize.id);
             if (prizeIndex === -1) {

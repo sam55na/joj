@@ -4,7 +4,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // ================================================================
-//                      CORS - السماح بالطلبات من أي مصدر
+//                      إعدادات CORS
 // ================================================================
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -432,7 +432,7 @@ app.post('/api/admin/seed-prizes', async (req, res) => {
     }
 });
 
-// -------------------- 1. جلب جميع الجوائز (للأدمن) --------------------
+// -------------------- جلب جميع الجوائز (للأدمن) --------------------
 app.get('/api/admin/prizes', async (req, res) => {
     const { admin_id } = req.query;
 
@@ -462,7 +462,7 @@ app.get('/api/admin/prizes', async (req, res) => {
     }
 });
 
-// -------------------- 2. إضافة جائزة جديدة --------------------
+// -------------------- إضافة جائزة جديدة --------------------
 app.post('/api/admin/prizes', async (req, res) => {
     const { admin_id, name, description, probability, icon } = req.body;
 
@@ -499,7 +499,7 @@ app.post('/api/admin/prizes', async (req, res) => {
     }
 });
 
-// -------------------- 3. تحديث جائزة --------------------
+// -------------------- تحديث جائزة --------------------
 app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     const { prize_id } = req.params;
     const { admin_id, name, description, probability, icon, is_active } = req.body;
@@ -544,7 +544,7 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 });
 
-// -------------------- 4. حذف جائزة --------------------
+// -------------------- حذف جائزة --------------------
 app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
     const { prize_id } = req.params;
     const { admin_id } = req.body;
@@ -574,7 +574,7 @@ app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 });
 
-// -------------------- 5. جلب الإعدادات --------------------
+// -------------------- جلب الإعدادات --------------------
 app.get('/api/admin/settings', async (req, res) => {
     const { admin_id } = req.query;
 
@@ -604,7 +604,7 @@ app.get('/api/admin/settings', async (req, res) => {
     }
 });
 
-// -------------------- 6. تحديث الإعدادات --------------------
+// -------------------- تحديث الإعدادات --------------------
 app.put('/api/admin/settings', async (req, res) => {
     const { admin_id, settings } = req.body;
 
@@ -637,7 +637,7 @@ app.put('/api/admin/settings', async (req, res) => {
     }
 });
 
-// -------------------- 7. تدوير العجلة --------------------
+// -------------------- تدوير العجلة --------------------
 app.post('/api/wheel/spin', async (req, res) => {
     const { user_id } = req.body;
 
@@ -664,6 +664,7 @@ app.post('/api/wheel/spin', async (req, res) => {
     }
 
     try {
+        // 1. التحقق من تفعيل العجلة
         const isActive = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['is_active']
@@ -676,6 +677,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             });
         }
 
+        // 2. التحقق من شرط الإيداع
         const depositRequired = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['deposit_required']
@@ -718,6 +720,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
+        // 3. التحقق من آخر تدوير (الفاصل الزمني)
         const intervalHours = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['spin_interval_hours']
@@ -752,6 +755,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
+        // 4. اختيار جائزة عشوائية حسب النسب
         const prizes = await pool.query(`
             SELECT * FROM wheel_prizes 
             WHERE is_active = true
@@ -765,7 +769,10 @@ app.post('/api/wheel/spin', async (req, res) => {
             });
         }
 
+        // حساب المجموع الكلي للنسب
         const totalProbability = prizes.rows.reduce((sum, p) => sum + parseFloat(p.probability), 0);
+        
+        // اختيار عشوائي
         let random = Math.random() * totalProbability;
         let selectedPrize = prizes.rows[0];
 
@@ -777,12 +784,14 @@ app.post('/api/wheel/spin', async (req, res) => {
             random -= parseFloat(prize.probability);
         }
 
+        // 5. تسجيل التدوير في قاعدة البيانات
         const result = await pool.query(`
             INSERT INTO wheel_spins (user_id, prize_id, prize_name)
             VALUES ($1, $2, $3)
             RETURNING id, spin_date
         `, [user_id, selectedPrize.id, selectedPrize.name]);
 
+        // 6. جلب إحصائيات المستخدم
         const userStats = await pool.query(`
             SELECT 
                 COUNT(*) as total_spins,
@@ -791,6 +800,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             WHERE user_id = $1
         `, [user_id]);
 
+        // 7. حساب وقت التدوير التالي
         const nextSpinDate = new Date();
         nextSpinDate.setHours(nextSpinDate.getHours() + intervalHoursValue);
 
@@ -820,7 +830,7 @@ app.post('/api/wheel/spin', async (req, res) => {
     }
 });
 
-// -------------------- 8. جلب سجل المستخدم --------------------
+// -------------------- جلب سجل المستخدم --------------------
 app.get('/api/wheel/history/:user_id', async (req, res) => {
     const { user_id } = req.params;
 
@@ -832,6 +842,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
     }
 
     try {
+        // آخر تدوير
         const lastSpin = await pool.query(`
             SELECT spin_date FROM wheel_spins 
             WHERE user_id = $1 
@@ -839,12 +850,14 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             LIMIT 1
         `, [user_id]);
 
+        // الإعدادات
         const intervalHours = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['spin_interval_hours']
         );
         const intervalHoursValue = parseInt(intervalHours.rows[0]?.setting_value || 24);
 
+        // شرط الإيداع
         const depositRequired = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['deposit_required']
@@ -880,6 +893,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             };
         }
 
+        // الوقت المتبقي
         let can_spin = true;
         let remaining_hours = 0;
         let remaining_minutes = 0;
@@ -898,6 +912,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             }
         }
 
+        // السجل
         const history = await pool.query(`
             SELECT 
                 s.id,
@@ -949,7 +964,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
     }
 });
 
-// -------------------- 9. المطالبة بالجائزة --------------------
+// -------------------- المطالبة بالجائزة --------------------
 app.put('/api/wheel/claim/:spin_id', async (req, res) => {
     const { spin_id } = req.params;
     const { user_id } = req.body;
@@ -1008,7 +1023,7 @@ app.put('/api/wheel/claim/:spin_id', async (req, res) => {
     }
 });
 
-// -------------------- 10. تسجيل إيداع --------------------
+// -------------------- تسجيل إيداع --------------------
 app.post('/api/wheel/deposit', async (req, res) => {
     const { user_id, amount, source } = req.body;
 
@@ -1044,7 +1059,7 @@ app.post('/api/wheel/deposit', async (req, res) => {
     }
 });
 
-// -------------------- 11. الإحصائيات العامة --------------------
+// -------------------- الإحصائيات العامة --------------------
 app.get('/api/admin/stats', async (req, res) => {
     const { admin_id } = req.query;
 

@@ -218,7 +218,7 @@ setInterval(() => {
 }, 300000);
 
 // ================================================================
-//                      الصفحة الرئيسية (ترحب فقط)
+//                      الصفحة الرئيسية
 // ================================================================
 app.get('/', (req, res) => {
     res.json({
@@ -233,7 +233,8 @@ app.get('/', (req, res) => {
             admin: {
                 prizes: 'GET /api/admin/prizes?admin_id=...',
                 settings: 'GET /api/admin/settings?admin_id=...',
-                stats: 'GET /api/admin/stats?admin_id=...'
+                stats: 'GET /api/admin/stats?admin_id=...',
+                view_prizes: 'GET /api/admin/view-prizes?admin_id=...'
             }
         }
     });
@@ -251,6 +252,84 @@ app.get('/api/status', (req, res) => {
         timestamp: new Date().toISOString(),
         database: { ready: dbReady }
     });
+});
+
+// -------------------- فحص وعرض محتوى جدول الجوائز --------------------
+app.get('/api/admin/view-prizes', async (req, res) => {
+    const { admin_id } = req.query;
+
+    // التحقق من الصلاحية
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: '❌ غير مصرح - Admin only'
+        });
+    }
+
+    try {
+        // 1. التحقق من وجود الجدول
+        const tableCheck = await pool.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                AND table_name = 'wheel_prizes'
+            )
+        `);
+        const tableExists = tableCheck.rows[0].exists;
+
+        if (!tableExists) {
+            return res.json({
+                success: false,
+                error: '❌ جدول wheel_prizes غير موجود',
+                table_exists: false,
+                prizes: []
+            });
+        }
+
+        // 2. جلب جميع الجوائز (بما فيها غير النشطة)
+        const result = await pool.query(`
+            SELECT 
+                id,
+                name,
+                description,
+                probability,
+                icon,
+                is_active,
+                created_at,
+                updated_at
+            FROM wheel_prizes 
+            ORDER BY id ASC
+        `);
+
+        // 3. جلب إحصائيات إضافية
+        const stats = await pool.query(`
+            SELECT 
+                COUNT(*) as total,
+                COUNT(CASE WHEN is_active = true THEN 1 END) as active,
+                SUM(probability) as total_probability
+            FROM wheel_prizes
+        `);
+
+        res.json({
+            success: true,
+            table_exists: true,
+            total_prizes: result.rows.length,
+            stats: {
+                total: parseInt(stats.rows[0].total),
+                active: parseInt(stats.rows[0].active),
+                total_probability: parseFloat(stats.rows[0].total_probability || 0)
+            },
+            prizes: result.rows,
+            message: result.rows.length === 0 ? '⚠️ لا توجد جوائز في الجدول' : `✅ يوجد ${result.rows.length} جوائز`
+        });
+
+    } catch (error) {
+        console.error('View prizes error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
 });
 
 // -------------------- فحص تفصيلي لقاعدة البيانات --------------------
@@ -343,7 +422,7 @@ app.post('/api/admin/seed-prizes', async (req, res) => {
     }
 });
 
-// -------------------- 1. جلب جميع الجوائز --------------------
+// -------------------- 1. جلب جميع الجوائز (للأدمن) --------------------
 app.get('/api/admin/prizes', async (req, res) => {
     const { admin_id } = req.query;
 
@@ -548,7 +627,7 @@ app.put('/api/admin/settings', async (req, res) => {
     }
 });
 
-// -------------------- 7. تدوير العجلة (الطلب الرئيسي) --------------------
+// -------------------- 7. تدوير العجلة --------------------
 app.post('/api/wheel/spin', async (req, res) => {
     const { user_id } = req.body;
 
@@ -1034,6 +1113,7 @@ async function startServer() {
         console.log(`\n✅ الخادم يعمل على المنفذ ${port}`);
         console.log(`🔗 فحص الحالة: http://localhost:${port}/api/status`);
         console.log(`🔗 تشخيص DB: http://localhost:${port}/api/admin/diagnose?admin_id=${ADMIN_ID}`);
+        console.log(`🔗 عرض الجوائز: http://localhost:${port}/api/admin/view-prizes?admin_id=${ADMIN_ID}`);
         console.log('\n📋 ===== جاهز! =====\n');
     });
 }

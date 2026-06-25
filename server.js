@@ -126,7 +126,6 @@ async function ensureTables() {
     const client = await pool.connect();
 
     try {
-        // إنشاء الجداول
         for (const table of Object.keys(TABLE_SCHEMAS)) {
             try {
                 await client.query(TABLE_SCHEMAS[table]);
@@ -148,8 +147,6 @@ async function ensureTables() {
                 `, [prize.name, prize.description, prize.probability, prize.icon, prize.color, prize.color2]);
             }
             console.log(`   ✅ تم إضافة ${DEFAULT_PRIZES.length} جائزة افتراضية`);
-        } else {
-            console.log(`   ✅ يوجد ${parseInt(prizesCount.rows[0].count)} جوائز في قاعدة البيانات`);
         }
 
         // الإعدادات الافتراضية
@@ -163,8 +160,6 @@ async function ensureTables() {
                 `, [setting.key, setting.value]);
             }
             console.log(`   ✅ تم إضافة ${DEFAULT_SETTINGS.length} إعداد افتراضي`);
-        } else {
-            console.log(`   ✅ يوجد ${parseInt(settingsCount.rows[0].count)} إعداد في قاعدة البيانات`);
         }
 
         // النص العلوي
@@ -175,16 +170,6 @@ async function ensureTables() {
                 VALUES ($1)
             `, ['🎡 IChancy · عجلة الحظ']);
             console.log('   ✅ تم إضافة النص العلوي الافتراضي');
-        } else {
-            console.log('   ✅ يوجد نص علوي في قاعدة البيانات');
-        }
-
-        // عرض الملخص
-        console.log('\n📋 ===== ملخص قاعدة البيانات =====');
-        const tables = ['wheel_prizes', 'wheel_spins', 'wheel_settings', 'wheel_deposits', 'wheel_banner'];
-        for (const table of tables) {
-            const countResult = await client.query(`SELECT COUNT(*) FROM ${table}`);
-            console.log(`   📊 ${table}: ${parseInt(countResult.rows[0].count)} سجل`);
         }
 
         console.log('\n✅ ===== قاعدة البيانات جاهزة! =====');
@@ -200,7 +185,7 @@ async function ensureTables() {
 }
 
 // ================================================================
-//                      نظام الأقفال (لمنع التكرار)
+//                      نظام الأقفال
 // ================================================================
 const userLocks = new Map();
 
@@ -214,7 +199,6 @@ function releaseLock(userId) {
     userLocks.delete(userId);
 }
 
-// تنظيف الأقفال القديمة كل 5 دقائق
 setInterval(() => {
     const now = Date.now();
     for (const [key, value] of userLocks) {
@@ -243,7 +227,7 @@ app.get('/', (req, res) => {
     res.json({
         status: 'running',
         service: 'Wheel of Fortune API',
-        message: '🚀 الخادم يعمل. استخدم /api/wheel/spin للتدوير',
+        message: '🚀 الخادم يعمل',
         endpoints: {
             spin: 'POST /api/wheel/spin',
             history: 'GET /api/wheel/history/:user_id',
@@ -323,7 +307,6 @@ app.get('/api/admin/settings', async (req, res) => {
             settings[row.setting_key] = row.setting_value;
         });
 
-        // النص العلوي
         const banner = await pool.query('SELECT text FROM wheel_banner ORDER BY id DESC LIMIT 1');
         settings.banner_text = banner.rows[0]?.text || '🎡 IChancy · عجلة الحظ';
 
@@ -472,7 +455,7 @@ app.post('/api/admin/prizes', async (req, res) => {
     }
 });
 
-// -------------------- تحديث جائزة --------------------
+// -------------------- تحديث جائزة (مع دعم الألوان) --------------------
 app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     const { prize_id } = req.params;
     const { admin_id, name, description, probability, icon, color, color2, is_active } = req.body;
@@ -485,38 +468,38 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 
     try {
-        // بناء الاستعلام ديناميكياً
+        // بناء الاستعلام ديناميكياً مع دعم جميع الحقول
         const updates = [];
         const values = [];
         let paramIndex = 1;
 
-        if (name !== undefined) {
+        if (name !== undefined && name !== null) {
             updates.push(`name = $${paramIndex++}`);
             values.push(name);
         }
-        if (description !== undefined) {
+        if (description !== undefined && description !== null) {
             updates.push(`description = $${paramIndex++}`);
             values.push(description);
         }
-        if (probability !== undefined) {
+        if (probability !== undefined && probability !== null) {
             updates.push(`probability = $${paramIndex++}`);
-            values.push(probability);
+            values.push(parseFloat(probability));
         }
-        if (icon !== undefined) {
+        if (icon !== undefined && icon !== null) {
             updates.push(`icon = $${paramIndex++}`);
             values.push(icon);
         }
-        if (color !== undefined) {
+        if (color !== undefined && color !== null) {
             updates.push(`color = $${paramIndex++}`);
             values.push(color);
         }
-        if (color2 !== undefined) {
+        if (color2 !== undefined && color2 !== null) {
             updates.push(`color2 = $${paramIndex++}`);
             values.push(color2);
         }
-        if (is_active !== undefined) {
+        if (is_active !== undefined && is_active !== null) {
             updates.push(`is_active = $${paramIndex++}`);
-            values.push(is_active);
+            values.push(is_active === true || is_active === 'true');
         }
 
         if (updates.length === 0) {
@@ -536,6 +519,9 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
             RETURNING *
         `;
 
+        console.log('📝 Update query:', query);
+        console.log('📝 Values:', values);
+
         const result = await pool.query(query, values);
 
         if (result.rows.length === 0) {
@@ -545,12 +531,15 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
             });
         }
 
+        console.log('✅ Prize updated:', result.rows[0]);
+
         res.json({
             success: true,
             prize: result.rows[0],
             message: '✅ تم تحديث الجائزة بنجاح'
         });
     } catch (error) {
+        console.error('❌ Update error:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -595,7 +584,7 @@ app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 });
 
-// -------------------- إعادة تعيين الجوائز للإعدادات الافتراضية --------------------
+// -------------------- إعادة تعيين الجوائز --------------------
 app.post('/api/admin/seed-prizes', async (req, res) => {
     const { admin_id } = req.body;
 
@@ -711,7 +700,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
-        // 3. التحقق من آخر تدوير (فترة التبريد)
+        // 3. التحقق من آخر تدوير
         const intervalHours = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['spin_interval_hours']
@@ -744,7 +733,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
-        // 4. اختيار جائزة عشوائية حسب النسب
+        // 4. اختيار جائزة
         const prizes = await pool.query(`
             SELECT * FROM wheel_prizes 
             WHERE is_active = true
@@ -758,10 +747,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             });
         }
 
-        // حساب المجموع الكلي للنسب
         const totalProbability = prizes.rows.reduce((sum, p) => sum + parseFloat(p.probability), 0);
-        
-        // اختيار عشوائي
         let random = Math.random() * totalProbability;
         let selectedPrize = prizes.rows[0];
 
@@ -773,14 +759,14 @@ app.post('/api/wheel/spin', async (req, res) => {
             random -= parseFloat(prize.probability);
         }
 
-        // 5. تسجيل التدوير في قاعدة البيانات
+        // 5. تسجيل التدوير
         const result = await pool.query(`
             INSERT INTO wheel_spins (user_id, prize_id, prize_name)
             VALUES ($1, $2, $3)
             RETURNING id, spin_date
         `, [user_id, selectedPrize.id, selectedPrize.name]);
 
-        // 6. جلب إحصائيات المستخدم
+        // 6. إحصائيات المستخدم
         const userStats = await pool.query(`
             SELECT 
                 COUNT(*) as total_spins,
@@ -825,7 +811,6 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
     }
 
     try {
-        // آخر تدوير
         const lastSpin = await pool.query(`
             SELECT spin_date FROM wheel_spins 
             WHERE user_id = $1 
@@ -833,14 +818,12 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             LIMIT 1
         `, [user_id]);
 
-        // الإعدادات
         const intervalHours = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['spin_interval_hours']
         );
         const intervalHoursValue = parseInt(intervalHours.rows[0]?.setting_value || 24);
 
-        // شرط الإيداع
         const depositRequired = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['deposit_required']
@@ -876,7 +859,6 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             };
         }
 
-        // الوقت المتبقي
         let can_spin = true;
         let remaining_hours = 0;
         let remaining_minutes = 0;
@@ -893,7 +875,6 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             }
         }
 
-        // الإحصائيات
         const stats = await pool.query(`
             SELECT 
                 COUNT(*) as total_spins,
@@ -925,7 +906,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
     }
 });
 
-// -------------------- تسجيل إيداع (للمستخدمين) --------------------
+// -------------------- تسجيل إيداع --------------------
 app.post('/api/wheel/deposit', async (req, res) => {
     const { user_id, amount, source } = req.body;
 
@@ -968,7 +949,6 @@ async function startServer() {
     console.log('\n🚀 ===== بدء تشغيل الخادم =====');
     console.log(`📡 المنفذ: ${port}`);
     console.log(`👑 المدير: ${ADMIN_ID}`);
-    console.log(`📊 قاعدة البيانات: ${DATABASE_URL.replace(/:[^:]*@/, ':****@')}`);
     
     const ready = await ensureTables();
     dbReady = ready;
@@ -977,12 +957,10 @@ async function startServer() {
         console.log(`\n✅ الخادم يعمل على المنفذ ${port}`);
         console.log(`🔗 فحص الحالة: http://localhost:${port}/api/status`);
         console.log(`🔗 الجوائز النشطة: http://localhost:${port}/api/prizes`);
-        console.log(`🔗 لوحة الإدارة: http://localhost:${port}/api/admin/prizes?admin_id=${ADMIN_ID}`);
         console.log('\n📋 ===== جاهز! =====\n');
     });
 }
 
-// بدء الخادم
 startServer().catch(err => {
     console.error('❌ فشل تشغيل الخادم:', err);
     process.exit(1);

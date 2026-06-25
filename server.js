@@ -1,6 +1,5 @@
 const express = require('express');
 const { Pool } = require('pg');
-const path = require('path');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -8,7 +7,6 @@ const port = process.env.PORT || 5000;
 //                      الإعدادات الأساسية
 // ================================================================
 app.use(express.json());
-app.use(express.static('public'));
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
@@ -19,7 +17,7 @@ if (!DATABASE_URL) {
 console.log('📊 DATABASE_URL:', DATABASE_URL.replace(/:[^:]*@/, ':****@'));
 
 // ================================================================
-//                      اتصال PostgreSQL مع إعادة المحاولة
+//                      اتصال PostgreSQL
 // ================================================================
 const pool = new Pool({
     connectionString: DATABASE_URL,
@@ -29,7 +27,7 @@ const pool = new Pool({
     connectionTimeoutMillis: 10000
 });
 
-// اختبار الاتصال مع إعادة المحاولة
+// اختبار الاتصال
 async function testConnection(retries = 5, delay = 2000) {
     for (let i = 0; i < retries; i++) {
         try {
@@ -52,14 +50,9 @@ async function testConnection(retries = 5, delay = 2000) {
 }
 
 // ================================================================
-//                      فحص الجداول وإنشاؤها
+//                      إنشاء الجداول والتحقق
 // ================================================================
-const REQUIRED_TABLES = [
-    'wheel_prizes',
-    'wheel_spins',
-    'wheel_settings',
-    'wheel_deposits'
-];
+const REQUIRED_TABLES = ['wheel_prizes', 'wheel_spins', 'wheel_settings', 'wheel_deposits'];
 
 const TABLE_SCHEMAS = {
     wheel_prizes: `
@@ -121,67 +114,35 @@ const DEFAULT_SETTINGS = [
     { key: 'deposit_check_hours', value: '24' }
 ];
 
-// ================================================================
-//                      وظيفة إنشاء الجداول والتحقق
-// ================================================================
+let dbReady = false;
+
 async function ensureTables() {
-    const results = {
-        connection: false,
-        tables: {},
-        prizes: false,
-        settings: false,
-        errors: []
-    };
-
     console.log('\n📋 ===== فحص قاعدة البيانات =====');
-
-    // 1. التحقق من الاتصال
-    results.connection = await testConnection();
-    if (!results.connection) {
-        results.errors.push('❌ فشل الاتصال بقاعدة البيانات');
-        return results;
+    
+    const connected = await testConnection();
+    if (!connected) {
+        console.error('❌ فشل الاتصال بقاعدة البيانات');
+        return false;
     }
 
     const client = await pool.connect();
 
     try {
-        // 2. إنشاء الجداول المطلوبة
+        // إنشاء الجداول
         console.log('\n📋 إنشاء الجداول المطلوبة...');
         for (const table of REQUIRED_TABLES) {
             try {
                 await client.query(TABLE_SCHEMAS[table]);
-                results.tables[table] = true;
                 console.log(`   ✅ جدول ${table}: تم إنشاؤه/تأكيده`);
             } catch (err) {
-                results.tables[table] = false;
-                results.errors.push(`❌ فشل إنشاء جدول ${table}: ${err.message}`);
                 console.log(`   ❌ جدول ${table}: فشل - ${err.message}`);
+                return false;
             }
         }
 
-        // 3. التحقق من وجود الجداول بعد الإنشاء
-        console.log('\n📋 التحقق من وجود الجداول...');
-        for (const table of REQUIRED_TABLES) {
-            const check = await client.query(`
-                SELECT EXISTS (
-                    SELECT FROM information_schema.tables 
-                    WHERE table_schema = 'public' 
-                    AND table_name = $1
-                )
-            `, [table]);
-            const exists = check.rows[0].exists;
-            console.log(`   ${exists ? '✅' : '❌'} جدول ${table}: ${exists ? 'موجود' : 'غير موجود'}`);
-            if (!exists) {
-                results.errors.push(`❌ جدول ${table} غير موجود بعد الإنشاء`);
-            }
-        }
-
-        // 4. إضافة الجوائز الافتراضية (إذا لم تكن موجودة)
-        console.log('\n📋 فحص الجوائز...');
+        // إضافة الجوائز الافتراضية
         const prizesCount = await client.query('SELECT COUNT(*) FROM wheel_prizes');
-        const count = parseInt(prizesCount.rows[0].count);
-        
-        if (count === 0) {
+        if (parseInt(prizesCount.rows[0].count) === 0) {
             console.log('   ⚠️ لا توجد جوائز، جاري إضافة الجوائز الافتراضية...');
             for (const prize of DEFAULT_PRIZES) {
                 await client.query(`
@@ -189,19 +150,14 @@ async function ensureTables() {
                     VALUES ($1, $2, $3, $4)
                 `, [prize.name, prize.description, prize.probability, prize.icon]);
             }
-            results.prizes = true;
             console.log(`   ✅ تم إضافة ${DEFAULT_PRIZES.length} جائزة افتراضية`);
         } else {
-            results.prizes = true;
-            console.log(`   ✅ يوجد ${count} جوائز في قاعدة البيانات`);
+            console.log(`   ✅ يوجد ${parseInt(prizesCount.rows[0].count)} جوائز في قاعدة البيانات`);
         }
 
-        // 5. إضافة الإعدادات الافتراضية (إذا لم تكن موجودة)
-        console.log('\n📋 فحص الإعدادات...');
+        // إضافة الإعدادات الافتراضية
         const settingsCount = await client.query('SELECT COUNT(*) FROM wheel_settings');
-        const settingsCountVal = parseInt(settingsCount.rows[0].count);
-        
-        if (settingsCountVal === 0) {
+        if (parseInt(settingsCount.rows[0].count) === 0) {
             console.log('   ⚠️ لا توجد إعدادات، جاري إضافة الإعدادات الافتراضية...');
             for (const setting of DEFAULT_SETTINGS) {
                 await client.query(`
@@ -209,54 +165,26 @@ async function ensureTables() {
                     VALUES ($1, $2)
                 `, [setting.key, setting.value]);
             }
-            results.settings = true;
             console.log(`   ✅ تم إضافة ${DEFAULT_SETTINGS.length} إعداد افتراضي`);
-        } else {
-            results.settings = true;
-            console.log(`   ✅ يوجد ${settingsCountVal} إعداد في قاعدة البيانات`);
         }
 
-        // 6. عرض ملخص الجداول والمحتوى
+        // عرض الملخص
         console.log('\n📋 ===== ملخص قاعدة البيانات =====');
         for (const table of REQUIRED_TABLES) {
             const countResult = await client.query(`SELECT COUNT(*) FROM ${table}`);
-            const rowCount = parseInt(countResult.rows[0].count);
-            console.log(`   📊 ${table}: ${rowCount} سجل`);
+            console.log(`   📊 ${table}: ${parseInt(countResult.rows[0].count)} سجل`);
         }
 
         console.log('\n✅ ===== قاعدة البيانات جاهزة! =====');
+        dbReady = true;
+        return true;
 
     } catch (err) {
         console.error('❌ خطأ أثناء تهيئة قاعدة البيانات:', err);
-        results.errors.push(`❌ خطأ عام: ${err.message}`);
+        return false;
     } finally {
         client.release();
     }
-
-    return results;
-}
-
-// ================================================================
-//                      تشغيل التهيئة عند بدء الخادم
-// ================================================================
-let dbReady = false;
-let dbStatus = null;
-
-async function initializeDatabase() {
-    dbStatus = await ensureTables();
-    dbReady = dbStatus.connection && 
-              Object.values(dbStatus.tables).every(v => v === true) &&
-              dbStatus.prizes &&
-              dbStatus.settings;
-    
-    if (dbReady) {
-        console.log('\n🚀 قاعدة البيانات جاهزة للعمل!');
-    } else {
-        console.log('\n⚠️ تحذير: بعض الجداول غير جاهزة!');
-        console.log('📋 الأخطاء:', dbStatus.errors);
-    }
-    
-    return dbReady;
 }
 
 // ================================================================
@@ -290,19 +218,38 @@ setInterval(() => {
 }, 300000);
 
 // ================================================================
+//                      الصفحة الرئيسية (ترحب فقط)
+// ================================================================
+app.get('/', (req, res) => {
+    res.json({
+        status: 'running',
+        service: 'Wheel of Fortune API',
+        message: '🚀 الخادم يعمل. استخدم /api/wheel/spin للتدوير',
+        endpoints: {
+            spin: 'POST /api/wheel/spin',
+            history: 'GET /api/wheel/history/:user_id',
+            claim: 'PUT /api/wheel/claim/:spin_id',
+            deposit: 'POST /api/wheel/deposit',
+            admin: {
+                prizes: 'GET /api/admin/prizes?admin_id=...',
+                settings: 'GET /api/admin/settings?admin_id=...',
+                stats: 'GET /api/admin/stats?admin_id=...'
+            }
+        }
+    });
+});
+
+// ================================================================
 //                      المسارات (API Endpoints)
 // ================================================================
 
-// -------------------- فحص حالة الخادم وقاعدة البيانات --------------------
+// -------------------- فحص حالة الخادم --------------------
 app.get('/api/status', (req, res) => {
     res.json({
         status: 'running',
-        service: 'Wheel of Fortune',
+        service: 'Wheel of Fortune API',
         timestamp: new Date().toISOString(),
-        database: {
-            ready: dbReady,
-            status: dbStatus
-        }
+        database: { ready: dbReady }
     });
 });
 
@@ -319,11 +266,7 @@ app.get('/api/admin/diagnose', async (req, res) => {
 
     try {
         const client = await pool.connect();
-        const result = {
-            tables: {},
-            counts: {},
-            settings: {}
-        };
+        const result = { tables: {}, counts: {}, settings: {} };
 
         for (const table of REQUIRED_TABLES) {
             const check = await client.query(`
@@ -341,13 +284,11 @@ app.get('/api/admin/diagnose', async (req, res) => {
             }
         }
 
-        // جلب الإعدادات
         const settings = await client.query('SELECT * FROM wheel_settings');
         settings.rows.forEach(row => {
             result.settings[row.setting_key] = row.setting_value;
         });
 
-        // جلب الجوائز
         const prizes = await client.query('SELECT * FROM wheel_prizes ORDER BY probability DESC');
         result.prizes = prizes.rows;
 
@@ -356,8 +297,7 @@ app.get('/api/admin/diagnose', async (req, res) => {
         res.json({
             success: true,
             diagnosis: result,
-            db_ready: dbReady,
-            message: dbReady ? '✅ قاعدة البيانات جاهزة' : '⚠️ قاعدة البيانات غير جاهزة'
+            db_ready: dbReady
         });
     } catch (error) {
         res.status(500).json({
@@ -608,7 +548,7 @@ app.put('/api/admin/settings', async (req, res) => {
     }
 });
 
-// -------------------- 7. تدوير العجلة --------------------
+// -------------------- 7. تدوير العجلة (الطلب الرئيسي) --------------------
 app.post('/api/wheel/spin', async (req, res) => {
     const { user_id } = req.body;
 
@@ -1077,11 +1017,6 @@ app.get('/api/admin/stats', async (req, res) => {
     }
 });
 
-// -------------------- الصفحة الرئيسية --------------------
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
 // ================================================================
 //                      تشغيل الخادم
 // ================================================================
@@ -1091,12 +1026,12 @@ async function startServer() {
     console.log(`👑 المدير: ${ADMIN_ID}`);
     
     // تهيئة قاعدة البيانات
-    await initializeDatabase();
+    const ready = await ensureTables();
+    dbReady = ready;
     
     // بدء الخادم
     app.listen(port, () => {
         console.log(`\n✅ الخادم يعمل على المنفذ ${port}`);
-        console.log(`🔗 رابط الواجهة: http://localhost:${port}/`);
         console.log(`🔗 فحص الحالة: http://localhost:${port}/api/status`);
         console.log(`🔗 تشخيص DB: http://localhost:${port}/api/admin/diagnose?admin_id=${ADMIN_ID}`);
         console.log('\n📋 ===== جاهز! =====\n');

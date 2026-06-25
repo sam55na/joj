@@ -29,6 +29,7 @@
             overflow: hidden;
         }
 
+        /* خلفية متحركة */
         body::before {
             content: '';
             position: fixed;
@@ -63,7 +64,34 @@
         }
 
         /* ============================================================
-                   صور الخلفية - Banner
+                   خلفية متحركة للعجلة
+                   ============================================================ */
+        .bg-image-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: slowZoom 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes slowZoom {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* ============================================================
+                   صور البanner
                    ============================================================ */
         .banner-container {
             width: 100%;
@@ -81,6 +109,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            transition: transform 0.5s ease;
         }
 
         .banner-container .banner-overlay {
@@ -89,7 +118,7 @@
             left: 0;
             right: 0;
             padding: 8px 16px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
             color: #FFD700;
             font-size: 12px;
             text-align: center;
@@ -453,7 +482,7 @@
         }
 
         /* ============================================================
-                   النتيجة - مع تأثيرات خاصة
+                   النتيجة - تأثيرات مميزة للفوز
                    ============================================================ */
         .result-box {
             background: rgba(255, 215, 0, 0.02);
@@ -465,33 +494,40 @@
             display: none;
             position: relative;
             overflow: hidden;
+            transition: all 0.5s ease;
         }
 
         .result-box.show {
             display: block;
-            animation: resultPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: resultPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @keyframes resultPop {
-            0% { transform: scale(0.8) rotate(-5deg); opacity: 0; }
+            0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
             100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
 
-        /* تأثير خاص للفوز بجائزة غير حظ سعيد */
+        /* ===== تأثير الفوز الكبير ===== */
         .result-box.winner {
-            border-color: rgba(255, 215, 0, 0.3);
-            background: rgba(255, 215, 0, 0.05);
-            animation: winGlow 1.5s ease-in-out infinite alternate;
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.05);
+            border-color: #FFD700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 100, 0, 0.05));
+            animation: winGlow 1s ease-in-out infinite alternate;
+            box-shadow: 0 0 80px rgba(255, 215, 0, 0.1);
         }
 
         @keyframes winGlow {
-            0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.05); }
-            100% { box-shadow: 0 0 80px rgba(255, 215, 0, 0.15); }
+            0% { 
+                box-shadow: 0 0 40px rgba(255, 215, 0, 0.05);
+                border-color: rgba(255, 215, 0, 0.3);
+            }
+            100% { 
+                box-shadow: 0 0 100px rgba(255, 215, 0, 0.2);
+                border-color: #FFD700;
+            }
         }
 
-        /* انفجار النجوم للفوز */
-        .result-box .confetti-container {
+        /* ===== انفجار الكونفيتي ===== */
+        .confetti-container {
             position: absolute;
             top: 0;
             left: 0;
@@ -501,61 +537,110 @@
             overflow: hidden;
         }
 
-        .result-box .confetti {
+        .confetti-piece {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             opacity: 0;
-            animation: confettiFall 2s ease-in forwards;
+            animation: confettiFall 2.5s ease-in forwards;
         }
 
         @keyframes confettiFall {
             0% {
                 opacity: 1;
-                transform: translateY(-20px) rotate(0deg) scale(1);
+                transform: translateY(-30px) rotate(0deg) scale(1);
             }
             100% {
                 opacity: 0;
-                transform: translateY(200px) rotate(720deg) scale(0);
+                transform: translateY(300px) rotate(720deg) scale(0.3);
             }
         }
 
+        /* ===== أيقونة الجائزة ===== */
         .result-box .prize-icon {
             font-size: 38px;
             animation: pulse 1.5s ease-in-out infinite;
             display: inline-block;
+            transition: all 0.5s ease;
         }
 
         .result-box .prize-icon.big-win {
-            font-size: 52px;
-            animation: bigWinPulse 0.8s ease-in-out infinite alternate;
+            font-size: 64px;
+            animation: bigWinPulse 0.6s ease-in-out infinite alternate;
         }
 
         @keyframes bigWinPulse {
-            0% { transform: scale(1) rotate(-5deg); }
-            100% { transform: scale(1.2) rotate(5deg); }
+            0% { 
+                transform: scale(1) rotate(-8deg);
+                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+            }
+            100% { 
+                transform: scale(1.3) rotate(8deg);
+                filter: drop-shadow(0 0 50px rgba(255, 215, 0, 0.6));
+            }
         }
 
+        /* ===== اسم الجائزة ===== */
         .result-box .prize-name {
             font-size: 20px;
             font-weight: 700;
             color: #FFD700;
             margin-top: 4px;
+            transition: all 0.5s ease;
         }
 
         .result-box .prize-name.win-text {
-            background: linear-gradient(135deg, #FFD700, #FF6B00, #FFD700);
-            background-size: 200% 200%;
+            background: linear-gradient(135deg, #FFD700, #FF6B00, #FF0080, #FFD700);
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: goldShine 1.5s ease-in-out infinite;
-            font-size: 24px;
+            animation: rainbowShine 1.5s ease-in-out infinite;
+            font-size: 26px;
+        }
+
+        @keyframes rainbowShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .result-box .prize-desc {
             color: #777;
             font-size: 13px;
             margin-top: 2px;
+        }
+
+        /* ===== شريط الإشعار ===== */
+        .notification-bar {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #FFD700, #FF8C00);
+            color: #0a0a0a;
+            padding: 16px 32px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            z-index: 1000;
+            box-shadow: 0 10px 60px rgba(255, 215, 0, 0.3);
+            animation: notifSlideDown 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .notification-bar.show {
+            display: block;
+        }
+
+        @keyframes notifSlideDown {
+            0% { 
+                transform: translateX(-50%) translateY(-100px);
+                opacity: 0;
+            }
+            100% { 
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
         }
 
         /* ============================================================
@@ -606,7 +691,7 @@
         }
 
         /* ============================================================
-                   تأثيرات الصوت - إعدادات
+                   إعدادات الصوت
                    ============================================================ */
         .sound-settings {
             display: flex;
@@ -640,6 +725,9 @@
             font-size: 14px;
         }
 
+        /* ============================================================
+                   تجاوب
+                   ============================================================ */
         @media (max-width: 420px) {
             .container { padding: 16px; }
             .header h1 { font-size: 22px; }
@@ -652,6 +740,16 @@
     </style>
 </head>
 <body>
+
+<!-- ===== خلفية الصور ===== -->
+<div class="bg-image-container" id="bgImageContainer">
+    <img id="bgImage" src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80" alt="Background">
+</div>
+
+<!-- ===== شريط الإشعار ===== -->
+<div class="notification-bar" id="notificationBar">
+    🎉 مبروك! لقد فزت بـ <span id="notifPrizeName">جائزة</span>!
+</div>
 
 <div class="container" id="app">
 
@@ -772,7 +870,6 @@ const ADMIN_ID = 7011476249;
 let USER_ID = null;
 let isSpinning = false;
 let prizesCache = [];
-let isReady = false;
 let currentRotation = 0;
 let soundEnabled = true;
 let musicEnabled = true;
@@ -780,13 +877,31 @@ let musicEnabled = true;
 // ================================================================
 //                      إعدادات الصور
 // ================================================================
+// صور البanner
 const BANNER_IMAGES = [
-    'https://via.placeholder.com/800x200/1a0a0a/FFD700?text=🎡+IChancy+Wheel',
-    'https://via.placeholder.com/800x200/0a1a0a/FFD700?text=💰+اربح+الآن!',
-    'https://via.placeholder.com/800x200/1a0a2a/FFD700?text=🎯+جرب+حظك!'
+    'https://images.unsplash.com/photo-1607344645866-009c320d53d0?w=800&h=200&fit=crop',
+    'https://images.unsplash.com/photo-1607344645866-009c320d53d0?w=800&h=200&fit=crop&auto=format',
+    'https://images.unsplash.com/photo-1607344645866-009c320d53d0?w=800&h=200&fit=crop&auto=format'
+];
+
+// صور الخلفية
+const BG_IMAGES = [
+    'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80',
+    'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80',
+    'https://images.unsplash.com/photo-1470071459604-7b40ec10c5b1?w=1920&q=80'
+];
+
+// صورة مركز العجلة
+const CENTER_IMAGES = [
+    '⭐',
+    '🎯',
+    '💎',
+    '🌟'
 ];
 
 let currentBannerIndex = 0;
+let currentBgIndex = 0;
+let centerImageIndex = 0;
 
 function changeBanner() {
     const img = document.getElementById('bannerImage');
@@ -794,17 +909,25 @@ function changeBanner() {
     img.src = BANNER_IMAGES[currentBannerIndex];
 }
 
-// تغيير البanner كل 10 ثواني
+function changeBackground() {
+    const img = document.getElementById('bgImage');
+    currentBgIndex = (currentBgIndex + 1) % BG_IMAGES.length;
+    img.src = BG_IMAGES[currentBgIndex];
+}
+
+// تغيير الصور كل 10 ثواني
 setInterval(changeBanner, 10000);
+setInterval(changeBackground, 15000);
 
 // ================================================================
-//                      نظام الصوت
+//                      نظام الصوت المتطور
 // ================================================================
 class SoundManager {
     constructor() {
-        this.sounds = {};
         this.initialized = false;
         this.audioContext = null;
+        this.oscillators = [];
+        this.gainNodes = [];
     }
 
     init() {
@@ -817,56 +940,15 @@ class SoundManager {
         }
     }
 
-    // توليد صوت الدوران (نغمات متكررة)
+    // صوت دوران حماسي
     playSpinSound() {
         if (!soundEnabled || !this.initialized) return;
         try {
             const ctx = this.audioContext;
             const now = ctx.currentTime;
             
-            // نغمة دورانية تصاعدية
-            for (let i = 0; i < 8; i++) {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                
-                const freq = 200 + i * 50;
-                osc.frequency.setValueAtTime(freq, now + i * 0.15);
-                osc.type = 'sine';
-                
-                gain.gain.setValueAtTime(0.1, now + i * 0.15);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.1);
-                
-                osc.start(now + i * 0.15);
-                osc.stop(now + i * 0.15 + 0.1);
-            }
-            
-            // نغمة خلفية مستمرة
-            const osc2 = ctx.createOscillator();
-            const gain2 = ctx.createGain();
-            osc2.connect(gain2);
-            gain2.connect(ctx.destination);
-            osc2.frequency.setValueAtTime(150, now);
-            osc2.frequency.exponentialRampToValueAtTime(400, now + 0.5);
-            osc2.type = 'sawtooth';
-            gain2.gain.setValueAtTime(0.03, now);
-            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-            osc2.start(now);
-            osc2.stop(now + 0.5);
-            
-        } catch(e) {
-            console.warn('Sound error:', e);
-        }
-    }
-
-    // صوت الفوز (نغمات احتفالية)
-    playWinSound() {
-        if (!soundEnabled || !this.initialized) return;
-        try {
-            const ctx = this.audioContext;
-            const now = ctx.currentTime;
-            const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
+            // نغمات تصاعدية سريعة مع تأثير الطبول
+            const notes = [150, 180, 210, 250, 300, 360, 420, 500, 600, 720, 850, 1000];
             
             notes.forEach((freq, i) => {
                 const osc = ctx.createOscillator();
@@ -874,98 +956,159 @@ class SoundManager {
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 
-                osc.frequency.setValueAtTime(freq, now + i * 0.12);
-                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq * 0.8, now + i * 0.06);
+                osc.frequency.exponentialRampToValueAtTime(freq, now + i * 0.06 + 0.04);
+                osc.type = i % 2 === 0 ? 'sawtooth' : 'square';
                 
-                gain.gain.setValueAtTime(0.15, now + i * 0.12);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.3);
+                gain.gain.setValueAtTime(0.08, now + i * 0.06);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.08);
                 
-                osc.start(now + i * 0.12);
-                osc.stop(now + i * 0.12 + 0.3);
+                osc.start(now + i * 0.06);
+                osc.stop(now + i * 0.06 + 0.08);
+                this.oscillators.push(osc);
+                this.gainNodes.push(gain);
             });
             
-            // وتر احتفالي
-            setTimeout(() => {
-                const oscChord = ctx.createOscillator();
-                const gainChord = ctx.createGain();
-                oscChord.connect(gainChord);
-                gainChord.connect(ctx.destination);
-                oscChord.frequency.setValueAtTime(523, now + 0.5);
-                oscChord.type = 'triangle';
-                gainChord.gain.setValueAtTime(0.08, now + 0.5);
-                gainChord.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-                oscChord.start(now + 0.5);
-                oscChord.stop(now + 0.8);
-            }, 500);
+            // تأثير الطبول
+            for (let i = 0; i < 5; i++) {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.setValueAtTime(80 + Math.random() * 40, now + i * 0.15);
+                osc.type = 'square';
+                gain.gain.setValueAtTime(0.04, now + i * 0.15);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.05);
+                osc.start(now + i * 0.15);
+                osc.stop(now + i * 0.15 + 0.05);
+            }
             
         } catch(e) {
             console.warn('Sound error:', e);
         }
     }
 
-    // صوت الخسارة (حظ سعيد)
+    // صوت فوز حماسي (نغمات احتفالية)
+    playWinSound() {
+        if (!soundEnabled || !this.initialized) return;
+        try {
+            const ctx = this.audioContext;
+            const now = ctx.currentTime;
+            
+            // لحن احتفالي
+            const melody = [
+                [523, 0.15], [659, 0.15], [784, 0.15], [1047, 0.2],
+                [784, 0.15], [880, 0.15], [1047, 0.15], [1319, 0.25],
+                [1047, 0.15], [1175, 0.15], [1319, 0.15], [1568, 0.3]
+            ];
+            
+            melody.forEach(([freq, dur], i) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.frequency.setValueAtTime(freq, now + i * 0.1);
+                osc.type = i % 3 === 0 ? 'sine' : 'triangle';
+                
+                gain.gain.setValueAtTime(0.12, now + i * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + dur);
+                
+                osc.start(now + i * 0.1);
+                osc.stop(now + i * 0.1 + dur);
+            });
+            
+            // وتر احتفالي كبير
+            setTimeout(() => {
+                const chords = [523, 659, 784];
+                chords.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.setValueAtTime(freq, now + 1.2);
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.06, now + 1.2);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+                    osc.start(now + 1.2);
+                    osc.stop(now + 1.8);
+                });
+            }, 1000);
+            
+        } catch(e) {
+            console.warn('Sound error:', e);
+        }
+    }
+
+    // صوت خسارة بسيط
     playLoseSound() {
         if (!soundEnabled || !this.initialized) return;
         try {
             const ctx = this.audioContext;
             const now = ctx.currentTime;
             
+            // نغمة هبوطية
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.connect(gain);
             gain.connect(ctx.destination);
             
-            osc.frequency.setValueAtTime(300, now);
-            osc.frequency.exponentialRampToValueAtTime(150, now + 0.3);
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(150, now + 0.4);
             osc.type = 'sawtooth';
             
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
             
             osc.start(now);
-            osc.stop(now + 0.3);
+            osc.stop(now + 0.4);
             
         } catch(e) {
             console.warn('Sound error:', e);
         }
     }
 
-    // موسيقى خلفية (حلقة)
+    // موسيقى خلفية حماسية
     playBackgroundMusic() {
         if (!musicEnabled || !this.initialized) return;
         try {
-            // نغمة خلفية بسيطة
             const ctx = this.audioContext;
             const now = ctx.currentTime;
             
-            const playNote = (freq, time, duration, vol) => {
+            const playNote = (freq, time, dur, vol, type = 'sine') => {
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 osc.frequency.setValueAtTime(freq, time);
-                osc.type = 'sine';
+                osc.type = type;
                 gain.gain.setValueAtTime(vol || 0.03, time);
-                gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
                 osc.start(time);
-                osc.stop(time + duration);
+                osc.stop(time + dur);
             };
             
-            // حلقة بسيطة من 4 نغمات
-            const pattern = [196, 262, 330, 392];
-            pattern.forEach((freq, i) => {
-                playNote(freq, now + i * 0.4, 0.3, 0.025);
+            // لحن خلفي جذاب
+            const pattern = [
+                [262, 0.3, 0.025], [330, 0.3, 0.025], [392, 0.3, 0.025], [523, 0.4, 0.03],
+                [330, 0.3, 0.025], [392, 0.3, 0.025], [523, 0.3, 0.025], [659, 0.4, 0.03]
+            ];
+            
+            pattern.forEach(([freq, dur, vol], i) => {
+                const time = now + i * 0.35;
+                playNote(freq, time, dur, vol, i % 2 === 0 ? 'sine' : 'triangle');
             });
             
-            // جدولة التكرار
+            // Bass خط
             if (this.bgInterval) clearInterval(this.bgInterval);
             this.bgInterval = setInterval(() => {
                 if (!musicEnabled) return;
                 const t = ctx.currentTime;
-                pattern.forEach((freq, i) => {
-                    playNote(freq, t + i * 0.4, 0.3, 0.025);
+                const bassNotes = [131, 165, 196, 262];
+                bassNotes.forEach((freq, i) => {
+                    playNote(freq, t + i * 0.3, 0.25, 0.02, 'square');
                 });
-            }, 1600);
+            }, 1200);
             
         } catch(e) {
             console.warn('Music error:', e);
@@ -983,48 +1126,63 @@ class SoundManager {
 const soundManager = new SoundManager();
 
 // ================================================================
-//                      تأثيرات الاحتفال
+//                      تأثيرات الاحتفال المتطورة
 // ================================================================
-function createConfetti(count = 30) {
+function createConfetti(count = 50) {
     const container = document.getElementById('confettiContainer');
     container.innerHTML = '';
     
-    const colors = ['#FFD700', '#FF6B00', '#FF0000', '#00FF00', '#00BFFF', '#FF00FF', '#FF69B4'];
+    const colors = ['#FFD700', '#FF6B00', '#FF0000', '#00FF00', '#00BFFF', '#FF00FF', '#FF69B4', '#FF4500', '#7CFC00'];
+    const shapes = ['circle', 'square', 'triangle'];
     
     for (let i = 0; i < count; i++) {
         const el = document.createElement('div');
-        el.className = 'confetti';
-        const size = 6 + Math.random() * 12;
+        el.className = 'confetti-piece';
+        const size = 6 + Math.random() * 14;
         el.style.width = size + 'px';
         el.style.height = size + 'px';
         el.style.background = colors[Math.floor(Math.random() * colors.length)];
         el.style.left = Math.random() * 100 + '%';
-        el.style.top = Math.random() * 30 + '%';
+        el.style.top = Math.random() * 40 + '%';
         el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-        el.style.animationDuration = (1 + Math.random()) + 's';
-        el.style.animationDelay = Math.random() * 0.5 + 's';
+        el.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+        el.style.animationDelay = Math.random() * 0.8 + 's';
+        
+        // أشكال مختلفة
+        if (shapes[Math.floor(Math.random() * shapes.length)] === 'triangle') {
+            el.style.width = '0';
+            el.style.height = '0';
+            el.style.background = 'transparent';
+            el.style.borderLeft = size/2 + 'px solid transparent';
+            el.style.borderRight = size/2 + 'px solid transparent';
+            el.style.borderBottom = size + 'px solid ' + colors[Math.floor(Math.random() * colors.length)];
+        }
+        
         container.appendChild(el);
     }
     
     setTimeout(() => {
         container.innerHTML = '';
-    }, 3000);
+    }, 3500);
 }
 
-function createWinEffects() {
+function createWinEffects(prizeName) {
     const resultBox = document.getElementById('resultBox');
     resultBox.classList.add('winner');
     
-    // إضافة أيقونة كبيرة
+    // أيقونة كبيرة
     const icon = document.getElementById('prizeIcon');
     icon.classList.add('big-win');
     
-    // إضافة نص مميز
+    // نص متلألئ
     const name = document.getElementById('prizeName');
     name.classList.add('win-text');
     
     // كونفيتي
-    createConfetti(40);
+    createConfetti(60);
+    
+    // إشعار منبثق
+    showNotification(`🎉 مبروك! لقد فزت بـ ${prizeName}!`);
 }
 
 function clearWinEffects() {
@@ -1036,6 +1194,19 @@ function clearWinEffects() {
     
     const name = document.getElementById('prizeName');
     name.classList.remove('win-text');
+}
+
+// ================================================================
+//                      إشعار الفوز
+// ================================================================
+function showNotification(message) {
+    const bar = document.getElementById('notificationBar');
+    document.getElementById('notifPrizeName').textContent = message.replace('🎉 مبروك! لقد فزت بـ ', '').replace('!', '');
+    bar.classList.add('show');
+    
+    setTimeout(() => {
+        bar.classList.remove('show');
+    }, 4000);
 }
 
 // ================================================================
@@ -1071,7 +1242,7 @@ function getUserId() {
 }
 
 // ================================================================
-//                      رسم العجلة
+//                      رسم العجلة مع صورة المركز
 // ================================================================
 function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     const canvas = document.getElementById('wheelCanvas');
@@ -1157,35 +1328,45 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
         ctx.restore();
     });
     
-    // المركز
-    const centerR = r * 0.14;
+    // ===== مركز العجلة مع صورة متحركة =====
+    const centerR = r * 0.16;
+    
+    // خلفية ذهبية مشعة
     const grad = ctx.createRadialGradient(cx-4, cy-4, 0, cx, cy, centerR);
     grad.addColorStop(0, '#FFD700');
-    grad.addColorStop(0.5, '#FF8C00');
+    grad.addColorStop(0.3, '#FFA500');
+    grad.addColorStop(0.7, '#FF8C00');
     grad.addColorStop(1, '#B8860B');
     
     ctx.beginPath();
     ctx.arc(cx, cy, centerR, 0, 2 * Math.PI);
     ctx.fillStyle = grad;
-    ctx.shadowColor = 'rgba(255, 215, 0, 0.4)';
-    ctx.shadowBlur = 30;
+    ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
+    ctx.shadowBlur = 40;
     ctx.fill();
     ctx.shadowBlur = 0;
     
+    // حلقة ذهبية خارجية
+    ctx.beginPath();
+    ctx.arc(cx, cy, centerR + 5, 0, 2 * Math.PI);
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // صورة المركز (أيقونة متحركة)
     ctx.fillStyle = '#0a0a0a';
-    ctx.font = '22px sans-serif';
+    ctx.font = '26px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.5)';
-    ctx.shadowBlur = 4;
-    ctx.fillText('⭐', cx, cy + 1);
+    ctx.shadowBlur = 8;
+    ctx.fillText(CENTER_IMAGES[centerImageIndex % CENTER_IMAGES.length], cx, cy + 1);
     ctx.shadowBlur = 0;
     
-    ctx.beginPath();
-    ctx.arc(cx, cy, centerR + 4, 0, 2 * Math.PI);
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.15)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    // تغيير صورة المركز كل 3 ثواني
+    setTimeout(() => {
+        centerImageIndex++;
+    }, 3000);
 }
 
 // ================================================================
@@ -1364,17 +1545,17 @@ async function spinWheel() {
             if (prizeIndex === -1) {
                 const randomIndex = Math.floor(Math.random() * prizesCache.length);
                 const targetAngle = (randomIndex / prizesCache.length) * 2 * Math.PI;
-                const totalRotation = currentRotation + (3 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step / 2));
+                const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step / 2));
                 
-                animateSpin(totalRotation, 3000, () => {
+                animateSpin(totalRotation, 3500, () => {
                     drawWheel(prizesCache, randomIndex, totalRotation);
                     showResult(prizesCache[randomIndex], isWin);
                 });
             } else {
                 const targetAngle = (prizeIndex / prizesCache.length) * 2 * Math.PI;
-                const totalRotation = currentRotation + (3 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step / 2));
+                const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step / 2));
                 
-                animateSpin(totalRotation, 3000, () => {
+                animateSpin(totalRotation, 3500, () => {
                     drawWheel(prizesCache, prizeIndex, totalRotation);
                     showResult(prize, isWin);
                 });
@@ -1412,15 +1593,17 @@ function showResult(prize, isWin) {
     document.getElementById('resultBox').classList.add('show');
     
     if (isWin) {
-        // فوز - تأثيرات احتفالية
-        createWinEffects();
+        // فوز - تأثيرات احتفالية قوية
+        createWinEffects(prize.name);
         soundManager.playWinSound();
         soundManager.stopBackgroundMusic();
         
-        // تغيير البanner مؤقتاً
+        // تغيير البanner مؤقتاً للاحتفال
         const img = document.getElementById('bannerImage');
-        img.src = 'https://via.placeholder.com/800x200/0a1a0a/FFD700?text=🎉+مبروك+الفوز!+🎉';
+        img.src = 'https://images.unsplash.com/photo-1607344645866-009c320d53d0?w=800&h=200&fit=crop&auto=format';
+        img.style.transform = 'scale(1.05)';
         setTimeout(() => {
+            img.style.transform = 'scale(1)';
             img.src = BANNER_IMAGES[currentBannerIndex];
         }, 5000);
         

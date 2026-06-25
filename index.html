@@ -441,15 +441,15 @@
         }
 
         /* ============================================================
-                   شاشة اللودينغ
+                   شاشة اللودينغ - مبسطة
                    ============================================================ */
         .loading-screen {
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 30px 20px;
-            min-height: 300px;
+            padding: 20px;
+            min-height: 350px;
         }
 
         .loading-screen.active {
@@ -457,51 +457,30 @@
             animation: fadeIn 0.5s ease;
         }
 
-        .loading-screen .loader-ring {
-            width: 60px;
-            height: 60px;
+        .loading-screen .loading-image {
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
-            border: 3px solid rgba(255, 215, 0, 0.05);
-            border-top: 3px solid #FFD700;
-            border-bottom: 3px solid #FF8C00;
-            animation: spin 1s linear infinite;
+            object-fit: cover;
+            margin-bottom: 30px;
+            border: 2px solid rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.05);
         }
 
-        .loading-screen .loader-icon {
-            margin-top: -45px;
-            font-size: 24px;
-            animation: pulse 1.5s ease-in-out infinite;
+        .loading-screen .progress-container {
+            width: 80%;
+            max-width: 250px;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-        }
-
-        .loading-screen .loader-title {
-            color: #FFD700;
-            font-size: 16px;
-            font-weight: 700;
-            margin-top: 16px;
-        }
-
-        .loading-screen .loader-sub {
-            color: #666;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .loading-screen .loader-progress {
+        .loading-screen .progress-bar-bg {
             width: 100%;
-            max-width: 200px;
-            height: 3px;
+            height: 4px;
             background: rgba(255, 255, 255, 0.04);
             border-radius: 4px;
-            margin-top: 12px;
             overflow: hidden;
         }
 
-        .loading-screen .loader-progress-bar {
+        .loading-screen .progress-bar-fill {
             height: 100%;
             width: 0%;
             background: linear-gradient(90deg, #FFD700, #FF8C00);
@@ -509,10 +488,13 @@
             transition: width 0.3s ease;
         }
 
-        .loading-screen .loader-status-text {
+        .loading-screen .progress-text {
             color: #555;
-            font-size: 11px;
+            font-size: 13px;
             margin-top: 8px;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
         }
 
         /* ============================================================
@@ -967,6 +949,7 @@
             .admin-panel .prize-item .prize-colors { justify-content: center; }
             .admin-panel .settings-section .setting-row { flex-direction: column; align-items: stretch; }
             .admin-panel .settings-section .setting-row label { min-width: auto; }
+            .loading-screen .loading-image { width: 150px; height: 150px; }
         }
     </style>
 </head>
@@ -1013,16 +996,15 @@
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
 
-    <!-- ===== شاشة اللودينغ ===== -->
+    <!-- ===== شاشة اللودينغ المبسطة ===== -->
     <div class="loading-screen" id="loadingScreen">
-        <div class="loader-ring"></div>
-        <div class="loader-icon">🎯</div>
-        <div class="loader-title">جاري الاتصال بالخادم</div>
-        <div class="loader-sub" id="loaderSub">التحقق من الخادم...</div>
-        <div class="loader-progress">
-            <div class="loader-progress-bar" id="loaderProgressBar"></div>
+        <img class="loading-image" id="loadingImage" src="https://via.placeholder.com/200/1a1a2e/FFD700?text=🎡" alt="Loading">
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="loaderProgressBar"></div>
+            </div>
+            <div class="progress-text" id="loaderStatusText">0%</div>
         </div>
-        <div class="loader-status-text" id="loaderStatusText">0%</div>
     </div>
 
     <!-- ===== العجلة ===== -->
@@ -1118,6 +1100,11 @@
                 <button class="btn-save" data-setting="bg_image_url" data-field="editBgImage">💾 حفظ</button>
             </div>
             <div class="setting-row">
+                <label>صورة اللودينغ</label>
+                <input type="text" id="editLoadingImage" placeholder="رابط صورة اللودينغ">
+                <button class="btn-save" data-setting="loading_image_url" data-field="editLoadingImage">💾 حفظ</button>
+            </div>
+            <div class="setting-row">
                 <label>مركز العجلة</label>
                 <input type="text" id="editCenterIcon" placeholder="🎯" style="max-width:80px;">
                 <button class="btn-save" data-setting="center_icon" data-field="editCenterIcon">💾 حفظ</button>
@@ -1180,10 +1167,9 @@ let soundEnabled = true;
 let musicEnabled = true;
 let settingsCache = {};
 let spinDuration = 3500;
-let isSoundPlaying = false;
 
 // ================================================================
-//                      نظام الصوت المتطور
+//                      نظام الصوت
 // ================================================================
 class SoundManager {
     constructor() {
@@ -1204,7 +1190,6 @@ class SoundManager {
     }
 
     stopAll() {
-        // إيقاف جميع الأصوات
         if (this.audioContext) {
             try {
                 this.audioContext.close();
@@ -1215,57 +1200,9 @@ class SoundManager {
         this.isPlaying = false;
     }
 
-    // ===== صوت دوران حماسي =====
-    playSpinSound() {
-        if (!soundEnabled || !this.initialized) return;
-        if (this.isPlaying) return;
-        this.isPlaying = true;
-        
-        try {
-            const ctx = this.audioContext;
-            const now = ctx.currentTime;
-            
-            // نغمات تصاعدية سريعة
-            const notes = [150, 180, 210, 250, 300, 360, 420, 500, 600, 720, 850, 1000, 1200];
-            
-            notes.forEach((freq, i) => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                
-                osc.frequency.setValueAtTime(freq * 0.7, now + i * 0.05);
-                osc.frequency.exponentialRampToValueAtTime(freq * 1.2, now + i * 0.05 + 0.03);
-                osc.type = i % 2 === 0 ? 'sawtooth' : 'square';
-                
-                gain.gain.setValueAtTime(0.06, now + i * 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.06);
-                
-                osc.start(now + i * 0.05);
-                osc.stop(now + i * 0.05 + 0.06);
-            });
-            
-            // تأثير طبول متسارع
-            for (let i = 0; i < 10; i++) {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.setValueAtTime(60 + i * 8, now + i * 0.08);
-                osc.type = 'square';
-                const vol = 0.03 + (i / 10) * 0.05;
-                gain.gain.setValueAtTime(vol, now + i * 0.08);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.04);
-                osc.start(now + i * 0.08);
-                osc.stop(now + i * 0.08 + 0.04);
-            }
-            
-        } catch(e) {
-            console.warn('Sound error:', e);
-        }
-    }
+    // ===== تم إزالة صوت التدوير =====
 
-    // ===== صوت فوز حماسي =====
+    // ===== صوت فوز =====
     playWinSound() {
         if (!soundEnabled || !this.initialized) return;
         
@@ -1273,7 +1210,6 @@ class SoundManager {
             const ctx = this.audioContext;
             const now = ctx.currentTime;
             
-            // لحن احتفالي سريع
             const melody = [
                 [523, 0.1], [587, 0.1], [659, 0.1], [784, 0.15],
                 [659, 0.1], [880, 0.1], [988, 0.1], [1175, 0.2],
@@ -1297,7 +1233,6 @@ class SoundManager {
                 osc.stop(now + i * 0.08 + dur);
             });
             
-            // وتر احتفالي كبير
             setTimeout(() => {
                 const chords = [523, 659, 784, 1047];
                 chords.forEach((freq, i) => {
@@ -1314,7 +1249,6 @@ class SoundManager {
                 });
             }, 800);
             
-            // إيقاف الصوت بعد الانتهاء
             setTimeout(() => {
                 this.isPlaying = false;
             }, 3000);
@@ -1333,7 +1267,6 @@ class SoundManager {
             const ctx = this.audioContext;
             const now = ctx.currentTime;
             
-            // نغمة هبوطية
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.connect(gain);
@@ -1349,7 +1282,6 @@ class SoundManager {
             osc.start(now);
             osc.stop(now + 0.5);
             
-            // نغمة إضافية
             setTimeout(() => {
                 const osc2 = ctx.createOscillator();
                 const gain2 = ctx.createGain();
@@ -1396,7 +1328,6 @@ class SoundManager {
                 osc.stop(time + dur);
             };
             
-            // لحن خلفي
             const pattern = [
                 [262, 0.25, 0.02], [330, 0.25, 0.02], [392, 0.25, 0.02], [523, 0.35, 0.025],
                 [330, 0.25, 0.02], [392, 0.25, 0.02], [523, 0.25, 0.02], [659, 0.35, 0.025],
@@ -1408,7 +1339,6 @@ class SoundManager {
                 playNote(freq, time, dur, vol, i % 2 === 0 ? 'sine' : 'triangle');
             });
             
-            // Bass
             this.bgInterval = setInterval(() => {
                 if (!musicEnabled || !this.initialized) {
                     this.stopBackgroundMusic();
@@ -1641,6 +1571,11 @@ async function loadSettings() {
                 document.getElementById('bgImage').src = settingsCache.bg_image_url;
             }
             
+            // تحديث صورة اللودينغ
+            if (settingsCache.loading_image_url) {
+                document.getElementById('loadingImage').src = settingsCache.loading_image_url;
+            }
+            
             // تحديث مدة التدوير
             if (settingsCache.spin_duration) {
                 spinDuration = parseInt(settingsCache.spin_duration) || 3500;
@@ -1649,6 +1584,7 @@ async function loadSettings() {
             // تحديث حقول الإدارة
             document.getElementById('editBannerText').value = settingsCache.banner_text || '';
             document.getElementById('editBgImage').value = settingsCache.bg_image_url || '';
+            document.getElementById('editLoadingImage').value = settingsCache.loading_image_url || '';
             document.getElementById('editCenterIcon').value = settingsCache.center_icon || '⭐';
             document.getElementById('editSpinDuration').value = settingsCache.spin_duration || 3500;
             document.getElementById('editIntervalHours').value = settingsCache.spin_interval_hours || 24;
@@ -1947,7 +1883,6 @@ async function loadUserStatus() {
                 const h = data.spin_status?.remaining_hours || 0;
                 const m = data.spin_status?.remaining_minutes || 0;
                 document.getElementById('spinBtnText').textContent = `⏳ ${h}h ${m}m`;
-                // إيقاف الصوت
                 soundManager.stopAll();
             } else if (data.deposit_requirement?.required && !data.deposit_requirement?.is_met) {
                 spinBtn.disabled = true;
@@ -2036,15 +1971,13 @@ function showNotification(message) {
 }
 
 // ================================================================
-//                      شاشة اللودينغ
+//                      شاشة اللودينغ المبسطة
 // ================================================================
-function updateLoading(progress, status) {
+function updateLoading(progress) {
     const bar = document.getElementById('loaderProgressBar');
     const text = document.getElementById('loaderStatusText');
-    const sub = document.getElementById('loaderSub');
     bar.style.width = progress + '%';
     text.textContent = progress + '%';
-    if (status) sub.textContent = status;
 }
 
 function showLoading(show) {
@@ -2081,7 +2014,6 @@ async function spinWheel() {
     clearWinEffects();
     
     soundManager.init();
-    soundManager.playSpinSound();
     soundManager.playBackgroundMusic();
     
     try {
@@ -2176,7 +2108,7 @@ function showError(msg) {
 }
 
 // ================================================================
-//                      أحداث الإدارة - حفظ كل تغيير على حدى
+//                      أحداث الإدارة
 // ================================================================
 document.querySelectorAll('.btn-save').forEach(btn => {
     btn.addEventListener('click', async function() {
@@ -2191,7 +2123,6 @@ document.querySelectorAll('.btn-save').forEach(btn => {
             value = document.getElementById(fieldId).value;
         }
         
-        // حفظ الزر
         const originalText = this.textContent;
         this.textContent = '⏳ جاري...';
         this.disabled = true;
@@ -2297,34 +2228,32 @@ async function init() {
     
     document.getElementById('userIdDisplay').textContent = USER_ID;
     showLoading(true);
-    updateLoading(10, 'جاري التحقق من الخادم...');
+    updateLoading(0);
     
     try {
+        // محاكاة تقدم التحميل
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 95) progress = 95;
+            updateLoading(Math.round(progress));
+        }, 200);
+        
         await new Promise(r => setTimeout(r, 500));
-        updateLoading(30, 'جاري الاتصال بقاعدة البيانات...');
         
         const statusRes = await fetch(`${API_BASE}/api/status`);
-        const statusData = await statusRes.json();
+        await statusRes.json();
         
-        if (!statusData.database?.ready) {
-            updateLoading(60, 'قاعدة البيانات غير جاهزة، جاري التهيئة...');
-            await new Promise(r => setTimeout(r, 800));
-        }
-        
-        updateLoading(70, 'جاري تحميل الإعدادات...');
         await loadSettings();
         
-        updateLoading(80, 'جاري تحميل الجوائز...');
         const prizes = await loadPrizes();
         drawWheel(prizes, -1, 0);
         
-        updateLoading(90, 'جاري تحميل بيانات المستخدم...');
         await loadUserStatus();
-        
-        updateLoading(95, 'جاري تحميل لوحة الإدارة...');
         await renderAdminPanel();
         
-        updateLoading(100, '✅ جاهز!');
+        clearInterval(interval);
+        updateLoading(100);
         await new Promise(r => setTimeout(r, 400));
         
         soundManager.init();
@@ -2332,9 +2261,9 @@ async function init() {
         
     } catch(e) {
         console.error('Init error:', e);
-        updateLoading(100, '⚠️ فشل الاتصال');
+        updateLoading(100);
         await new Promise(r => setTimeout(r, 600));
-        showError('فشل الاتصال بالخادم، تأكد من اتصالك بالإنترنت');
+        showError('فشل الاتصال بالخادم');
     }
     
     showLoading(false);

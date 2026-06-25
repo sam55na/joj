@@ -4,6 +4,20 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // ================================================================
+//                      CORS - السماح بالطلبات من أي مصدر
+// ================================================================
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
+// ================================================================
 //                      الإعدادات الأساسية
 // ================================================================
 app.use(express.json());
@@ -258,7 +272,6 @@ app.get('/api/status', (req, res) => {
 app.get('/api/admin/view-prizes', async (req, res) => {
     const { admin_id } = req.query;
 
-    // التحقق من الصلاحية
     if (parseInt(admin_id) !== ADMIN_ID) {
         return res.status(403).json({
             success: false,
@@ -267,7 +280,6 @@ app.get('/api/admin/view-prizes', async (req, res) => {
     }
 
     try {
-        // 1. التحقق من وجود الجدول
         const tableCheck = await pool.query(`
             SELECT EXISTS (
                 SELECT FROM information_schema.tables 
@@ -286,7 +298,6 @@ app.get('/api/admin/view-prizes', async (req, res) => {
             });
         }
 
-        // 2. جلب جميع الجوائز (بما فيها غير النشطة)
         const result = await pool.query(`
             SELECT 
                 id,
@@ -301,7 +312,6 @@ app.get('/api/admin/view-prizes', async (req, res) => {
             ORDER BY id ASC
         `);
 
-        // 3. جلب إحصائيات إضافية
         const stats = await pool.query(`
             SELECT 
                 COUNT(*) as total,
@@ -654,7 +664,6 @@ app.post('/api/wheel/spin', async (req, res) => {
     }
 
     try {
-        // التحقق من تفعيل العجلة
         const isActive = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['is_active']
@@ -667,7 +676,6 @@ app.post('/api/wheel/spin', async (req, res) => {
             });
         }
 
-        // التحقق من شرط الإيداع
         const depositRequired = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['deposit_required']
@@ -710,7 +718,6 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
-        // التحقق من آخر تدوير
         const intervalHours = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['spin_interval_hours']
@@ -745,7 +752,6 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
-        // اختيار جائزة عشوائية
         const prizes = await pool.query(`
             SELECT * FROM wheel_prizes 
             WHERE is_active = true
@@ -771,7 +777,6 @@ app.post('/api/wheel/spin', async (req, res) => {
             random -= parseFloat(prize.probability);
         }
 
-        // تسجيل التدوير
         const result = await pool.query(`
             INSERT INTO wheel_spins (user_id, prize_id, prize_name)
             VALUES ($1, $2, $3)
@@ -1104,21 +1109,17 @@ async function startServer() {
     console.log(`📡 المنفذ: ${port}`);
     console.log(`👑 المدير: ${ADMIN_ID}`);
     
-    // تهيئة قاعدة البيانات
     const ready = await ensureTables();
     dbReady = ready;
     
-    // بدء الخادم
     app.listen(port, () => {
         console.log(`\n✅ الخادم يعمل على المنفذ ${port}`);
         console.log(`🔗 فحص الحالة: http://localhost:${port}/api/status`);
-        console.log(`🔗 تشخيص DB: http://localhost:${port}/api/admin/diagnose?admin_id=${ADMIN_ID}`);
         console.log(`🔗 عرض الجوائز: http://localhost:${port}/api/admin/view-prizes?admin_id=${ADMIN_ID}`);
         console.log('\n📋 ===== جاهز! =====\n');
     });
 }
 
-// تشغيل الخادم
 startServer().catch(err => {
     console.error('❌ فشل تشغيل الخادم:', err);
     process.exit(1);

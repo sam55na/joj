@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>🎡 عجلة الحظ - IChancy</title>
+    <title>🎡 عجلة الحظ</title>
     
     <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -37,8 +37,8 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(ellipse at 30% 50%, rgba(139, 0, 0, 0.12), transparent 60%),
-                        radial-gradient(ellipse at 70% 50%, rgba(255, 215, 0, 0.06), transparent 60%);
+            background: radial-gradient(ellipse at 30% 50%, rgba(139, 0, 0, 0.15), transparent 60%),
+                        radial-gradient(ellipse at 70% 50%, rgba(255, 215, 0, 0.08), transparent 60%);
             animation: bgFloat 20s ease-in-out infinite alternate;
             z-index: 0;
         }
@@ -56,13 +56,13 @@
             z-index: 1;
             background: linear-gradient(145deg, rgba(18, 18, 18, 0.95), rgba(10, 10, 10, 0.98));
             border-radius: 32px;
-            padding: 24px 20px 20px;
+            padding: 28px 24px 24px;
             max-width: 480px;
             width: 100%;
-            border: 1px solid rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.08);
             box-shadow: 
                 0 20px 80px rgba(0, 0, 0, 0.8),
-                0 0 60px rgba(255, 215, 0, 0.02);
+                0 0 60px rgba(255, 215, 0, 0.03);
             backdrop-filter: blur(10px);
         }
 
@@ -71,7 +71,7 @@
                    ============================================================ */
         .header {
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .header h1 {
@@ -103,14 +103,14 @@
         }
 
         /* ============================================================
-                   حالة المستخدم
+                   حالة المستخدم - تصميم أنيق
                    ============================================================ */
         .user-status {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 10px 16px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -203,11 +203,11 @@
 
         .error-container .btn-open-bot:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
         }
 
         /* ============================================================
-                   شاشة اللودينغ
+                   لودينغ - شاشة التحقق من الخادم
                    ============================================================ */
         .loading-screen {
             display: none;
@@ -215,7 +215,7 @@
             align-items: center;
             justify-content: center;
             padding: 30px 20px 20px;
-            min-height: 320px;
+            min-height: 350px;
         }
 
         .loading-screen.active {
@@ -224,14 +224,14 @@
         }
 
         .loading-screen .loader-ring {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             border: 3px solid rgba(255, 215, 0, 0.05);
             border-top: 3px solid #FFD700;
             border-bottom: 3px solid #FF8C00;
             animation: spin 1s linear infinite;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.08);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
         }
 
         @keyframes spin {
@@ -240,36 +240,36 @@
         }
 
         .loading-screen .loader-icon {
-            margin-top: -48px;
-            font-size: 24px;
+            margin-top: -55px;
+            font-size: 28px;
             animation: pulse 1.5s ease-in-out infinite;
         }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.15); }
         }
 
         .loading-screen .loader-title {
             color: #FFD700;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
-            margin-top: 16px;
+            margin-top: 20px;
         }
 
         .loading-screen .loader-sub {
             color: #666;
-            font-size: 12px;
-            margin-top: 4px;
+            font-size: 13px;
+            margin-top: 6px;
         }
 
         .loading-screen .loader-progress {
             width: 100%;
-            max-width: 200px;
+            max-width: 250px;
             height: 3px;
             background: rgba(255, 255, 255, 0.04);
             border-radius: 4px;
-            margin-top: 14px;
+            margin-top: 16px;
             overflow: hidden;
         }
 
@@ -283,8 +283,8 @@
 
         .loading-screen .loader-status-text {
             color: #555;
-            font-size: 11px;
-            margin-top: 8px;
+            font-size: 12px;
+            margin-top: 10px;
         }
 
         /* ============================================================
@@ -315,26 +315,26 @@
             height: 100% !important;
             border-radius: 50%;
             box-shadow: 
-                0 0 60px rgba(255, 215, 0, 0.03),
-                inset 0 0 60px rgba(0, 0, 0, 0.4);
+                0 0 60px rgba(255, 215, 0, 0.04),
+                inset 0 0 60px rgba(0, 0, 0, 0.3);
             border: 2px solid rgba(255, 215, 0, 0.06);
             transition: filter 0.5s ease;
         }
 
         .wheel-wrapper canvas.spinning {
-            filter: brightness(1.15) drop-shadow(0 0 50px rgba(255, 215, 0, 0.1));
+            filter: brightness(1.2) drop-shadow(0 0 50px rgba(255, 215, 0, 0.15));
         }
 
         /* ============================================================
-                   المؤشر العلوي
+                   المؤشر العلوي (بصورة)
                    ============================================================ */
         .pointer {
             position: absolute;
-            top: -14px;
+            top: -16px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            font-size: 30px;
+            font-size: 34px;
             filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
             animation: pointerBounce 2s ease-in-out infinite;
             pointer-events: none;
@@ -351,17 +351,17 @@
         .no-prizes {
             display: none;
             text-align: center;
-            padding: 30px 20px;
+            padding: 40px 20px;
         }
 
         .no-prizes .icon {
-            font-size: 36px;
-            margin-bottom: 8px;
+            font-size: 40px;
+            margin-bottom: 10px;
         }
 
         .no-prizes .text {
             color: #555;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         /* ============================================================
@@ -370,12 +370,12 @@
         .actions {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-top: 14px;
+            gap: 10px;
+            margin-top: 16px;
         }
 
         .btn {
-            padding: 14px 20px;
+            padding: 15px 24px;
             border: none;
             border-radius: 14px;
             font-size: 16px;
@@ -390,14 +390,14 @@
         .btn-spin {
             background: linear-gradient(135deg, #B8860B, #FFD700);
             color: #0a0a0a;
-            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.08);
-            font-size: 16px;
+            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.1);
+            font-size: 17px;
             letter-spacing: 0.5px;
         }
 
         .btn-spin:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 40px rgba(255, 215, 0, 0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px rgba(255, 215, 0, 0.2);
         }
 
         .btn-spin:disabled {
@@ -408,13 +408,13 @@
 
         .btn-spin .spinner-small {
             display: none;
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             border: 2px solid rgba(10, 10, 10, 0.1);
             border-top: 2px solid #0a0a0a;
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
-            margin-right: 8px;
+            margin-right: 10px;
             vertical-align: middle;
         }
 
@@ -428,9 +428,9 @@
         .result-box {
             background: rgba(255, 215, 0, 0.02);
             border: 1px solid rgba(255, 215, 0, 0.06);
-            border-radius: 12px;
-            padding: 14px;
-            margin-top: 12px;
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 14px;
             text-align: center;
             display: none;
         }
@@ -446,20 +446,20 @@
         }
 
         .result-box .prize-icon {
-            font-size: 34px;
+            font-size: 38px;
             animation: pulse 1.5s ease-in-out infinite;
         }
 
         .result-box .prize-name {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
             color: #FFD700;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .result-box .prize-desc {
             color: #777;
-            font-size: 12px;
+            font-size: 13px;
             margin-top: 2px;
         }
 
@@ -469,9 +469,9 @@
         .deposit-notice {
             background: rgba(255, 215, 0, 0.03);
             border: 1px solid rgba(255, 215, 0, 0.06);
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin-top: 8px;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-top: 10px;
             text-align: center;
             display: none;
         }
@@ -482,7 +482,7 @@
 
         .deposit-notice .notice-text {
             color: #FF8C00;
-            font-size: 12px;
+            font-size: 13px;
         }
 
         .deposit-notice .notice-text .amount {
@@ -491,17 +491,17 @@
         }
 
         /* ============================================================
-                   رسالة الخطأ
+                   رسالة الخطأ العامة
                    ============================================================ */
         .error-msg {
             background: rgba(255, 0, 0, 0.04);
             border: 1px solid rgba(255, 0, 0, 0.06);
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 10px;
+            padding: 12px;
             color: #FF6B6B;
             text-align: center;
-            font-size: 12px;
-            margin-top: 8px;
+            font-size: 13px;
+            margin-top: 10px;
             display: none;
         }
 
@@ -514,12 +514,12 @@
                    تجاوب
                    ============================================================ */
         @media (max-width: 420px) {
-            .container { padding: 14px; }
+            .container { padding: 16px; }
             .header h1 { font-size: 22px; }
-            .btn { font-size: 14px; padding: 12px 16px; }
+            .btn { font-size: 14px; padding: 13px 18px; }
             .user-status { flex-direction: column; text-align: center; }
             .user-status .spin-info { justify-content: center; }
-            .pointer { font-size: 24px; top: -10px; }
+            .pointer { font-size: 28px; top: -12px; }
         }
     </style>
 </head>
@@ -552,8 +552,7 @@
             يرجى فتح العجلة من خلال <span class="highlight">بوت IChancy</span>.<br>
             <br>
             <span style="color:#555;font-size:13px;">
-                🔗 تأكد من فتح الرابط من داخل البوت<br>
-                📱 أو استخدم الرابط مع <code style="color:#FFD700;">?user_id=</code>
+                🔗 تأكد من فتح الرابط من داخل البوت
             </span>
         </div>
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
@@ -574,6 +573,7 @@
     <!-- ===== العجلة ===== -->
     <div class="wheel-container" id="wheelContainer">
         <div class="wheel-wrapper">
+            <!-- المؤشر العلوي -->
             <div class="pointer" id="pointer">🔽</div>
             <canvas id="wheelCanvas" width="500" height="500"></canvas>
         </div>
@@ -624,65 +624,44 @@ const ADMIN_ID = 7011476249;
 let USER_ID = null;
 let isSpinning = false;
 let prizesCache = [];
-let currentRotation = 0;
+let isReady = false;
 
 // ================================================================
 //                      جلب USER_ID
 // ================================================================
 function getUserId() {
-    console.log('🔍 === بدء البحث عن USER_ID ===');
-    
-    // 1. قراءة user_id من معلمات الرابط
     const params = new URLSearchParams(window.location.search);
-    console.log('📌 URL parameters:', window.location.search);
-    
     let id = params.get('user_id') || params.get('userId') || params.get('id');
-    console.log('📌 Extracted ID from URL:', id);
-    
     if (id && !isNaN(id)) {
         USER_ID = parseInt(id);
         localStorage.setItem('wheel_user_id', USER_ID);
         document.getElementById('userIdDisplay').textContent = USER_ID;
-        console.log('✅ USER_ID من الرابط:', USER_ID);
         return USER_ID;
     }
-    
-    // 2. محاولة من Telegram WebApp
     try {
         if (window.Telegram && window.Telegram.WebApp) {
             const user = window.Telegram.WebApp.initDataUnsafe?.user;
-            console.log('📌 Telegram user:', user);
             if (user && user.id) {
                 USER_ID = user.id;
                 localStorage.setItem('wheel_user_id', USER_ID);
                 document.getElementById('userIdDisplay').textContent = USER_ID;
-                console.log('✅ USER_ID من Telegram:', USER_ID);
                 return USER_ID;
             }
         }
-    } catch(e) {
-        console.log('⚠️ Telegram WebApp not available');
-    }
-    
-    // 3. محاولة من localStorage
+    } catch(e) {}
     id = localStorage.getItem('wheel_user_id');
-    console.log('📌 ID from localStorage:', id);
     if (id) {
         USER_ID = parseInt(id);
         document.getElementById('userIdDisplay').textContent = USER_ID;
-        console.log('✅ USER_ID من localStorage:', USER_ID);
         return USER_ID;
     }
-    
-    // 4. لم يتم العثور على ID
-    console.log('❌ لم يتم العثور على USER_ID');
     return null;
 }
 
 // ================================================================
-//                      رسم العجلة
+//                      رسم العجلة - تصميم متطور
 // ================================================================
-function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
+function drawWheel(prizes, highlightIndex = -1) {
     const canvas = document.getElementById('wheelCanvas');
     const ctx = canvas.getContext('2d');
     const w = canvas.width, h = canvas.height;
@@ -704,14 +683,15 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     const total = prizes.length;
     const step = (2 * Math.PI) / total;
     
+    // ألوان جذابة
     const colors = [
         '#1a1a2e', '#16213e', '#0f3460', '#1a1a2e', 
-        '#2d1b3d', '#1a0a0a', '#0a1a2e', '#2a1a2a',
-        '#1a2a1a', '#2a1a3a'
+        '#2d1b3d', '#1a1a2e', '#16213e', '#0f3460',
+        '#1a0a0a', '#2a1a2a'
     ];
     
     prizes.forEach((p, i) => {
-        const start = i * step + rotation;
+        const start = i * step - Math.PI/2;
         const end = start + step;
         const isHighlight = (i === highlightIndex);
         
@@ -720,6 +700,7 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
         ctx.arc(cx, cy, r, start, end);
         ctx.closePath();
         
+        // تدرج لوني لكل شريحة
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
         const color1 = isHighlight ? '#FFD700' : colors[i % colors.length];
         const color2 = isHighlight ? '#FF8C00' : colors[(i + 3) % colors.length];
@@ -728,19 +709,22 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
         ctx.fillStyle = grad;
         ctx.fill();
         
-        // خطوط ذهبية متوهجة
-        ctx.shadowColor = '#FFD700';
-        ctx.shadowBlur = isHighlight ? 25 : 8;
-        ctx.strokeStyle = '#FFD700';
-        ctx.lineWidth = isHighlight ? 3 : 1.5;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, r, start, start);
-        ctx.lineTo(cx + r * Math.cos(start), cy + r * Math.sin(start));
+        // توهج للشريحة المميزة
+        if (isHighlight) {
+            ctx.shadowColor = '#FFD700';
+            ctx.shadowBlur = 40;
+        } else {
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+        }
+        
+        // حدود ذهبية خفيفة
+        ctx.strokeStyle = isHighlight ? '#FFD700' : 'rgba(255,215,0,0.06)';
+        ctx.lineWidth = isHighlight ? 2.5 : 0.5;
         ctx.stroke();
         ctx.shadowBlur = 0;
         
-        // النص
+        // النص - أيقونة + اسم الجائزة
         const mid = start + step/2;
         const tr = r * 0.65;
         const x = cx + Math.cos(mid) * tr;
@@ -750,29 +734,28 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
         ctx.translate(x, y);
         ctx.rotate(mid + (mid > Math.PI/2 ? Math.PI : 0));
         
-        ctx.fillStyle = isHighlight ? '#0a0a0a' : '#ffffff';
-        ctx.font = isHighlight ? 'bold 16px sans-serif' : 'bold 14px sans-serif';
+        // الأيقونة
+        ctx.fillStyle = isHighlight ? '#0a0a0a' : '#fff';
+        ctx.font = isHighlight ? 'bold 16px sans-serif' : '14px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowColor = 'rgba(0,0,0,0.7)';
         ctx.shadowBlur = 6;
+        ctx.fillText(p.icon || '🎁', 0, -8);
         
-        let displayName = p.name.replace(/^[\u{1F000}-\u{1FFFF}]|^[\u2600}-\u{27BF}]|^[\u{1F300}-\u{1F5FF}]|^[\u{1F600}-\u{1F64F}]|^[\u{1F680}-\u{1F6FF}]|^[\u{1F700}-\u{1F77F}]|^[\u{1F780}-\u{1F7FF}]|^[\u{1F800}-\u{1F8FF}]|^[\u{1F900}-\u{1F9FF}]|^[\u{1FA00}-\u{1FA6F}]|^[\u{1FA70}-\u{1FAFF}]|^[\u{1FB00}-\u{1FBFF}]|^[\u{1FC00}-\u{1FCFF}]|^[\u{1FD00}-\u{1FDFF}]|^[\u{1FE00}-\u{1FEFF}]|^[\u{1FF00}-\u{1FFFF}]|^\p{Emoji}/u, '').trim();
-        
-        if (displayName.length > 12) {
-            const midIdx = Math.floor(displayName.length / 2);
-            ctx.fillText(displayName.substring(0, midIdx), 0, -10);
-            ctx.fillText(displayName.substring(midIdx), 0, 14);
-        } else {
-            ctx.fillText(displayName, 0, 0);
-        }
+        // اسم الجائزة (مختصر)
+        ctx.font = isHighlight ? 'bold 9px sans-serif' : '8px sans-serif';
+        const name = p.name.length > 10 ? p.name.substring(0, 10) + '…' : p.name;
+        ctx.fillText(name, 0, 12);
         
         ctx.shadowBlur = 0;
         ctx.restore();
     });
     
-    // الدائرة المركزية
-    const centerR = r * 0.13;
+    // ===== الدائرة المركزية مع صورة =====
+    const centerR = r * 0.14;
+    
+    // خلفية ذهبية مشعة
     const grad = ctx.createRadialGradient(cx-4, cy-4, 0, cx, cy, centerR);
     grad.addColorStop(0, '#FFD700');
     grad.addColorStop(0.5, '#FF8C00');
@@ -781,13 +764,14 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     ctx.beginPath();
     ctx.arc(cx, cy, centerR, 0, 2 * Math.PI);
     ctx.fillStyle = grad;
-    ctx.shadowColor = 'rgba(255, 215, 0, 0.3)';
-    ctx.shadowBlur = 25;
+    ctx.shadowColor = 'rgba(255, 215, 0, 0.4)';
+    ctx.shadowBlur = 30;
     ctx.fill();
     ctx.shadowBlur = 0;
     
+    // صورة في المركز (يمكن تغييرها)
     ctx.fillStyle = '#0a0a0a';
-    ctx.font = '20px sans-serif';
+    ctx.font = '22px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.5)';
@@ -795,16 +779,11 @@ function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
     ctx.fillText('⭐', cx, cy + 1);
     ctx.shadowBlur = 0;
     
+    // حلقة ذهبية حول المركز
     ctx.beginPath();
     ctx.arc(cx, cy, centerR + 4, 0, 2 * Math.PI);
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.12)';
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.15)';
     ctx.lineWidth = 1.5;
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.arc(cx, cy, r - 2, 0, 2 * Math.PI);
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.06)';
-    ctx.lineWidth = 1;
     ctx.stroke();
 }
 
@@ -815,7 +794,6 @@ async function loadPrizes() {
     try {
         const res = await fetch(`${API_BASE}/api/admin/prizes?admin_id=${ADMIN_ID}`);
         const data = await res.json();
-        console.log('📌 Prizes response:', data);
         if (data.success && data.prizes && data.prizes.length > 0) {
             prizesCache = data.prizes;
             return data.prizes;
@@ -835,7 +813,6 @@ async function loadUserStatus() {
     try {
         const res = await fetch(`${API_BASE}/api/wheel/history/${USER_ID}`);
         const data = await res.json();
-        console.log('📌 User status:', data);
         if (data.success) {
             document.getElementById('totalSpins').textContent = data.stats?.total_spins || 0;
             document.getElementById('totalWins').textContent = data.stats?.wins || 0;
@@ -936,51 +913,27 @@ async function spinWheel() {
         
         const data = await response.json();
         spinBtn.classList.remove('loading');
-        console.log('📌 Spin response:', data);
         
         if (data.success) {
             const prize = data.spin.prize;
-            const prizeIndex = prizesCache.findIndex(p => p.id === prize.id);
             
-            // حساب زاوية التوقف
-            const step = (2 * Math.PI) / prizesCache.length;
-            const targetAngle = prizeIndex * step + step / 2;
-            const extraSpins = 5 + Math.random() * 3;
-            const targetRotation = extraSpins * 2 * Math.PI + (2 * Math.PI - targetAngle);
-            
-            const canvas = document.getElementById('wheelCanvas');
+            // تأثير دوران العجلة
+            const canvas = document.querySelector('.wheel-wrapper canvas');
             canvas.classList.add('spinning');
+            setTimeout(() => {
+                canvas.classList.remove('spinning');
+            }, 1200);
             
-            const startRotation = currentRotation;
-            const endRotation = startRotation + targetRotation;
-            const duration = 3000 + Math.random() * 1000;
-            const startTime = Date.now();
+            // عرض النتيجة
+            document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
+            document.getElementById('prizeName').textContent = prize.name;
+            document.getElementById('prizeDesc').textContent = prize.description || 'مبروك!';
+            document.getElementById('resultBox').classList.add('show');
             
-            function animateRotation() {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-                const currentAngle = startRotation + targetRotation * eased;
-                
-                drawWheel(prizesCache, -1, currentAngle);
-                
-                if (progress < 1) {
-                    requestAnimationFrame(animateRotation);
-                } else {
-                    currentRotation = endRotation;
-                    canvas.classList.remove('spinning');
-                    
-                    document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
-                    document.getElementById('prizeName').textContent = prize.name;
-                    document.getElementById('prizeDesc').textContent = prize.description || 'مبروك!';
-                    document.getElementById('resultBox').classList.add('show');
-                    
-                    drawWheel(prizesCache, prizeIndex, endRotation);
-                    await loadUserStatus();
-                }
-            }
-            
-            animateRotation();
+            // إبراز الجائزة
+            const idx = prizesCache.findIndex(p => p.id === prize.id);
+            drawWheel(prizesCache, idx);
+            await loadUserStatus();
             
         } else {
             showError(data.error || 'حدث خطأ');
@@ -1013,13 +966,11 @@ function showError(msg) {
 }
 
 // ================================================================
-//                      التهيئة
+//                      التهيئة - التحقق من الخادم
 // ================================================================
 async function init() {
-    console.log('🚀 === بدء التهيئة ===');
-    
+    // 1. الحصول على USER_ID
     USER_ID = getUserId();
-    console.log('📌 USER_ID النهائي:', USER_ID);
     
     if (!USER_ID) {
         document.getElementById('errorContainer').classList.add('show');
@@ -1029,16 +980,17 @@ async function init() {
     
     document.getElementById('userIdDisplay').textContent = USER_ID;
     
+    // 2. إظهار شاشة اللودينغ
     showLoading(true);
     updateLoading(10, 'جاري التحقق من الخادم...');
     
     try {
+        // 3. التحقق من الخادم
         await new Promise(r => setTimeout(r, 500));
         updateLoading(30, 'جاري الاتصال بقاعدة البيانات...');
         
         const statusRes = await fetch(`${API_BASE}/api/status`);
         const statusData = await statusRes.json();
-        console.log('📌 Server status:', statusData);
         
         if (!statusData.database?.ready) {
             updateLoading(60, 'قاعدة البيانات غير جاهزة، جاري التهيئة...');
@@ -1046,26 +998,31 @@ async function init() {
         }
         
         updateLoading(70, 'جاري تحميل الجوائز...');
+        
+        // 4. تحميل الجوائز
         const prizes = await loadPrizes();
-        console.log('📌 Prizes loaded:', prizes.length);
         drawWheel(prizes);
         
         updateLoading(85, 'جاري تحميل بيانات المستخدم...');
+        
+        // 5. تحميل حالة المستخدم
         await loadUserStatus();
         
         updateLoading(100, '✅ جاهز!');
         await new Promise(r => setTimeout(r, 400));
         
     } catch(e) {
-        console.error('❌ Init error:', e);
+        console.error('Init error:', e);
         updateLoading(100, '⚠️ فشل الاتصال');
         await new Promise(r => setTimeout(r, 600));
-        showError('فشل الاتصال بالخادم');
+        showError('فشل الاتصال بالخادم، تأكد من اتصالك بالإنترنت');
     }
     
+    // 6. إخفاء اللودينغ وإظهار العجلة
     showLoading(false);
+    
+    // 7. ربط زر التدوير
     document.getElementById('spinBtn').onclick = spinWheel;
-    console.log('✅ === انتهت التهيئة ===');
 }
 
 document.addEventListener('DOMContentLoaded', init);
@@ -1073,3 +1030,4 @@ document.addEventListener('DOMContentLoaded', init);
 
 </body>
 </html>
+

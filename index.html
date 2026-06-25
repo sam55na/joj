@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>🎡 عجلة الحظ - IChancy</title>
+    
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        /* ============================================================
+                   جميع الأنماط - نفس التصميم السابق
+                   ============================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            color: #fff;
+        }
+        .container {
+            background: linear-gradient(145deg, #121212, #0a0a0a);
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 460px;
+            width: 100%;
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            box-shadow: 0 8px 60px rgba(0, 0, 0, 0.8);
+        }
+        .header { text-align: center; margin-bottom: 18px; }
+        .header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFD700, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header .subtitle { color: #555; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
+        .header .subtitle span { color: #FFD700; }
+        
+        .user-status {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .user-status .user-id { color: #666; font-size: 12px; }
+        .user-status .user-id span { color: #FFD700; font-weight: 600; background: rgba(255,215,0,0.06); padding: 2px 10px; border-radius: 4px; border: 1px solid rgba(255,215,0,0.06); }
+        .user-status .spin-info { color: #555; font-size: 12px; display: flex; gap: 12px; }
+        .user-status .spin-info .count { color: #FFD700; }
+        .user-status .spin-info .wins { color: #FF8C00; }
+        
+        .error-container { display: none; text-align: center; padding: 30px 20px; }
+        .error-container.show { display: block; }
+        .error-container .error-icon { font-size: 48px; margin-bottom: 12px; }
+        .error-container .error-title { color: #FFD700; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .error-container .error-text { color: #888; font-size: 14px; line-height: 1.6; }
+        .error-container .error-text .highlight { color: #FFD700; }
+        .error-container .btn-open-bot {
+            margin-top: 16px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #B8860B, #FFD700);
+            border: none;
+            border-radius: 12px;
+            color: #0a0a0a;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .error-container .btn-open-bot:hover { transform: scale(1.05); }
+        
+        .loading-container {
+            display: none;
+            margin-bottom: 14px;
+            padding: 14px 18px 18px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255,215,0,0.04);
+        }
+        .loading-container.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .loader-track {
+            width: 100%;
+            height: 5px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .loader-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #FFD700, #FF8C00, #FFD700);
+            background-size: 200% 100%;
+            border-radius: 4px;
+            transition: width 0.25s ease;
+            animation: loaderShine 1.2s linear infinite;
+        }
+        @keyframes loaderShine { 0% { background-position: 0% 0%; } 100% { background-position: 200% 0%; } }
+        
+        .loader-image {
+            position: absolute;
+            top: -16px;
+            left: 0%;
+            transform: translateX(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #B8860B);
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 20px rgba(255,215,0,0.15);
+            transition: left 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            z-index: 10;
+        }
+        .loader-percent { text-align: center; color: #FFD700; font-size: 20px; font-weight: 700; margin-top: 6px; }
+        .loader-status { text-align: center; color: #555; font-size: 12px; margin-top: 3px; }
+        
+        .wheel-wrapper { position: relative; width: 100%; max-width: 380px; margin: 0 auto 14px; aspect-ratio: 1/1; }
+        .wheel-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(255,215,0,0.04), inset 0 0 40px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,215,0,0.06);
+            transition: filter 0.3s ease;
+        }
+        .wheel-wrapper canvas.spinning { filter: brightness(1.15) drop-shadow(0 0 30px rgba(255,215,0,0.1)); }
+        
+        .no-prizes { display: none; text-align: center; padding: 30px 20px; }
+        .no-prizes .icon { font-size: 36px; margin-bottom: 8px; }
+        .no-prizes .text { color: #555; font-size: 14px; }
+        
+        .actions { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .btn {
+            padding: 13px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        .btn-spin {
+            background: linear-gradient(135deg, #B8860B, #FFD700);
+            color: #0a0a0a;
+            box-shadow: 0 4px 20px rgba(255,215,0,0.1);
+        }
+        .btn-spin:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(255,215,0,0.2); }
+        .btn-spin:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.03);
+            color: #FFD700;
+            border: 1px solid rgba(255,215,0,0.08);
+            font-size: 13px;
+            padding: 9px;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.05); }
+        
+        .result-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,215,0,0.06);
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        .result-box.show { display: block; animation: resultPop 0.35s ease; }
+        @keyframes resultPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .result-box .prize-icon { font-size: 34px; }
+        .result-box .prize-name { font-size: 18px; font-weight: 700; color: #FFD700; margin-top: 2px; }
+        .result-box .prize-desc { color: #777; font-size: 13px; margin-top: 2px; }
+        .result-box .prize-value { color: #FF8C00; font-size: 15px; font-weight: 600; margin-top: 4px; }
+        
+        .deposit-notice {
+            background: rgba(255,215,0,0.03);
+            border: 1px solid rgba(255,215,0,0.06);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            text-align: center;
+            display: none;
+        }
+        .deposit-notice.show { display: block; }
+        .deposit-notice .notice-text { color: #FF8C00; font-size: 12px; }
+        .deposit-notice .notice-text .amount { color: #FFD700; font-weight: 700; }
+        
+        .error-msg {
+            background: rgba(255,0,0,0.04);
+            border: 1px solid rgba(255,0,0,0.06);
+            border-radius: 8px;
+            padding: 10px;
+            color: #FF6B6B;
+            text-align: center;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+        .error-msg.show { display: block; }
+        
+        .history-toggle { text-align: center; margin-top: 10px; }
+        .history-toggle button {
+            background: none;
+            border: none;
+            color: #444;
+            cursor: pointer;
+            font-size: 12px;
+            transition: color 0.2s;
+            padding: 4px 10px;
+        }
+        .history-toggle button:hover { color: #FFD700; }
+        
+        .history-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 8px;
+            margin-top: 6px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, opacity 0.3s ease;
+            opacity: 0;
+            padding: 0 10px;
+        }
+        .history-box.open { max-height: 300px; opacity: 1; padding: 10px; overflow-y: auto; }
+        .history-box .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            color: #777;
+            font-size: 12px;
+        }
+        .history-box .history-item:last-child { border-bottom: none; }
+        .history-box .history-item .h-prize { color: #FFD700; }
+        .history-box .history-item .h-date { color: #444; font-size: 11px; }
+        .history-box::-webkit-scrollbar { width: 3px; }
+        .history-box::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        
+        @media (max-width: 400px) {
+            .container { padding: 14px; }
+            .header h1 { font-size: 20px; }
+            .btn { font-size: 13px; padding: 11px 16px; }
+            .user-status { flex-direction: column; text-align: center; }
+            .user-status .spin-info { justify-content: center; }
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,215,0,0.1);
+            border-top: 2px solid #FFD700;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+
+    <div class="header">
+        <h1>🎡 عجلة الحظ</h1>
+        <div class="subtitle"><span>IChancy</span> · دور واربح</div>
+    </div>
+
+    <div class="user-status" id="userStatus">
+        <div class="user-id">👤 <span id="userIdDisplay">---</span></div>
+        <div class="spin-info">
+            <span>🎡 <span class="count" id="totalSpins">0</span></span>
+            <span>🏆 <span class="wins" id="totalWins">0</span></span>
+            <span id="depositStatus"></span>
+        </div>
+    </div>
+
+    <div class="error-container" id="errorContainer">
+        <div class="error-icon">⚠️</div>
+        <div class="error-title">يجب الدخول من البوت</div>
+        <div class="error-text">
+            لا يمكن الوصول إلى معرف المستخدم.<br>
+            يرجى فتح العجلة من خلال <span class="highlight">بوت IChancy</span>.<br>
+            <br>
+            <span style="color:#666;font-size:13px;">
+                🔗 تأكد من فتح الرابط من داخل البوت<br>
+                📱 أو استخدم الرابط مع <code style="color:#FFD700;">?user_id=</code>
+            </span>
+        </div>
+        <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
+    </div>
+
+    <div class="loading-container" id="loadingContainer">
+        <div class="loader-track">
+            <div class="loader-bar" id="loaderBar"></div>
+            <div class="loader-image" id="loaderImage">🎯</div>
+        </div>
+        <div class="loader-percent" id="loaderPercent">0%</div>
+        <div class="loader-status" id="loaderStatus">🔄 جاري الاتصال...</div>
+    </div>
+
+    <div class="wheel-wrapper" id="wheelWrapper">
+        <canvas id="wheelCanvas" width="500" height="500"></canvas>
+    </div>
+
+    <div class="no-prizes" id="noPrizes">
+        <div class="icon">⚠️</div>
+        <div class="text">لا توجد جوائز متاحة</div>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-spin" id="spinBtn" disabled>
+            <span class="spinner" style="display:none;" id="spinSpinner"></span>
+            <span id="spinBtnText">🎰 تدوير العجلة</span>
+        </button>
+        <button class="btn btn-secondary" id="claimBtn" style="display:none;">📦 المطالبة بالجائزة</button>
+    </div>
+
+    <div class="deposit-notice" id="depositNotice">
+        <div class="notice-text">
+            💰 مطلوب إيداع <span class="amount" id="depositMinAmount">0</span> SYP
+            خلال <span id="depositCheckHours">24</span> ساعة
+        </div>
+    </div>
+
+    <div class="error-msg" id="errorMsg">
+        <span id="errorText"></span>
+    </div>
+
+    <div class="result-box" id="resultBox">
+        <div class="prize-icon" id="prizeIcon">🎁</div>
+        <div class="prize-name" id="prizeName">جائزة!</div>
+        <div class="prize-desc" id="prizeDesc"></div>
+        <div class="prize-value" id="prizeValue"></div>
+    </div>
+
+    <div class="history-toggle">
+        <button id="historyToggleBtn">📜 عرض السجل</button>
+    </div>
+    <div class="history-box" id="historyBox">
+        <div id="historyList"></div>
+    </div>
+
+</div>
+
+<script>
+// ================================================================
+//                      الإعدادات الأساسية
+// ================================================================
+// 🔴 هنا يتم تحديد رابط الخادم (API)
+const API_BASE = 'https://joj-d0kl.onrender.com';
+const ADMIN_ID = 7011476249;
+let USER_ID = null;
+let isSpinning = false;
+let prizesCache = [];
+
+// ================================================================
+//                      جلب USER_ID
+// ================================================================
+function getUserId() {
+    // 1. من الرابط
+    const params = new URLSearchParams(window.location.search);
+    let id = params.get('user_id') || params.get('userId') || params.get('id');
+    if (id && !isNaN(id)) {
+        USER_ID = parseInt(id);
+        localStorage.setItem('wheel_user_id', USER_ID);
+        document.getElementById('userIdDisplay').textContent = USER_ID;
+        return USER_ID;
+    }
+    
+    // 2. من Telegram WebApp
+    try {
+        if (window.Telegram && window.Telegram.WebApp) {
+            const user = window.Telegram.WebApp.initDataUnsafe?.user;
+            if (user && user.id) {
+                USER_ID = user.id;
+                localStorage.setItem('wheel_user_id', USER_ID);
+                document.getElementById('userIdDisplay').textContent = USER_ID;
+                return USER_ID;
+            }
+        }
+    } catch(e) {}
+    
+    // 3. من localStorage
+    id = localStorage.getItem('wheel_user_id');
+    if (id) {
+        USER_ID = parseInt(id);
+        document.getElementById('userIdDisplay').textContent = USER_ID;
+        return USER_ID;
+    }
+    
+    // 4. لم يتم العثور على USER_ID
+    return null;
+}
+
+// ================================================================
+//                      رسم العجلة
+// ================================================================
+function drawWheel(prizes, highlightIndex = -1) {
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const cx = w/2, cy = h/2;
+    const r = Math.min(w, h)/2 - 8;
+    const noPrizes = document.getElementById('noPrizes');
+    const wrapper = document.getElementById('wheelWrapper');
+    
+    if (!prizes || prizes.length === 0) {
+        noPrizes.style.display = 'block';
+        wrapper.style.display = 'none';
+        return;
+    }
+    
+    noPrizes.style.display = 'none';
+    wrapper.style.display = 'block';
+    ctx.clearRect(0, 0, w, h);
+    
+    const total = prizes.length;
+    const step = (2 * Math.PI) / total;
+    const colors = ['#1a1a2e', '#16213e', '#0f3460', '#1a1a2e', '#2d1b3d'];
+    
+    prizes.forEach((p, i) => {
+        const start = i * step - Math.PI/2;
+        const end = start + step;
+        const isHighlight = (i === highlightIndex);
+        
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, end);
+        ctx.closePath();
+        
+        ctx.fillStyle = isHighlight ? '#FFD700' : colors[i % colors.length];
+        ctx.fill();
+        
+        ctx.strokeStyle = isHighlight ? '#FFD700' : 'rgba(255,215,0,0.1)';
+        ctx.lineWidth = isHighlight ? 2 : 1;
+        ctx.shadowColor = isHighlight ? 'rgba(255,215,0,0.2)' : 'transparent';
+        ctx.shadowBlur = isHighlight ? 15 : 0;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        
+        const mid = start + step/2;
+        const tr = r * 0.6;
+        const x = cx + Math.cos(mid) * tr;
+        const y = cy + Math.sin(mid) * tr;
+        
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(mid + (mid > Math.PI/2 ? Math.PI : 0));
+        
+        ctx.fillStyle = isHighlight ? '#0a0a0a' : '#fff';
+        ctx.font = isHighlight ? 'bold 12px sans-serif' : '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 4;
+        
+        const icon = p.icon || '🎁';
+        const name = p.name.length > 8 ? p.name.substring(0, 8) + '…' : p.name;
+        ctx.fillText(icon, 0, -5);
+        ctx.font = isHighlight ? 'bold 9px sans-serif' : '8px sans-serif';
+        ctx.fillText(name, 0, 10);
+        
+        ctx.shadowBlur = 0;
+        ctx.restore();
+    });
+    
+    const grad = ctx.createRadialGradient(cx-4, cy-4, 0, cx, cy, r*0.1);
+    grad.addColorStop(0, '#FFD700');
+    grad.addColorStop(0.6, '#FF8C00');
+    grad.addColorStop(1, '#1a1a2e');
+    
+    ctx.beginPath();
+    ctx.arc(cx, cy, r*0.1, 0, 2*Math.PI);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,215,0,0.2)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(cx-12, 8);
+    ctx.lineTo(cx+12, 8);
+    ctx.lineTo(cx, -8);
+    ctx.closePath();
+    ctx.fillStyle = '#FFD700';
+    ctx.shadowColor = 'rgba(255,215,0,0.15)';
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+}
+
+// ================================================================
+//                      تحميل الجوائز من الخادم
+// ================================================================
+async function loadPrizes() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/prizes?admin_id=${ADMIN_ID}`);
+        const data = await res.json();
+        if (data.success && data.prizes && data.prizes.length > 0) {
+            prizesCache = data.prizes;
+            return data.prizes;
+        }
+        return [];
+    } catch(e) {
+        console.error('Error loading prizes:', e);
+        return [];
+    }
+}
+
+// ================================================================
+//                      تحميل حالة المستخدم من الخادم
+// ================================================================
+async function loadUserStatus() {
+    if (!USER_ID) return;
+    
+    try {
+        const res = await fetch(`${API_BASE}/api/wheel/history/${USER_ID}`);
+        const data = await res.json();
+        
+        if (data.success) {
+            document.getElementById('totalSpins').textContent = data.stats?.total_spins || 0;
+            document.getElementById('totalWins').textContent = data.stats?.wins || 0;
+            
+            const depositNotice = document.getElementById('depositNotice');
+            const depositStatus = document.getElementById('depositStatus');
+            
+            if (data.deposit_requirement?.required) {
+                document.getElementById('depositMinAmount').textContent = data.deposit_requirement.min_amount || 0;
+                document.getElementById('depositCheckHours').textContent = data.deposit_requirement.check_hours || 24;
+                
+                if (data.deposit_requirement.is_met) {
+                    depositNotice.classList.remove('show');
+                    depositStatus.innerHTML = '💰 ✔';
+                } else {
+                    depositNotice.classList.add('show');
+                    depositStatus.innerHTML = '💰 ⚠️';
+                }
+            } else {
+                depositNotice.classList.remove('show');
+                depositStatus.innerHTML = '';
+            }
+            
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            if (data.history && data.history.length > 0) {
+                data.history.slice(0, 15).forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    div.innerHTML = `
+                        <span class="h-prize">${item.icon || '🎁'} ${item.prize_name}</span>
+                        <span class="h-date">${item.is_claimed ? '✅' : '⏳'} ${new Date(item.spin_date).toLocaleDateString('ar')}</span>
+                    `;
+                    historyList.appendChild(div);
+                });
+            } else {
+                historyList.innerHTML = '<div style="text-align:center;color:#444;padding:10px;font-size:12px;">لا توجد تدويرات</div>';
+            }
+            
+            const spinBtn = document.getElementById('spinBtn');
+            const canSpin = data.spin_status?.can_spin !== false && 
+                           (!data.deposit_requirement?.required || data.deposit_requirement?.is_met);
+            
+            if (canSpin && prizesCache.length > 0) {
+                spinBtn.disabled = false;
+                document.getElementById('spinBtnText').textContent = '🎰 تدوير العجلة';
+            } else if (!data.spin_status?.can_spin) {
+                spinBtn.disabled = true;
+                const h = data.spin_status?.remaining_hours || 0;
+                const m = data.spin_status?.remaining_minutes || 0;
+                document.getElementById('spinBtnText').textContent = `⏳ ${h}h ${m}m`;
+            } else if (data.deposit_requirement?.required && !data.deposit_requirement?.is_met) {
+                spinBtn.disabled = true;
+                document.getElementById('spinBtnText').textContent = '💰 إيداع مطلوب';
+            } else {
+                spinBtn.disabled = true;
+                document.getElementById('spinBtnText').textContent = '⏳ جاري التحميل...';
+            }
+        }
+    } catch(e) {
+        console.error('Error loading user status:', e);
+    }
+}
+
+// ================================================================
+//                      اللودينغ
+// ================================================================
+function showLoading(show, statusText = '🔄 جاري الاتصال...') {
+    const container = document.getElementById('loadingContainer');
+    const bar = document.getElementById('loaderBar');
+    const percent = document.getElementById('loaderPercent');
+    const status = document.getElementById('loaderStatus');
+    const image = document.getElementById('loaderImage');
+    
+    if (show) {
+        container.classList.add('active');
+        status.textContent = statusText;
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 2 + 1;
+            if (progress > 100) progress = 100;
+            bar.style.width = progress + '%';
+            image.style.left = progress + '%';
+            percent.textContent = Math.floor(progress) + '%';
+            if (progress >= 100) clearInterval(interval);
+        }, 80);
+        container._interval = interval;
+    } else {
+        container.classList.remove('active');
+        if (container._interval) {
+            clearInterval(container._interval);
+            container._interval = null;
+        }
+        bar.style.width = '0%';
+        image.style.left = '0%';
+        percent.textContent = '0%';
+    }
+}
+
+// ================================================================
+//                      تدوير العجلة - إرسال طلب للخادم
+// ================================================================
+async function spinWheel() {
+    if (isSpinning || !USER_ID) return;
+    if (document.getElementById('spinBtn').disabled) return;
+    if (prizesCache.length === 0) {
+        showError('لا توجد جوائز متاحة');
+        return;
+    }
+    
+    isSpinning = true;
+    const spinBtn = document.getElementById('spinBtn');
+    spinBtn.disabled = true;
+    document.getElementById('spinBtnText').textContent = '⏳ جاري التدوير...';
+    document.getElementById('spinSpinner').style.display = 'inline-block';
+    
+    document.getElementById('resultBox').classList.remove('show');
+    document.getElementById('errorMsg').classList.remove('show');
+    document.getElementById('claimBtn').style.display = 'none';
+    
+    showLoading(true, '🎡 جاري الطلب من الخادم...');
+    
+    try {
+        await new Promise(r => setTimeout(r, 400));
+        showLoading(true, '📡 جاري معالجة الطلب...');
+        
+        const response = await fetch(`${API_BASE}/api/wheel/spin`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: USER_ID })
+        });
+        
+        const data = await response.json();
+        showLoading(false);
+        document.getElementById('spinSpinner').style.display = 'none';
+        
+        if (data.success) {
+            const prize = data.spin.prize;
+            
+            document.querySelector('.wheel-wrapper canvas').classList.add('spinning');
+            setTimeout(() => {
+                document.querySelector('.wheel-wrapper canvas').classList.remove('spinning');
+            }, 1000);
+            
+            document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
+            document.getElementById('prizeName').textContent = prize.name;
+            document.getElementById('prizeDesc').textContent = prize.description || 'مبروك!';
+            
+            const match = prize.name.match(/\d+/);
+            document.getElementById('prizeValue').textContent = match ? `💰 ${match[0]} SYP` : '';
+            document.getElementById('resultBox').classList.add('show');
+            
+            if (!prize.name.includes('حظ سعيد')) {
+                document.getElementById('claimBtn').style.display = 'block';
+                document.getElementById('claimBtn').textContent = '📦 المطالبة';
+                document.getElementById('claimBtn').onclick = () => claimPrize(data.spin.id);
+            }
+            
+            const idx = prizesCache.findIndex(p => p.id === prize.id);
+            drawWheel(prizesCache, idx);
+            await loadUserStatus();
+            
+        } else {
+            showError(data.error || 'حدث خطأ');
+            if (data.remaining_hours !== undefined) {
+                const btn = document.getElementById('spinBtn');
+                btn.disabled = true;
+                document.getElementById('spinBtnText').textContent = `⏳ ${data.remaining_hours}h ${data.remaining_minutes}m`;
+            }
+        }
+        
+    } catch(e) {
+        showLoading(false);
+        document.getElementById('spinSpinner').style.display = 'none';
+        showError('خطأ في الاتصال: ' + e.message);
+    }
+    
+    isSpinning = false;
+    if (!document.getElementById('spinBtn').disabled) {
+        document.getElementById('spinBtnText').textContent = '🎰 تدوير العجلة';
+    }
+}
+
+// ================================================================
+//                      المطالبة بالجائزة
+// ================================================================
+async function claimPrize(spinId) {
+    const claimBtn = document.getElementById('claimBtn');
+    claimBtn.disabled = true;
+    claimBtn.textContent = '⏳ جاري...';
+    
+    try {
+        const res = await fetch(`${API_BASE}/api/wheel/claim/${spinId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: USER_ID })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            claimBtn.textContent = '✅ تمت المطالبة!';
+            claimBtn.style.background = 'rgba(76, 175, 80, 0.1)';
+            claimBtn.style.color = '#4CAF50';
+            claimBtn.style.borderColor = 'rgba(76, 175, 80, 0.2)';
+            document.getElementById('prizeValue').textContent = '✅ تمت المطالبة!';
+            await loadUserStatus();
+        } else {
+            claimBtn.textContent = '❌ فشل';
+            alert('❌ ' + (data.error || 'فشل المطالبة'));
+        }
+    } catch(e) {
+        claimBtn.textContent = '❌ خطأ';
+        alert('❌ خطأ في الاتصال');
+    }
+    
+    claimBtn.disabled = false;
+    setTimeout(() => {
+        claimBtn.style.display = 'none';
+    }, 3000);
+}
+
+// ================================================================
+//                      عرض الخطأ
+// ================================================================
+function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    document.getElementById('errorText').textContent = '❌ ' + msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+// ================================================================
+//                      التهيئة
+// ================================================================
+async function init() {
+    USER_ID = getUserId();
+    
+    if (!USER_ID) {
+        document.getElementById('errorContainer').classList.add('show');
+        document.getElementById('userStatus').style.display = 'none';
+        document.getElementById('wheelWrapper').style.display = 'none';
+        document.getElementById('actions').style.display = 'none';
+        document.getElementById('historyToggle').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('userIdDisplay').textContent = USER_ID;
+    
+    const prizes = await loadPrizes();
+    drawWheel(prizes);
+    
+    await loadUserStatus();
+    
+    document.getElementById('spinBtn').onclick = spinWheel;
+    document.getElementById('historyToggleBtn').onclick = () => {
+        const box = document.getElementById('historyBox');
+        box.classList.toggle('open');
+        document.getElementById('historyToggleBtn').textContent = 
+            box.classList.contains('open') ? '📜 إخفاء السجل' : '📜 عرض السجل';
+    };
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

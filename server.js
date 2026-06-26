@@ -310,6 +310,8 @@ app.get('/api/admin/settings', async (req, res) => {
         const banner = await pool.query('SELECT text FROM wheel_banner ORDER BY id DESC LIMIT 1');
         settings.banner_text = banner.rows[0]?.text || '🎡 IChancy · عجلة الحظ';
 
+        console.log('📋 Settings loaded:', Object.keys(settings).length, 'keys');
+        
         res.json({
             success: true,
             settings
@@ -325,6 +327,8 @@ app.get('/api/admin/settings', async (req, res) => {
 // -------------------- تحديث إعداد واحد --------------------
 app.put('/api/admin/setting', async (req, res) => {
     const { admin_id, key, value } = req.body;
+
+    console.log(`📝 Updating setting: ${key} = ${value}`);
 
     if (parseInt(admin_id) !== ADMIN_ID) {
         return res.status(403).json({
@@ -355,11 +359,14 @@ app.put('/api/admin/setting', async (req, res) => {
             `, [key, value]);
         }
 
+        console.log(`✅ Setting ${key} updated successfully`);
+        
         res.json({
             success: true,
             message: 'Setting updated successfully'
         });
     } catch (error) {
+        console.error(`❌ Error updating setting ${key}:`, error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -383,6 +390,8 @@ app.get('/api/admin/prizes', async (req, res) => {
             SELECT * FROM wheel_prizes 
             ORDER BY probability DESC
         `);
+        
+        console.log(`📋 Loaded ${result.rows.length} prizes for admin`);
         
         res.json({
             success: true,
@@ -421,6 +430,8 @@ app.get('/api/prizes', async (req, res) => {
 app.post('/api/admin/prizes', async (req, res) => {
     const { admin_id, name, description, probability, icon, color, color2 } = req.body;
 
+    console.log(`📝 Adding new prize: ${name}`);
+
     if (parseInt(admin_id) !== ADMIN_ID) {
         return res.status(403).json({
             success: false,
@@ -442,12 +453,15 @@ app.post('/api/admin/prizes', async (req, res) => {
             RETURNING *
         `, [name, description || '', probability, icon || '🎁', color || '#1a1a2e', color2 || '#16213e']);
 
+        console.log(`✅ Prize added: ${result.rows[0].id} - ${name}`);
+
         res.json({
             success: true,
             prize: result.rows[0],
             message: '✅ تم إضافة الجائزة بنجاح'
         });
     } catch (error) {
+        console.error('❌ Error adding prize:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -460,6 +474,8 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     const { prize_id } = req.params;
     const { admin_id, name, description, probability, icon, color, color2, is_active } = req.body;
 
+    console.log(`📝 Updating prize ${prize_id}:`, { name, probability, color, color2 });
+
     if (parseInt(admin_id) !== ADMIN_ID) {
         return res.status(403).json({
             success: false,
@@ -468,12 +484,13 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 
     try {
-        // بناء الاستعلام ديناميكياً مع دعم جميع الحقول
+        // بناء الاستعلام ديناميكياً
+        let query = 'UPDATE wheel_prizes SET ';
         const updates = [];
         const values = [];
         let paramIndex = 1;
 
-        if (name !== undefined && name !== null) {
+        if (name !== undefined && name !== null && name !== '') {
             updates.push(`name = $${paramIndex++}`);
             values.push(name);
         }
@@ -485,17 +502,19 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
             updates.push(`probability = $${paramIndex++}`);
             values.push(parseFloat(probability));
         }
-        if (icon !== undefined && icon !== null) {
+        if (icon !== undefined && icon !== null && icon !== '') {
             updates.push(`icon = $${paramIndex++}`);
             values.push(icon);
         }
-        if (color !== undefined && color !== null) {
+        if (color !== undefined && color !== null && color !== '') {
             updates.push(`color = $${paramIndex++}`);
             values.push(color);
+            console.log(`🎨 Setting color to: ${color}`);
         }
-        if (color2 !== undefined && color2 !== null) {
+        if (color2 !== undefined && color2 !== null && color2 !== '') {
             updates.push(`color2 = $${paramIndex++}`);
             values.push(color2);
+            console.log(`🎨 Setting color2 to: ${color2}`);
         }
         if (is_active !== undefined && is_active !== null) {
             updates.push(`is_active = $${paramIndex++}`);
@@ -512,17 +531,12 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
         updates.push(`updated_at = CURRENT_TIMESTAMP`);
         values.push(prize_id);
 
-        const query = `
-            UPDATE wheel_prizes 
-            SET ${updates.join(', ')}
-            WHERE id = $${values.length}
-            RETURNING *
-        `;
+        const fullQuery = query + updates.join(', ') + ` WHERE id = $${values.length} RETURNING *`;
 
-        console.log('📝 Update query:', query);
+        console.log('📝 Full query:', fullQuery);
         console.log('📝 Values:', values);
 
-        const result = await pool.query(query, values);
+        const result = await pool.query(fullQuery, values);
 
         if (result.rows.length === 0) {
             return res.status(404).json({
@@ -572,6 +586,8 @@ app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
             });
         }
 
+        console.log(`🗑️ Prize ${prize_id} deleted`);
+
         res.json({
             success: true,
             message: '✅ تم حذف الجائزة بنجاح'
@@ -604,6 +620,8 @@ app.post('/api/admin/seed-prizes', async (req, res) => {
                 VALUES ($1, $2, $3, $4, $5, $6, true)
             `, [prize.name, prize.description, prize.probability, prize.icon, prize.color, prize.color2]);
         }
+
+        console.log('🔄 Prizes reset to defaults');
 
         res.json({
             success: true,
@@ -664,6 +682,8 @@ app.post('/api/wheel/spin', async (req, res) => {
         );
         const isDepositRequired = depositRequired.rows[0]?.setting_value === 'true';
 
+        console.log(`💰 Deposit required: ${isDepositRequired} for user ${user_id}`);
+
         if (isDepositRequired) {
             const minAmount = await pool.query(
                 'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
@@ -677,6 +697,8 @@ app.post('/api/wheel/spin', async (req, res) => {
             const minAmountValue = parseFloat(minAmount.rows[0]?.setting_value || 1000);
             const checkHoursValue = parseInt(checkHours.rows[0]?.setting_value || 24);
 
+            console.log(`💰 Min amount: ${minAmountValue}, Check hours: ${checkHoursValue}`);
+
             const userDeposits = await pool.query(`
                 SELECT COALESCE(SUM(amount), 0) as total
                 FROM wheel_deposits
@@ -685,6 +707,8 @@ app.post('/api/wheel/spin', async (req, res) => {
             `, [user_id]);
 
             const totalDeposits = parseFloat(userDeposits.rows[0]?.total || 0);
+
+            console.log(`💰 User ${user_id} deposits: ${totalDeposits}`);
 
             if (totalDeposits < minAmountValue) {
                 releaseLock(user_id);
@@ -930,6 +954,8 @@ app.post('/api/wheel/deposit', async (req, res) => {
             VALUES ($1, $2, $3)
         `, [user_id, amount, source || 'manual']);
 
+        console.log(`💰 Deposit recorded: ${user_id} - ${amount} SYP`);
+
         res.json({
             success: true,
             message: '✅ تم تسجيل الإيداع بنجاح'
@@ -957,6 +983,7 @@ async function startServer() {
         console.log(`\n✅ الخادم يعمل على المنفذ ${port}`);
         console.log(`🔗 فحص الحالة: http://localhost:${port}/api/status`);
         console.log(`🔗 الجوائز النشطة: http://localhost:${port}/api/prizes`);
+        console.log(`🔗 لوحة الإدارة: http://localhost:${port}/api/admin/prizes?admin_id=${ADMIN_ID}`);
         console.log('\n📋 ===== جاهز! =====\n');
     });
 }

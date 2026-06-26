@@ -550,7 +550,7 @@
         }
 
         /* ============================================================
-                   لوحة الإدارة
+                   لوحة الإدارة - معدلة
                    ============================================================ */
         .admin-panel {
             display: none;
@@ -593,40 +593,63 @@
             margin-bottom: 6px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
         .admin-panel .prize-item .prize-icon-small {
-            font-size: 20px;
-            width: 30px;
+            font-size: 18px;
+            width: 28px;
             text-align: center;
         }
 
         .admin-panel .prize-item .prize-info {
             flex: 1;
-            min-width: 80px;
+            min-width: 100px;
         }
 
-        .admin-panel .prize-item .prize-info .name {
+        .admin-panel .prize-item .prize-info .name-input {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
             color: #fff;
             font-size: 12px;
             font-weight: 600;
+            padding: 2px 6px;
+            width: 100%;
+            transition: border-color 0.3s ease;
         }
 
-        .admin-panel .prize-item .prize-info .desc {
+        .admin-panel .prize-item .prize-info .name-input:focus {
+            outline: none;
+            border-color: #FFD700;
+        }
+
+        .admin-panel .prize-item .prize-info .desc-input {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 4px;
             color: #666;
             font-size: 10px;
+            padding: 2px 6px;
+            width: 100%;
+            margin-top: 2px;
+            transition: border-color 0.3s ease;
+        }
+
+        .admin-panel .prize-item .prize-info .desc-input:focus {
+            outline: none;
+            border-color: rgba(255, 215, 0, 0.3);
         }
 
         .admin-panel .prize-item .prize-prob {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
         }
 
-        .admin-panel .prize-item .prize-prob input {
-            width: 50px;
+        .admin-panel .prize-item .prize-prob .prob-input {
+            width: 45px;
             padding: 3px 4px;
             border-radius: 4px;
             border: 1px solid rgba(255, 215, 0, 0.1);
@@ -636,29 +659,49 @@
             text-align: center;
         }
 
-        .admin-panel .prize-item .prize-prob input:focus {
+        .admin-panel .prize-item .prize-prob .prob-input:focus {
             outline: none;
             border-color: #FFD700;
         }
 
         .admin-panel .prize-item .prize-prob .prob-label {
             color: #555;
-            font-size: 10px;
+            font-size: 9px;
+        }
+
+        .admin-panel .prize-item .prize-prob .btn-save-prob {
+            padding: 2px 6px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 4px;
+            color: #FFD700;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-panel .prize-item .prize-prob .btn-save-prob:hover {
+            background: rgba(255, 215, 0, 0.2);
         }
 
         .admin-panel .prize-item .prize-colors {
             display: flex;
-            gap: 4px;
+            gap: 3px;
         }
 
         .admin-panel .prize-item .prize-colors input[type="color"] {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 4px;
             padding: 2px;
             background: transparent;
             cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .admin-panel .prize-item .prize-colors input[type="color"]:hover {
+            border-color: #FFD700;
         }
 
         .admin-panel .prize-item .prize-colors input[type="color"]::-webkit-color-swatch-wrapper {
@@ -671,7 +714,7 @@
         }
 
         .admin-panel .prize-item .btn-delete {
-            background: rgba(255, 0, 0, 0.1);
+            background: rgba(255, 0, 0, 0.08);
             border: none;
             color: #FF4444;
             padding: 2px 8px;
@@ -683,6 +726,7 @@
 
         .admin-panel .prize-item .btn-delete:hover {
             background: rgba(255, 0, 0, 0.2);
+            transform: scale(1.05);
         }
 
         .admin-panel .add-prize-form {
@@ -690,6 +734,7 @@
             gap: 6px;
             margin-top: 10px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .admin-panel .add-prize-form input {
@@ -700,7 +745,7 @@
             background: rgba(0, 0, 0, 0.3);
             color: #fff;
             font-size: 11px;
-            min-width: 60px;
+            min-width: 50px;
         }
 
         .admin-panel .add-prize-form input:focus {
@@ -719,13 +764,19 @@
             border-radius: 6px;
             color: #0a0a0a;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .admin-panel .add-prize-form .btn-add:hover {
             transform: scale(1.05);
+        }
+
+        .admin-panel .add-prize-form .btn-add:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .admin-panel .panel-actions {
@@ -967,6 +1018,9 @@
             .admin-panel .settings-section .setting-row { flex-direction: column; align-items: stretch; }
             .admin-panel .settings-section .setting-row label { min-width: auto; }
             .loading-screen .loading-image { width: 70vw; }
+            .admin-panel .add-prize-form input { min-width: 40px; font-size: 10px; }
+            .admin-panel .prize-item .prize-info { min-width: 80px; }
+            .admin-panel .prize-item .prize-prob .prob-input { width: 38px; }
         }
     </style>
 </head>
@@ -1093,9 +1147,9 @@
         <div class="add-prize-form">
             <input type="text" id="newPrizeName" placeholder="الاسم">
             <input type="text" id="newPrizeIcon" placeholder="🎁" style="max-width:40px;">
-            <input type="number" id="newPrizeProb" placeholder="نسبة %" style="max-width:60px;">
-            <input type="color" id="newPrizeColor" value="#1a1a2e" style="max-width:36px;padding:2px;">
-            <input type="color" id="newPrizeColor2" value="#16213e" style="max-width:36px;padding:2px;">
+            <input type="number" id="newPrizeProb" placeholder="نسبة" style="max-width:55px;">
+            <input type="color" id="newPrizeColor" value="#1a1a2e" style="max-width:32px;padding:2px;">
+            <input type="color" id="newPrizeColor2" value="#16213e" style="max-width:32px;padding:2px;">
             <button class="btn-add" id="addPrizeBtn">➕</button>
         </div>
         
@@ -1698,29 +1752,41 @@ async function updatePrize(prizeId, data) {
         return result.success === true;
     } catch(e) {
         console.error('❌ Error updating prize:', e);
-        showError('فشل تحديث الجائزة: ' + e.message);
+        showError('❌ فشل تحديث الجائزة: ' + e.message);
         return false;
     }
 }
 
 async function deletePrize(prizeId) {
     try {
-        const res = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
+        console.log('🗑️ Deleting prize:', prizeId);
+        
+        const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ admin_id: ADMIN_ID })
         });
-        const data = await res.json();
-        return data.success;
+        
+        const data = await response.json();
+        console.log('📥 Delete response:', data);
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'فشل الحذف');
+        }
+        
+        return data.success === true;
     } catch(e) {
-        console.error('Error deleting prize:', e);
+        console.error('❌ Error deleting prize:', e);
+        showError('❌ فشل حذف الجائزة: ' + e.message);
         return false;
     }
 }
 
 async function addPrize(name, icon, probability, color, color2) {
     try {
-        const res = await fetch(`${API_BASE}/api/admin/prizes`, {
+        console.log('➕ Adding prize:', { name, icon, probability, color, color2 });
+        
+        const response = await fetch(`${API_BASE}/api/admin/prizes`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1733,10 +1799,18 @@ async function addPrize(name, icon, probability, color, color2) {
                 description: ''
             })
         });
-        const data = await res.json();
-        return data.success;
+        
+        const data = await response.json();
+        console.log('📥 Add response:', data);
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'فشل الإضافة');
+        }
+        
+        return data.success === true;
     } catch(e) {
-        console.error('Error adding prize:', e);
+        console.error('❌ Error adding prize:', e);
+        showError('❌ فشل إضافة الجائزة: ' + e.message);
         return false;
     }
 }
@@ -1757,7 +1831,7 @@ async function resetPrizes() {
 }
 
 // ================================================================
-//                      عرض لوحة الإدارة
+//                      عرض لوحة الإدارة (معدلة)
 // ================================================================
 async function renderAdminPanel() {
     const panel = document.getElementById('adminPanel');
@@ -1776,29 +1850,83 @@ async function renderAdminPanel() {
     
     const prizes = await loadAdminPrizes();
     if (!prizes || prizes.length === 0) {
-        list.innerHTML = '<div style="color:#555;font-size:13px;text-align:center;padding:10px;">لا توجد جوائز</div>';
+        list.innerHTML = `
+            <div style="color:#555;font-size:13px;text-align:center;padding:20px;">
+                <div style="font-size:30px;margin-bottom:10px;">📭</div>
+                لا توجد جوائز<br>
+                <span style="font-size:11px;color:#444;">أضف جائزة جديدة باستخدام النموذج أدناه</span>
+            </div>
+        `;
         return;
     }
     
-    list.innerHTML = prizes.map(p => `
-        <div class="prize-item" data-id="${p.id}">
+    list.innerHTML = prizes.map((p, index) => `
+        <div class="prize-item" data-id="${p.id}" data-index="${index}">
             <div class="prize-icon-small">${p.icon || '🎁'}</div>
             <div class="prize-info">
-                <div class="name">${p.name}</div>
-                <div class="desc">${p.description || ''}</div>
+                <div class="name">
+                    <input type="text" class="name-input" value="${p.name}" placeholder="اسم الجائزة">
+                </div>
+                <div class="desc">
+                    <input type="text" class="desc-input" value="${p.description || ''}" placeholder="وصف الجائزة (اختياري)">
+                </div>
             </div>
             <div class="prize-prob">
                 <input type="number" class="prob-input" value="${p.probability}" min="0" max="100" step="0.1">
                 <span class="prob-label">%</span>
+                <button class="btn-save-prob" data-id="${p.id}">💾</button>
             </div>
             <div class="prize-colors">
-                <input type="color" class="color-input" value="${p.color || '#1a1a2e'}" data-field="color">
-                <input type="color" class="color-input" value="${p.color2 || '#16213e'}" data-field="color2">
+                <input type="color" class="color-input" value="${p.color || '#1a1a2e'}" data-field="color" data-id="${p.id}">
+                <input type="color" class="color-input" value="${p.color2 || '#16213e'}" data-field="color2" data-id="${p.id}">
             </div>
             <button class="btn-delete" data-id="${p.id}">✕</button>
         </div>
     `).join('');
     
+    // ===== تعديل الاسم =====
+    list.querySelectorAll('.name-input').forEach(input => {
+        input.addEventListener('change', async function() {
+            const item = this.closest('.prize-item');
+            const id = parseInt(item.dataset.id);
+            const value = this.value.trim();
+            if (!value) {
+                showError('⚠️ الاسم مطلوب');
+                this.value = item.querySelector('.name-input').dataset.oldValue || '';
+                return;
+            }
+            const success = await updatePrize(id, { name: value });
+            if (success) {
+                await refreshAll();
+                showNotification('✅ تم تحديث الاسم');
+            } else {
+                showError('❌ فشل تحديث الاسم');
+                await refreshAll();
+            }
+        });
+        input.addEventListener('focus', function() {
+            this.dataset.oldValue = this.value;
+        });
+    });
+    
+    // ===== تعديل الوصف =====
+    list.querySelectorAll('.desc-input').forEach(input => {
+        input.addEventListener('change', async function() {
+            const item = this.closest('.prize-item');
+            const id = parseInt(item.dataset.id);
+            const value = this.value.trim();
+            const success = await updatePrize(id, { description: value });
+            if (success) {
+                await refreshAll();
+                showNotification('✅ تم تحديث الوصف');
+            } else {
+                showError('❌ فشل تحديث الوصف');
+                await refreshAll();
+            }
+        });
+    });
+    
+    // ===== تعديل النسبة =====
     list.querySelectorAll('.prob-input').forEach(input => {
         input.addEventListener('change', async function() {
             const item = this.closest('.prize-item');
@@ -1808,20 +1936,49 @@ async function renderAdminPanel() {
                 this.value = 0;
                 return;
             }
-            const success = await updatePrize(id, { probability: val });
+            if (val > 100) {
+                this.value = 100;
+            }
+            const success = await updatePrize(id, { probability: parseFloat(this.value) });
             if (success) {
                 await refreshAll();
                 showNotification('✅ تم تحديث النسبة');
             } else {
-                showError('فشل تحديث النسبة');
+                showError('❌ فشل تحديث النسبة');
+                await refreshAll();
             }
         });
     });
     
-    list.querySelectorAll('.color-input').forEach(input => {
-        input.addEventListener('change', async function() {
+    // ===== أزرار حفظ النسبة =====
+    list.querySelectorAll('.btn-save-prob').forEach(btn => {
+        btn.addEventListener('click', async function() {
             const item = this.closest('.prize-item');
             const id = parseInt(item.dataset.id);
+            const input = item.querySelector('.prob-input');
+            const val = parseFloat(input.value);
+            if (isNaN(val) || val < 0) {
+                input.value = 0;
+                return;
+            }
+            if (val > 100) {
+                input.value = 100;
+            }
+            const success = await updatePrize(id, { probability: parseFloat(input.value) });
+            if (success) {
+                await refreshAll();
+                showNotification('✅ تم حفظ النسبة');
+            } else {
+                showError('❌ فشل حفظ النسبة');
+                await refreshAll();
+            }
+        });
+    });
+    
+    // ===== تعديل الألوان =====
+    list.querySelectorAll('.color-input').forEach(input => {
+        input.addEventListener('change', async function() {
+            const id = parseInt(this.dataset.id);
             const field = this.dataset.field;
             const value = this.value;
             
@@ -1833,7 +1990,7 @@ async function renderAdminPanel() {
             const success = await updatePrize(id, updateData);
             if (success) {
                 await refreshAll();
-                showNotification('✅ تم تحديث اللون');
+                showNotification(`✅ تم تحديث ${field === 'color' ? 'اللون الأساسي' : 'اللون الثانوي'}`);
             } else {
                 showError('❌ فشل تحديث اللون');
                 await refreshAll();
@@ -1841,16 +1998,20 @@ async function renderAdminPanel() {
         });
     });
     
+    // ===== حذف الجائزة =====
     list.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', async function() {
             const id = parseInt(this.dataset.id);
-            if (confirm('هل أنت متأكد من حذف هذه الجائزة؟')) {
+            const item = this.closest('.prize-item');
+            const name = item.querySelector('.name-input').value || 'هذه الجائزة';
+            
+            if (confirm(`⚠️ هل أنت متأكد من حذف "${name}"؟\nلا يمكن التراجع عن هذا الإجراء.`)) {
                 const success = await deletePrize(id);
                 if (success) {
                     await refreshAll();
-                    showNotification('✅ تم حذف الجائزة');
+                    showNotification(`✅ تم حذف "${name}"`);
                 } else {
-                    showError('فشل حذف الجائزة');
+                    showError('❌ فشل حذف الجائزة');
                 }
             }
         });
@@ -2216,6 +2377,53 @@ document.querySelectorAll('.btn-save').forEach(btn => {
     });
 });
 
+// ===== إضافة جائزة جديدة =====
+document.getElementById('addPrizeBtn').addEventListener('click', async function() {
+    const nameInput = document.getElementById('newPrizeName');
+    const iconInput = document.getElementById('newPrizeIcon');
+    const probInput = document.getElementById('newPrizeProb');
+    const colorInput = document.getElementById('newPrizeColor');
+    const color2Input = document.getElementById('newPrizeColor2');
+    
+    const name = nameInput.value.trim();
+    const icon = iconInput.value.trim() || '🎁';
+    const prob = parseFloat(probInput.value) || 10;
+    const color = colorInput.value || '#1a1a2e';
+    const color2 = color2Input.value || '#16213e';
+    
+    if (!name) {
+        showError('⚠️ الرجاء إدخال اسم الجائزة');
+        nameInput.focus();
+        return;
+    }
+    
+    if (prob < 0 || prob > 100) {
+        showError('⚠️ النسبة يجب أن تكون بين 0 و 100');
+        probInput.focus();
+        return;
+    }
+    
+    const btn = this;
+    btn.disabled = true;
+    btn.textContent = '⏳';
+    
+    const success = await addPrize(name, icon, prob, color, color2);
+    
+    if (success) {
+        nameInput.value = '';
+        iconInput.value = '';
+        probInput.value = '';
+        
+        await refreshAll();
+        showNotification(`✅ تم إضافة "${name}" بنجاح`);
+    } else {
+        showError('❌ فشل إضافة الجائزة');
+    }
+    
+    btn.disabled = false;
+    btn.textContent = '➕';
+});
+
 document.getElementById('refreshPrizesBtn').addEventListener('click', async function() {
     await refreshAll();
     showNotification('🔄 تم تحديث الكل');
@@ -2228,32 +2436,8 @@ document.getElementById('resetPrizesBtn').addEventListener('click', async functi
             await refreshAll();
             showNotification('✅ تم إعادة تعيين الجوائز');
         } else {
-            showError('فشل إعادة التعيين');
+            showError('❌ فشل إعادة التعيين');
         }
-    }
-});
-
-document.getElementById('addPrizeBtn').addEventListener('click', async function() {
-    const name = document.getElementById('newPrizeName').value.trim();
-    const icon = document.getElementById('newPrizeIcon').value.trim() || '🎁';
-    const prob = parseFloat(document.getElementById('newPrizeProb').value) || 10;
-    const color = document.getElementById('newPrizeColor').value || '#1a1a2e';
-    const color2 = document.getElementById('newPrizeColor2').value || '#16213e';
-    
-    if (!name) {
-        showError('الرجاء إدخال اسم الجائزة');
-        return;
-    }
-    
-    const success = await addPrize(name, icon, prob, color, color2);
-    if (success) {
-        document.getElementById('newPrizeName').value = '';
-        document.getElementById('newPrizeIcon').value = '';
-        document.getElementById('newPrizeProb').value = '';
-        await refreshAll();
-        showNotification(`✅ تم إضافة "${name}"`);
-    } else {
-        showError('فشل إضافة الجائزة');
     }
 });
 

@@ -20,15 +20,16 @@
             width: 100%;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             background: #0a0a0a;
             overflow-x: hidden;
+            padding: 12px;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 12px;
         }
 
         /* خلفية ثابتة */
@@ -58,9 +59,6 @@
             }
         }
 
-        /* تم إزالة حاوية .container بالكامل */
-        /* أصبحت العناصر تظهر مباشرة فوق الخلفية */
-
         /* ===== النص العلوي ===== */
         .banner-text {
             text-align: center;
@@ -82,6 +80,8 @@
             backdrop-filter: blur(6px);
             margin-left: auto;
             margin-right: auto;
+            position: relative;
+            z-index: 1;
         }
 
         /* ===== حالة المستخدم (مخفية) ===== */
@@ -89,23 +89,19 @@
             display: none;
         }
 
-        /* ===== العجلة ===== */
-        .wheel-container {
-            display: none;
+        /* ===== العجلة - بدون حاوية خارجية ===== */
+        .wheel-wrapper {
             position: relative;
             width: 100%;
             max-width: 420px;
             margin: 0 auto;
             aspect-ratio: 1/1;
+            display: none;
+            z-index: 1;
         }
-        .wheel-container.show {
+        .wheel-wrapper.show {
             display: block;
             animation: fadeIn 0.5s ease;
-        }
-        .wheel-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
         }
         .wheel-wrapper canvas {
             width: 100% !important;
@@ -114,6 +110,7 @@
             box-shadow: 0 0 60px rgba(255, 215, 0, 0.03), inset 0 0 60px rgba(0, 0, 0, 0.3);
             border: 2px solid rgba(255, 215, 0, 0.05);
             transition: filter 0.4s ease;
+            display: block;
         }
         .wheel-wrapper canvas.spinning {
             filter: brightness(1.15) drop-shadow(0 0 50px rgba(255, 215, 0, 0.12));
@@ -162,6 +159,7 @@
             backdrop-filter: blur(6px);
             max-width: 420px;
             margin: 0 auto;
+            z-index: 1;
         }
 
         /* ===== الأزرار ===== */
@@ -174,6 +172,8 @@
             max-width: 380px;
             margin-left: auto;
             margin-right: auto;
+            z-index: 1;
+            position: relative;
         }
         .btn {
             padding: 16px 20px;
@@ -238,6 +238,8 @@
             backdrop-filter: blur(6px);
             margin-left: auto;
             margin-right: auto;
+            z-index: 1;
+            position: relative;
         }
         .deposit-notice.show {
             display: block;
@@ -278,6 +280,7 @@
             backdrop-filter: blur(6px);
             margin-left: auto;
             margin-right: auto;
+            z-index: 1;
         }
         .result-box.show {
             display: block;
@@ -381,6 +384,8 @@
             backdrop-filter: blur(6px);
             margin-left: auto;
             margin-right: auto;
+            z-index: 1;
+            position: relative;
         }
         .error-msg.show {
             display: block;
@@ -472,6 +477,8 @@
             backdrop-filter: blur(6px);
             margin-left: auto;
             margin-right: auto;
+            z-index: 1;
+            position: relative;
         }
         .sound-settings label {
             color: #666;
@@ -505,6 +512,8 @@
             backdrop-filter: blur(6px);
             margin-left: auto;
             margin-right: auto;
+            z-index: 1;
+            position: relative;
         }
         .admin-panel.show {
             display: block;
@@ -811,6 +820,8 @@
             backdrop-filter: blur(6px);
             max-width: 420px;
             margin: 0 auto;
+            z-index: 1;
+            position: relative;
         }
         .error-container.show {
             display: block;
@@ -975,9 +986,6 @@
         🎉 مبروك! لقد فزت بـ <span id="notifPrizeName">جائزة</span>!
     </div>
 
-    <!-- ===== تم إزالة حاوية .container ===== -->
-    <!-- العناصر تظهر مباشرة -->
-
     <!-- ===== النص العلوي ===== -->
     <div class="banner-text" id="bannerText">🎡 IChancy · عجلة الحظ</div>
 
@@ -1006,12 +1014,10 @@
         </div>
     </div>
 
-    <!-- ===== العجلة ===== -->
-    <div class="wheel-container" id="wheelContainer">
-        <div class="wheel-wrapper">
-            <div class="pointer" id="pointer">🔽</div>
-            <canvas id="wheelCanvas" width="500" height="500"></canvas>
-        </div>
+    <!-- ===== العجلة - بدون حاوية خارجية ===== -->
+    <div class="wheel-wrapper" id="wheelWrapper">
+        <div class="pointer" id="pointer">🔽</div>
+        <canvas id="wheelCanvas" width="500" height="500"></canvas>
     </div>
 
     <!-- ===== لا توجد جوائز ===== -->
@@ -1388,16 +1394,16 @@
                 cy = h / 2;
             const r = Math.min(w, h) / 2 - 12;
             const noPrizes = document.getElementById('noPrizes');
-            const container = document.getElementById('wheelContainer');
+            const wrapper = document.getElementById('wheelWrapper');
 
             if (!prizes || prizes.length === 0) {
                 noPrizes.style.display = 'block';
-                container.classList.remove('show');
+                wrapper.classList.remove('show');
                 return;
             }
 
             noPrizes.style.display = 'none';
-            container.classList.add('show');
+            wrapper.classList.add('show');
             ctx.clearRect(0, 0, w, h);
 
             const total = prizes.length;
@@ -2018,13 +2024,13 @@
 
         function showLoading(show) {
             const screen = document.getElementById('loadingScreen');
-            const container = document.getElementById('wheelContainer');
+            const wrapper = document.getElementById('wheelWrapper');
             if (show) {
                 screen.classList.add('active');
-                container.classList.remove('show');
+                wrapper.classList.remove('show');
             } else {
                 screen.classList.remove('active');
-                container.classList.add('show');
+                wrapper.classList.add('show');
             }
         }
 

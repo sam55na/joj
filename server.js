@@ -118,6 +118,72 @@ const DEFAULT_SETTINGS = [
 ];
 
 // ================================================================
+//                      تحديث هيكل الجدول
+// ================================================================
+async function updateTableSchema() {
+    const client = await pool.connect();
+    try {
+        console.log('📋 ===== التحقق من هيكل الجداول =====');
+        
+        // التحقق من وجود أعمدة الألوان في جدول wheel_prizes
+        const checkColumns = await client.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'wheel_prizes' 
+            AND column_name IN ('color', 'color2')
+        `);
+        
+        const existingColumns = checkColumns.rows.map(row => row.column_name);
+        console.log('📋 الأعمدة الموجودة:', existingColumns);
+        
+        // إضافة عمود color إذا لم يكن موجوداً
+        if (!existingColumns.includes('color')) {
+            console.log('➕ إضافة عمود color...');
+            await client.query(`
+                ALTER TABLE wheel_prizes 
+                ADD COLUMN color VARCHAR(50) DEFAULT '#1a1a2e'
+            `);
+            console.log('✅ تم إضافة عمود color');
+        }
+        
+        // إضافة عمود color2 إذا لم يكن موجوداً
+        if (!existingColumns.includes('color2')) {
+            console.log('➕ إضافة عمود color2...');
+            await client.query(`
+                ALTER TABLE wheel_prizes 
+                ADD COLUMN color2 VARCHAR(50) DEFAULT '#16213e'
+            `);
+            console.log('✅ تم إضافة عمود color2');
+        }
+        
+        // التأكد من وجود عمود updated_at
+        const checkUpdatedAt = await client.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'wheel_prizes' 
+            AND column_name = 'updated_at'
+        `);
+        
+        if (checkUpdatedAt.rows.length === 0) {
+            console.log('➕ إضافة عمود updated_at...');
+            await client.query(`
+                ALTER TABLE wheel_prizes 
+                ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            `);
+            console.log('✅ تم إضافة عمود updated_at');
+        }
+        
+        console.log('✅ ===== هيكل الجدول محدث =====');
+        return true;
+    } catch (error) {
+        console.error('❌ خطأ في تحديث هيكل الجدول:', error);
+        return false;
+    } finally {
+        client.release();
+    }
+}
+
+// ================================================================
 //                      تهيئة قاعدة البيانات
 // ================================================================
 async function ensureTables() {
@@ -126,6 +192,7 @@ async function ensureTables() {
     const client = await pool.connect();
 
     try {
+        // إنشاء الجداول
         for (const table of Object.keys(TABLE_SCHEMAS)) {
             try {
                 await client.query(TABLE_SCHEMAS[table]);
@@ -135,6 +202,9 @@ async function ensureTables() {
                 return false;
             }
         }
+        
+        // تحديث هيكل الجدول (إضافة أعمدة الألوان)
+        await updateTableSchema();
 
         // الجوائز الافتراضية
         const prizesCount = await client.query('SELECT COUNT(*) FROM wheel_prizes');
@@ -147,6 +217,15 @@ async function ensureTables() {
                 `, [prize.name, prize.description, prize.probability, prize.icon, prize.color, prize.color2]);
             }
             console.log(`   ✅ تم إضافة ${DEFAULT_PRIZES.length} جائزة افتراضية`);
+        } else {
+            // تحديث الجوائز الموجودة بإضافة الألوان إذا كانت فارغة
+            console.log('   🔄 تحديث الجوائز الموجودة بالألوان الافتراضية...');
+            await client.query(`
+                UPDATE wheel_prizes 
+                SET color = COALESCE(color, '#1a1a2e'),
+                    color2 = COALESCE(color2, '#16213e')
+                WHERE color IS NULL OR color2 IS NULL
+            `);
         }
 
         // الإعدادات الافتراضية
@@ -484,7 +563,6 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 
     try {
-        // بناء الاستعلام ديناميكياً
         let query = 'UPDATE wheel_prizes SET ';
         const updates = [];
         const values = [];

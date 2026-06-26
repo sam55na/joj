@@ -441,31 +441,40 @@
         }
 
         /* ============================================================
-                   شاشة اللودينغ - مبسطة (صورة + مؤشر فقط)
+                   شاشة اللودينغ - FULLSCREEN
                    ============================================================ */
         .loading-screen {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: #0a0a0a;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 30px 20px;
-            min-height: 380px;
+            padding: 0;
+            margin: 0;
         }
 
         .loading-screen.active {
             display: flex;
-            animation: fadeIn 0.5s ease;
+            animation: fadeIn 0.3s ease;
         }
 
         .loading-screen .loading-image {
-            width: 200px;
-            height: 200px;
+            width: 80vw;
+            max-width: 400px;
+            height: auto;
+            aspect-ratio: 1/1;
             border-radius: 50%;
             object-fit: cover;
-            margin-bottom: 30px;
             border: 2px solid rgba(255, 215, 0, 0.1);
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.05);
+            box-shadow: 0 0 80px rgba(255, 215, 0, 0.05);
             animation: loadingPulse 2s ease-in-out infinite;
+            margin-bottom: 40px;
         }
 
         @keyframes loadingPulse {
@@ -474,8 +483,9 @@
         }
 
         .loading-screen .progress-container {
-            width: 80%;
-            max-width: 250px;
+            width: 60%;
+            max-width: 300px;
+            position: relative;
         }
 
         .loading-screen .progress-bar-bg {
@@ -495,12 +505,13 @@
         }
 
         .loading-screen .progress-text {
-            color: #555;
-            font-size: 13px;
-            margin-top: 10px;
+            color: #888;
+            font-size: 14px;
+            margin-top: 12px;
             text-align: center;
             font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            font-variant-numeric: tabular-nums;
         }
 
         /* ============================================================
@@ -955,7 +966,7 @@
             .admin-panel .prize-item .prize-colors { justify-content: center; }
             .admin-panel .settings-section .setting-row { flex-direction: column; align-items: stretch; }
             .admin-panel .settings-section .setting-row label { min-width: auto; }
-            .loading-screen .loading-image { width: 150px; height: 150px; }
+            .loading-screen .loading-image { width: 70vw; }
         }
     </style>
 </head>
@@ -1002,7 +1013,7 @@
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
 
-    <!-- ===== شاشة اللودينغ (صورة + مؤشر فقط) ===== -->
+    <!-- ===== شاشة اللودينغ FULLSCREEN ===== -->
     <div class="loading-screen" id="loadingScreen">
         <img class="loading-image" id="loadingImage" src="https://via.placeholder.com/200/1a1a2e/FFD700?text=🎡" alt="Loading">
         <div class="progress-container">
@@ -1600,19 +1611,36 @@ async function loadSettings() {
 
 async function saveSetting(key, value) {
     try {
-        const res = await fetch(`${API_BASE}/api/admin/setting`, {
+        console.log(`💾 Saving setting: ${key} = ${value} (${typeof value})`);
+        
+        let finalValue = value;
+        if (typeof value === 'boolean') {
+            finalValue = value ? 'true' : 'false';
+        }
+        
+        const response = await fetch(`${API_BASE}/api/admin/setting`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 admin_id: ADMIN_ID,
                 key: key,
-                value: value
+                value: String(finalValue)
             })
         });
-        const data = await res.json();
-        return data.success;
+        
+        const data = await response.json();
+        console.log('📥 Save response:', data);
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'فشل الحفظ');
+        }
+        
+        return data.success === true;
     } catch(e) {
-        console.error('Error saving setting:', e);
+        console.error('❌ Error saving setting:', e);
+        showError('فشل حفظ الإعداد: ' + e.message);
         return false;
     }
 }
@@ -1647,18 +1675,30 @@ async function loadPublicPrizes() {
 
 async function updatePrize(prizeId, data) {
     try {
-        const res = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
+        console.log('📤 Updating prize:', prizeId, data);
+        
+        const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 admin_id: ADMIN_ID,
                 ...data
             })
         });
-        const result = await res.json();
-        return result.success;
+        
+        const result = await response.json();
+        console.log('📥 Update response:', result);
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'فشل التحديث');
+        }
+        
+        return result.success === true;
     } catch(e) {
-        console.error('Error updating prize:', e);
+        console.error('❌ Error updating prize:', e);
+        showError('فشل تحديث الجائزة: ' + e.message);
         return false;
     }
 }
@@ -1784,14 +1824,19 @@ async function renderAdminPanel() {
             const id = parseInt(item.dataset.id);
             const field = this.dataset.field;
             const value = this.value;
+            
+            console.log(`🎨 Updating color ${field} for prize ${id} to ${value}`);
+            
             const updateData = {};
             updateData[field] = value;
+            
             const success = await updatePrize(id, updateData);
             if (success) {
                 await refreshAll();
                 showNotification('✅ تم تحديث اللون');
             } else {
-                showError('فشل تحديث اللون');
+                showError('❌ فشل تحديث اللون');
+                await refreshAll();
             }
         });
     });
@@ -1976,12 +2021,40 @@ function updateLoading(progress) {
 function showLoading(show) {
     const screen = document.getElementById('loadingScreen');
     const container = document.getElementById('wheelContainer');
+    
     if (show) {
         screen.classList.add('active');
         container.classList.remove('show');
     } else {
         screen.classList.remove('active');
         container.classList.add('show');
+    }
+}
+
+// ================================================================
+//                      التحقق من الاتصال
+// ================================================================
+async function checkConnection() {
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const response = await fetch(`${API_BASE}/api/status`, {
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('✅ Connection successful:', data);
+        return true;
+    } catch(e) {
+        console.error('❌ Connection failed:', e);
+        return false;
     }
 }
 
@@ -2111,10 +2184,12 @@ document.querySelectorAll('.btn-save').forEach(btn => {
         let value = '';
         
         if (type === 'checkbox') {
-            value = document.getElementById(fieldId).checked ? 'true' : 'false';
+            value = document.getElementById(fieldId).checked;
         } else {
             value = document.getElementById(fieldId).value;
         }
+        
+        console.log(`💾 Saving: ${key} = ${value}`);
         
         const originalText = this.textContent;
         this.textContent = '⏳ جاري...';
@@ -2137,7 +2212,6 @@ document.querySelectorAll('.btn-save').forEach(btn => {
                 this.textContent = originalText;
                 this.disabled = false;
             }, 2000);
-            showError('فشل حفظ الإعداد');
         }
     });
 });
@@ -2223,35 +2297,57 @@ async function init() {
         let progress = 0;
         const interval = setInterval(() => {
             progress += Math.random() * 12;
-            if (progress > 95) progress = 95;
+            if (progress > 85) progress = 85;
             updateLoading(Math.round(progress));
-        }, 200);
+        }, 150);
         
-        await new Promise(r => setTimeout(r, 500));
+        // 1. التحقق من الاتصال
+        const isConnected = await checkConnection();
+        if (!isConnected) {
+            clearInterval(interval);
+            updateLoading(100);
+            await new Promise(r => setTimeout(r, 400));
+            showLoading(false);
+            showError('⚠️ لا يمكن الاتصال بالخادم. تأكد من اتصالك بالإنترنت.');
+            return;
+        }
         
-        const statusRes = await fetch(`${API_BASE}/api/status`);
-        await statusRes.json();
+        updateLoading(30);
+        await new Promise(r => setTimeout(r, 300));
         
+        // 2. تحميل الإعدادات
         await loadSettings();
+        updateLoading(50);
+        await new Promise(r => setTimeout(r, 300));
         
+        // 3. تحميل الجوائز
         const prizes = await loadPrizes();
         drawWheel(prizes, -1, 0);
+        updateLoading(70);
+        await new Promise(r => setTimeout(r, 300));
         
+        // 4. تحميل حالة المستخدم
         await loadUserStatus();
+        updateLoading(85);
+        await new Promise(r => setTimeout(r, 300));
+        
+        // 5. لوحة الإدارة
         await renderAdminPanel();
+        updateLoading(95);
+        await new Promise(r => setTimeout(r, 300));
         
         clearInterval(interval);
         updateLoading(100);
-        await new Promise(r => setTimeout(r, 400));
+        await new Promise(r => setTimeout(r, 500));
         
         soundManager.init();
         soundManager.playBackgroundMusic();
         
     } catch(e) {
-        console.error('Init error:', e);
+        console.error('❌ Init error:', e);
         updateLoading(100);
         await new Promise(r => setTimeout(r, 600));
-        showError('فشل الاتصال بالخادم');
+        showError('⚠️ فشل تحميل البيانات: ' + e.message);
     }
     
     showLoading(false);

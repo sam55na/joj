@@ -469,7 +469,7 @@ app.post('/api/admin/prizes', async (req, res) => {
     }
 });
 
-// -------------------- تحديث جائزة (مع دعم الألوان) --------------------
+// -------------------- تحديث جائزة --------------------
 app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     const { prize_id } = req.params;
     const { admin_id, name, description, probability, icon, color, color2, is_active } = req.body;
@@ -484,7 +484,6 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 
     try {
-        // بناء الاستعلام ديناميكياً
         let query = 'UPDATE wheel_prizes SET ';
         const updates = [];
         const values = [];

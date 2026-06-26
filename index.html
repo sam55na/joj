@@ -69,7 +69,7 @@
             align-items: center;
         }
 
-        /* ===== النص العلوي (بدون hint) ===== */
+        /* ===== النص العلوي ===== */
         .banner-text {
             text-align: center;
             padding: 10px 12px;
@@ -256,7 +256,7 @@
             color: #FF4444;
         }
 
-        /* ===== النتيجة ===== */
+        /* ===== النتيجة (يظهر فيها الوصف فقط) ===== */
         .result-box {
             background: rgba(255, 215, 0, 0.02);
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -323,30 +323,22 @@
                 transform: translateY(220px) rotate(720deg) scale(0);
             }
         }
+
+        /* إخفاء الأيقونة والاسم، نعرض الوصف فقط */
         .result-box .prize-icon {
-            font-size: 48px;
-            display: inline-block;
-            line-height: 1.2;
-        }
-        .result-box .prize-icon.big-win {
-            font-size: 72px;
-            animation: bigWinPulse 0.7s ease-in-out infinite alternate;
-        }
-        @keyframes bigWinPulse {
-            0% {
-                transform: scale(1) rotate(-4deg);
-            }
-            100% {
-                transform: scale(1.2) rotate(4deg);
-            }
+            display: none;
         }
         .result-box .prize-name {
+            display: none;
+        }
+        .result-box .prize-desc {
+            color: #FFD700;
             font-size: 24px;
             font-weight: 700;
-            color: #FFD700;
             margin-top: 4px;
+            padding: 6px 0;
         }
-        .result-box .prize-name.win-text {
+        .result-box.winner .prize-desc {
             background: linear-gradient(135deg, #FFD700, #FF6B00, #FFD700);
             background-size: 200% 200%;
             -webkit-background-clip: text;
@@ -362,11 +354,6 @@
             50% {
                 background-position: 100% 50%;
             }
-        }
-        .result-box .prize-desc {
-            color: #888;
-            font-size: 14px;
-            margin-top: 2px;
         }
 
         /* ===== رسائل الخطأ ===== */
@@ -402,6 +389,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            margin: 0;
         }
         .loading-screen.active {
             display: flex;
@@ -409,14 +397,14 @@
         }
         .loading-screen .loading-image {
             width: 70vw;
-            max-width: 340px;
+            max-width: 300px;
             aspect-ratio: 1/1;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid rgba(255, 215, 0, 0.08);
             box-shadow: 0 0 80px rgba(255, 215, 0, 0.04);
             animation: loadingPulse 2s ease-in-out infinite;
-            margin-bottom: 32px;
+            margin-bottom: 30px;
         }
         @keyframes loadingPulse {
             0%,
@@ -431,7 +419,7 @@
         }
         .loading-screen .progress-container {
             width: 60%;
-            max-width: 260px;
+            max-width: 240px;
             position: relative;
         }
         .loading-screen .progress-bar-bg {
@@ -895,16 +883,10 @@
                 font-size: 26px;
                 top: -12px;
             }
-            .result-box .prize-icon {
-                font-size: 40px;
-            }
-            .result-box .prize-icon.big-win {
-                font-size: 60px;
-            }
-            .result-box .prize-name {
+            .result-box .prize-desc {
                 font-size: 20px;
             }
-            .result-box .prize-name.win-text {
+            .result-box.winner .prize-desc {
                 font-size: 24px;
             }
             .admin-panel .prize-item {
@@ -948,16 +930,10 @@
                 font-size: 15px;
                 padding: 12px 14px;
             }
-            .result-box .prize-icon {
-                font-size: 34px;
-            }
-            .result-box .prize-icon.big-win {
-                font-size: 50px;
-            }
-            .result-box .prize-name {
+            .result-box .prize-desc {
                 font-size: 17px;
             }
-            .result-box .prize-name.win-text {
+            .result-box.winner .prize-desc {
                 font-size: 20px;
             }
             .pointer {
@@ -1042,7 +1018,7 @@
             </div>
         </div>
 
-        <!-- ===== النتيجة ===== -->
+        <!-- ===== النتيجة (يظهر الوصف فقط) ===== -->
         <div class="result-box" id="resultBox">
             <div class="confetti-container" id="confettiContainer"></div>
             <div class="prize-icon" id="prizeIcon">🎁</div>
@@ -1071,8 +1047,9 @@
             <div id="prizesList"></div>
 
             <div class="add-prize-form">
-                <input type="text" id="newPrizeName" placeholder="الاسم">
+                <input type="text" id="newPrizeName" placeholder="الاسم (للإدارة)">
                 <input type="text" id="newPrizeIcon" placeholder="🎁" style="max-width:44px;">
+                <input type="text" id="newPrizeDesc" placeholder="الوصف (يظهر للجمهور)" style="flex:1.5;">
                 <input type="number" id="newPrizeProb" placeholder="نسبة" style="max-width:55px;">
                 <input type="color" id="newPrizeColor" value="#1a1a2e" style="max-width:34px;padding:2px;">
                 <input type="color" id="newPrizeColor2" value="#16213e" style="max-width:34px;padding:2px;">
@@ -1381,7 +1358,7 @@
         }
 
         // ================================================================
-        //                      رسم العجلة (جوائز مكبرة)
+        //                      رسم العجلة (يظهر الإيموجي فقط)
         // ================================================================
         function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
             const canvas = document.getElementById('wheelCanvas');
@@ -1445,7 +1422,7 @@
                 ctx.stroke();
                 ctx.shadowBlur = 0;
 
-                // تكبير النصوص والرموز 4×
+                // عرض الإيموجي فقط (بدون اسم)
                 const mid = start + step / 2;
                 const tr = r * 0.62;
                 const x = cx + Math.cos(mid) * tr;
@@ -1456,17 +1433,12 @@
                 ctx.rotate(mid + (mid > Math.PI / 2 ? Math.PI : 0));
 
                 ctx.fillStyle = isHighlight ? '#0a0a0a' : '#fff';
-                ctx.font = isHighlight ? 'bold 28px sans-serif' : '26px sans-serif';
+                ctx.font = isHighlight ? 'bold 38px sans-serif' : '34px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.shadowColor = 'rgba(0,0,0,0.8)';
-                ctx.shadowBlur = 12;
-                ctx.fillText(p.icon || '🎁', 0, -12);
-
-                ctx.font = isHighlight ? 'bold 16px sans-serif' : '14px sans-serif';
-                const name = p.name.length > 12 ? p.name.substring(0, 12) + '…' : p.name;
-                ctx.fillText(name, 0, 24);
-
+                ctx.shadowBlur = 14;
+                ctx.fillText(p.icon || '🎁', 0, 0);
                 ctx.shadowBlur = 0;
                 ctx.restore();
             });
@@ -1671,7 +1643,7 @@
             }
         }
 
-        async function addPrize(name, icon, probability, color, color2) {
+        async function addPrize(name, icon, description, probability, color, color2) {
             try {
                 const response = await fetch(`${API_BASE}/api/admin/prizes`, {
                     method: 'POST',
@@ -1680,10 +1652,10 @@
                         admin_id: ADMIN_ID,
                         name: name,
                         icon: icon || '🎁',
+                        description: description || '',
                         probability: parseFloat(probability) || 10,
                         color: color || '#1a1a2e',
-                        color2: color2 || '#16213e',
-                        description: ''
+                        color2: color2 || '#16213e'
                     })
                 });
                 const data = await response.json();
@@ -1747,7 +1719,7 @@
                                 <input type="text" class="name-input" value="${p.name}" placeholder="اسم الجائزة">
                             </div>
                             <div class="desc">
-                                <input type="text" class="desc-input" value="${p.description || ''}" placeholder="وصف الجائزة (اختياري)">
+                                <input type="text" class="desc-input" value="${p.description || ''}" placeholder="الوصف (يظهر للجمهور)">
                             </div>
                         </div>
                         <div class="prize-prob">
@@ -1994,8 +1966,6 @@
         function createWinEffects(prizeName) {
             const resultBox = document.getElementById('resultBox');
             resultBox.classList.add('winner');
-            const icon = document.getElementById('prizeIcon');
-            icon.classList.add('big-win');
             const name = document.getElementById('prizeName');
             name.classList.add('win-text');
             createConfetti(60);
@@ -2005,8 +1975,6 @@
         function clearWinEffects() {
             const resultBox = document.getElementById('resultBox');
             resultBox.classList.remove('winner');
-            const icon = document.getElementById('prizeIcon');
-            icon.classList.remove('big-win');
             const name = document.getElementById('prizeName');
             name.classList.remove('win-text');
         }
@@ -2145,18 +2113,17 @@
         }
 
         // ================================================================
-        //                      عرض النتيجة
+        //                      عرض النتيجة (يظهر الوصف فقط)
         // ================================================================
         function showResult(prize, isWin) {
-            document.getElementById('prizeIcon').textContent = prize.icon || '🎁';
-            document.getElementById('prizeName').textContent = prize.name;
-            document.getElementById('prizeDesc').textContent = prize.description || 'مبروك!';
+            // نعرض الوصف فقط
+            document.getElementById('prizeDesc').textContent = prize.description || prize.name || 'جائزة!';
             document.getElementById('resultBox').classList.add('show');
 
             soundManager.stopAll();
 
             if (isWin) {
-                createWinEffects(prize.name);
+                createWinEffects(prize.description || prize.name);
                 soundManager.playWinSound();
             } else {
                 soundManager.playLoseSound();
@@ -2215,12 +2182,14 @@
         document.getElementById('addPrizeBtn').addEventListener('click', async function() {
             const nameInput = document.getElementById('newPrizeName');
             const iconInput = document.getElementById('newPrizeIcon');
+            const descInput = document.getElementById('newPrizeDesc');
             const probInput = document.getElementById('newPrizeProb');
             const colorInput = document.getElementById('newPrizeColor');
             const color2Input = document.getElementById('newPrizeColor2');
 
             const name = nameInput.value.trim();
             const icon = iconInput.value.trim() || '🎁';
+            const description = descInput.value.trim() || '';
             const prob = parseFloat(probInput.value) || 10;
             const color = colorInput.value || '#1a1a2e';
             const color2 = color2Input.value || '#16213e';
@@ -2240,10 +2209,11 @@
             btn.disabled = true;
             btn.textContent = '⏳';
 
-            const success = await addPrize(name, icon, prob, color, color2);
+            const success = await addPrize(name, icon, description, prob, color, color2);
             if (success) {
                 nameInput.value = '';
                 iconInput.value = '';
+                descInput.value = '';
                 probInput.value = '';
                 await refreshAll();
                 showNotification(`✅ تم إضافة "${name}" بنجاح`);

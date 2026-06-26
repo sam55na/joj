@@ -15,15 +15,20 @@
             box-sizing: border-box;
         }
 
+        html,
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            width: 100%;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 12px;
             background: #0a0a0a;
             overflow-x: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 12px;
         }
 
         /* خلفية ثابتة */
@@ -375,7 +380,7 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* ===== شاشة اللودينغ ===== */
+        /* ===== شاشة اللودينغ (متمركزة تماماً) ===== */
         .loading-screen {
             display: none;
             position: fixed;
@@ -397,14 +402,14 @@
         }
         .loading-screen .loading-image {
             width: 70vw;
-            max-width: 300px;
+            max-width: 280px;
             aspect-ratio: 1/1;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid rgba(255, 215, 0, 0.08);
             box-shadow: 0 0 80px rgba(255, 215, 0, 0.04);
             animation: loadingPulse 2s ease-in-out infinite;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
         @keyframes loadingPulse {
             0%,
@@ -419,7 +424,7 @@
         }
         .loading-screen .progress-container {
             width: 60%;
-            max-width: 240px;
+            max-width: 220px;
             position: relative;
         }
         .loading-screen .progress-bar-bg {
@@ -905,6 +910,7 @@
             }
             .loading-screen .loading-image {
                 width: 60vw;
+                max-width: 220px;
             }
             .admin-panel .add-prize-form input {
                 min-width: 40px;
@@ -1358,7 +1364,7 @@
         }
 
         // ================================================================
-        //                      رسم العجلة (يظهر الإيموجي فقط)
+        //                      رسم العجلة (نص مصغر /2)
         // ================================================================
         function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
             const canvas = document.getElementById('wheelCanvas');
@@ -1422,7 +1428,7 @@
                 ctx.stroke();
                 ctx.shadowBlur = 0;
 
-                // عرض الإيموجي فقط (بدون اسم)
+                // عرض الإيموجي فقط (بدون اسم) - حجم الإيموجي المصغر /2
                 const mid = start + step / 2;
                 const tr = r * 0.62;
                 const x = cx + Math.cos(mid) * tr;
@@ -1433,17 +1439,18 @@
                 ctx.rotate(mid + (mid > Math.PI / 2 ? Math.PI : 0));
 
                 ctx.fillStyle = isHighlight ? '#0a0a0a' : '#fff';
-                ctx.font = isHighlight ? 'bold 38px sans-serif' : '34px sans-serif';
+                // تصغير حجم الخط إلى النصف (كان 38 و 34 أصبح 19 و 17)
+                ctx.font = isHighlight ? 'bold 19px sans-serif' : '17px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.shadowColor = 'rgba(0,0,0,0.8)';
-                ctx.shadowBlur = 14;
+                ctx.shadowBlur = 8;
                 ctx.fillText(p.icon || '🎁', 0, 0);
                 ctx.shadowBlur = 0;
                 ctx.restore();
             });
 
-            // مركز العجلة
+            // مركز العجلة (بقيت كما هي)
             const centerR = r * 0.16;
             const centerIcon = settingsCache.center_icon || '⭐';
 
@@ -2116,7 +2123,6 @@
         //                      عرض النتيجة (يظهر الوصف فقط)
         // ================================================================
         function showResult(prize, isWin) {
-            // نعرض الوصف فقط
             document.getElementById('prizeDesc').textContent = prize.description || prize.name || 'جائزة!';
             document.getElementById('resultBox').classList.add('show');
 

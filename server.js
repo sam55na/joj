@@ -63,7 +63,7 @@ const TABLE_SCHEMAS = {
         CREATE TABLE IF NOT EXISTS wheel_spins (
             id SERIAL PRIMARY KEY,
             user_id BIGINT NOT NULL,
-            prize_id INTEGER REFERENCES wheel_prizes(id),
+            prize_id INTEGER REFERENCES wheel_prizes(id) ON DELETE SET NULL,
             prize_name VARCHAR(255),
             spin_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             is_claimed BOOLEAN DEFAULT FALSE,
@@ -388,7 +388,7 @@ app.get('/api/admin/prizes', async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT * FROM wheel_prizes 
-            ORDER BY probability DESC
+            ORDER BY id ASC
         `);
         
         console.log(`📋 Loaded ${result.rows.length} prizes for admin`);
@@ -411,7 +411,7 @@ app.get('/api/prizes', async (req, res) => {
         const result = await pool.query(`
             SELECT * FROM wheel_prizes 
             WHERE is_active = true
-            ORDER BY probability DESC
+            ORDER BY id ASC
         `);
         
         res.json({
@@ -469,7 +469,7 @@ app.post('/api/admin/prizes', async (req, res) => {
     }
 });
 
-// -------------------- تحديث جائزة --------------------
+// -------------------- تحديث جائزة (مع دعم الألوان والنسبة) --------------------
 app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     const { prize_id } = req.params;
     const { admin_id, name, description, probability, icon, color, color2, is_active } = req.body;
@@ -484,6 +484,7 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 
     try {
+        // بناء الاستعلام ديناميكياً
         let query = 'UPDATE wheel_prizes SET ';
         const updates = [];
         const values = [];
@@ -565,6 +566,8 @@ app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
     const { prize_id } = req.params;
     const { admin_id } = req.body;
 
+    console.log(`🗑️ Deleting prize ${prize_id}`);
+
     if (parseInt(admin_id) !== ADMIN_ID) {
         return res.status(403).json({
             success: false,
@@ -573,6 +576,13 @@ app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 
     try {
+        // أولاً: حذف السجلات المرتبطة في wheel_spins
+        await pool.query(
+            'UPDATE wheel_spins SET prize_id = NULL WHERE prize_id = $1',
+            [prize_id]
+        );
+
+        // ثم: حذف الجائزة
         const result = await pool.query(
             'DELETE FROM wheel_prizes WHERE id = $1 RETURNING id',
             [prize_id]
@@ -585,13 +595,14 @@ app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
             });
         }
 
-        console.log(`🗑️ Prize ${prize_id} deleted`);
+        console.log(`✅ Prize ${prize_id} deleted successfully`);
 
         res.json({
             success: true,
             message: '✅ تم حذف الجائزة بنجاح'
         });
     } catch (error) {
+        console.error('❌ Delete error:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -611,6 +622,8 @@ app.post('/api/admin/seed-prizes', async (req, res) => {
     }
 
     try {
+        // حذف جميع السجلات المرتبطة أولاً
+        await pool.query('UPDATE wheel_spins SET prize_id = NULL');
         await pool.query('DELETE FROM wheel_prizes');
         
         for (const prize of DEFAULT_PRIZES) {
@@ -627,6 +640,7 @@ app.post('/api/admin/seed-prizes', async (req, res) => {
             message: '✅ تم إعادة تعيين الجوائز الافتراضية بنجاح!'
         });
     } catch (error) {
+        console.error('❌ Reset error:', error);
         res.status(500).json({
             success: false,
             error: error.message

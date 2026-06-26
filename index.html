@@ -441,15 +441,15 @@
         }
 
         /* ============================================================
-                   شاشة اللودينغ - مبسطة
+                   شاشة اللودينغ - مبسطة (صورة + مؤشر فقط)
                    ============================================================ */
         .loading-screen {
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            min-height: 350px;
+            padding: 30px 20px;
+            min-height: 380px;
         }
 
         .loading-screen.active {
@@ -465,6 +465,12 @@
             margin-bottom: 30px;
             border: 2px solid rgba(255, 215, 0, 0.1);
             box-shadow: 0 0 60px rgba(255, 215, 0, 0.05);
+            animation: loadingPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes loadingPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.8; }
         }
 
         .loading-screen .progress-container {
@@ -491,7 +497,7 @@
         .loading-screen .progress-text {
             color: #555;
             font-size: 13px;
-            margin-top: 8px;
+            margin-top: 10px;
             text-align: center;
             font-weight: 600;
             letter-spacing: 1px;
@@ -996,7 +1002,7 @@
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
 
-    <!-- ===== شاشة اللودينغ المبسطة ===== -->
+    <!-- ===== شاشة اللودينغ (صورة + مؤشر فقط) ===== -->
     <div class="loading-screen" id="loadingScreen">
         <img class="loading-image" id="loadingImage" src="https://via.placeholder.com/200/1a1a2e/FFD700?text=🎡" alt="Loading">
         <div class="progress-container">
@@ -1200,9 +1206,6 @@ class SoundManager {
         this.isPlaying = false;
     }
 
-    // ===== تم إزالة صوت التدوير =====
-
-    // ===== صوت فوز =====
     playWinSound() {
         if (!soundEnabled || !this.initialized) return;
         
@@ -1259,7 +1262,6 @@ class SoundManager {
         }
     }
 
-    // ===== صوت خسارة =====
     playLoseSound() {
         if (!soundEnabled || !this.initialized) return;
         
@@ -1306,7 +1308,6 @@ class SoundManager {
         }
     }
 
-    // ===== موسيقى خلفية =====
     playBackgroundMusic() {
         if (!musicEnabled || !this.initialized) return;
         if (this.bgInterval) return;
@@ -1560,28 +1561,23 @@ async function loadSettings() {
         if (data.success) {
             settingsCache = data.settings;
             
-            // تحديث النص العلوي
             if (settingsCache.banner_text) {
                 document.getElementById('bannerText').innerHTML = settingsCache.banner_text + 
                     ' <span class="edit-hint" id="editHint">(👑 يمكنك تعديله من الإدارة)</span>';
             }
             
-            // تحديث صورة الخلفية
             if (settingsCache.bg_image_url) {
                 document.getElementById('bgImage').src = settingsCache.bg_image_url;
             }
             
-            // تحديث صورة اللودينغ
             if (settingsCache.loading_image_url) {
                 document.getElementById('loadingImage').src = settingsCache.loading_image_url;
             }
             
-            // تحديث مدة التدوير
             if (settingsCache.spin_duration) {
                 spinDuration = parseInt(settingsCache.spin_duration) || 3500;
             }
             
-            // تحديث حقول الإدارة
             document.getElementById('editBannerText').value = settingsCache.banner_text || '';
             document.getElementById('editBgImage').value = settingsCache.bg_image_url || '';
             document.getElementById('editLoadingImage').value = settingsCache.loading_image_url || '';
@@ -1763,7 +1759,6 @@ async function renderAdminPanel() {
         </div>
     `).join('');
     
-    // أحداث تحديث النسبة
     list.querySelectorAll('.prob-input').forEach(input => {
         input.addEventListener('change', async function() {
             const item = this.closest('.prize-item');
@@ -1783,7 +1778,6 @@ async function renderAdminPanel() {
         });
     });
     
-    // أحداث تحديث الألوان
     list.querySelectorAll('.color-input').forEach(input => {
         input.addEventListener('change', async function() {
             const item = this.closest('.prize-item');
@@ -1802,7 +1796,6 @@ async function renderAdminPanel() {
         });
     });
     
-    // أحداث الحذف
     list.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', async function() {
             const id = parseInt(this.dataset.id);
@@ -1971,7 +1964,7 @@ function showNotification(message) {
 }
 
 // ================================================================
-//                      شاشة اللودينغ المبسطة
+//                      شاشة اللودينغ
 // ================================================================
 function updateLoading(progress) {
     const bar = document.getElementById('loaderProgressBar');
@@ -2149,13 +2142,11 @@ document.querySelectorAll('.btn-save').forEach(btn => {
     });
 });
 
-// تحديث الجوائز
 document.getElementById('refreshPrizesBtn').addEventListener('click', async function() {
     await refreshAll();
     showNotification('🔄 تم تحديث الكل');
 });
 
-// إعادة تعيين الجوائز
 document.getElementById('resetPrizesBtn').addEventListener('click', async function() {
     if (confirm('⚠️ هل أنت متأكد من إعادة تعيين جميع الجوائز إلى الإعدادات الافتراضية؟')) {
         const success = await resetPrizes();
@@ -2168,7 +2159,6 @@ document.getElementById('resetPrizesBtn').addEventListener('click', async functi
     }
 });
 
-// إضافة جائزة
 document.getElementById('addPrizeBtn').addEventListener('click', async function() {
     const name = document.getElementById('newPrizeName').value.trim();
     const icon = document.getElementById('newPrizeIcon').value.trim() || '🎁';
@@ -2193,7 +2183,6 @@ document.getElementById('addPrizeBtn').addEventListener('click', async function(
     }
 });
 
-// إعدادات الصوت
 document.getElementById('soundToggle').addEventListener('change', function() {
     soundEnabled = this.checked;
     if (!soundEnabled) {
@@ -2231,10 +2220,9 @@ async function init() {
     updateLoading(0);
     
     try {
-        // محاكاة تقدم التحميل
         let progress = 0;
         const interval = setInterval(() => {
-            progress += Math.random() * 15;
+            progress += Math.random() * 12;
             if (progress > 95) progress = 95;
             updateLoading(Math.round(progress));
         }, 200);

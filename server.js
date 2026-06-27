@@ -45,41 +45,42 @@ let dbReady = false;
 //                      إنشاء الجداول
 // ================================================================
 const TABLE_SCHEMAS = {
-    wheel_prizes: `
-        CREATE TABLE IF NOT EXISTS wheel_prizes (
+    flip_prizes: `
+        CREATE TABLE IF NOT EXISTS flip_prizes (
             id SERIAL PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             description TEXT,
-            probability DECIMAL(5,2) NOT NULL DEFAULT 0,
             icon VARCHAR(50),
-            color VARCHAR(50) DEFAULT '#1a1a2e',
-            color2 VARCHAR(50) DEFAULT '#16213e',
+            color VARCHAR(50) DEFAULT '#FFD700',
+            card_color VARCHAR(50) DEFAULT '#1a1a2e',
+            card_back_color VARCHAR(50) DEFAULT '#16213e',
             is_active BOOLEAN DEFAULT TRUE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     `,
-    wheel_spins: `
-        CREATE TABLE IF NOT EXISTS wheel_spins (
+    flip_games: `
+        CREATE TABLE IF NOT EXISTS flip_games (
             id SERIAL PRIMARY KEY,
             user_id BIGINT NOT NULL,
-            prize_id INTEGER REFERENCES wheel_prizes(id) ON DELETE SET NULL,
+            prize_id INTEGER REFERENCES flip_prizes(id) ON DELETE SET NULL,
             prize_name VARCHAR(255),
-            spin_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            card_index INTEGER,
+            played_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             is_claimed BOOLEAN DEFAULT FALSE,
             claimed_date TIMESTAMP
         )
     `,
-    wheel_settings: `
-        CREATE TABLE IF NOT EXISTS wheel_settings (
+    flip_settings: `
+        CREATE TABLE IF NOT EXISTS flip_settings (
             id SERIAL PRIMARY KEY,
             setting_key VARCHAR(100) UNIQUE NOT NULL,
             setting_value TEXT,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     `,
-    wheel_deposits: `
-        CREATE TABLE IF NOT EXISTS wheel_deposits (
+    flip_deposits: `
+        CREATE TABLE IF NOT EXISTS flip_deposits (
             id SERIAL PRIMARY KEY,
             user_id BIGINT NOT NULL,
             amount DECIMAL(20,2) NOT NULL,
@@ -87,8 +88,8 @@ const TABLE_SCHEMAS = {
             source VARCHAR(100)
         )
     `,
-    wheel_banner: `
-        CREATE TABLE IF NOT EXISTS wheel_banner (
+    flip_banner: `
+        CREATE TABLE IF NOT EXISTS flip_banner (
             id SERIAL PRIMARY KEY,
             text TEXT,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -97,24 +98,25 @@ const TABLE_SCHEMAS = {
 };
 
 const DEFAULT_PRIZES = [
-    { name: '🎁 1000 SYP', description: 'الفوز بـ 1000 ليرة سورية', probability: 15, icon: '🎁', color: '#1a1a2e', color2: '#16213e' },
-    { name: '🎁 500 SYP', description: 'الفوز بـ 500 ليرة سورية', probability: 20, icon: '🎁', color: '#2d1b3d', color2: '#1a0a0a' },
-    { name: '🎁 200 SYP', description: 'الفوز بـ 200 ليرة سورية', probability: 30, icon: '🎁', color: '#0f3460', color2: '#1a1a2e' },
-    { name: '🎫 كود هدية', description: 'كود هدية بقيمة 50 SYP', probability: 10, icon: '🎫', color: '#1a2a1a', color2: '#0f1a0f' },
-    { name: '😅 حظ سعيد', description: 'لا يوجد فوز هذه المرة', probability: 20, icon: '😅', color: '#2a1a1a', color2: '#1a0a0a' },
-    { name: '⭐ 50 SYP', description: 'الفوز بـ 50 ليرة سورية', probability: 5, icon: '⭐', color: '#1a1a2a', color2: '#0f0f2a' }
+    { name: '🎁 1000 SYP', description: 'الفوز بـ 1000 ليرة سورية', icon: '💎', color: '#FFD700', card_color: '#1a1a2e', card_back_color: '#FFD700' },
+    { name: '🎁 500 SYP', description: 'الفوز بـ 500 ليرة سورية', icon: '👑', color: '#FF6B35', card_color: '#2d1b3d', card_back_color: '#FF6B35' },
+    { name: '🎁 200 SYP', description: 'الفوز بـ 200 ليرة سورية', icon: '🌟', color: '#00D4FF', card_color: '#0f3460', card_back_color: '#00D4FF' },
+    { name: '🎫 كود هدية', description: 'كود هدية بقيمة 50 SYP', icon: '🎫', color: '#7BFF8A', card_color: '#1a2a1a', card_back_color: '#7BFF8A' },
+    { name: '😅 حظ سعيد', description: 'لا يوجد فوز هذه المرة', icon: '🔄', color: '#FF6B6B', card_color: '#2a1a1a', card_back_color: '#FF6B6B' },
+    { name: '⭐ 50 SYP', description: 'الفوز بـ 50 ليرة سورية', icon: '⭐', color: '#FFB800', card_color: '#1a1a2a', card_back_color: '#FFB800' }
 ];
 
 const DEFAULT_SETTINGS = [
-    { key: 'spin_interval_hours', value: '24' },
+    { key: 'play_interval_hours', value: '24' },
     { key: 'is_active', value: 'true' },
     { key: 'deposit_required', value: 'false' },
     { key: 'deposit_min_amount', value: '1000' },
     { key: 'deposit_check_hours', value: '24' },
-    { key: 'center_icon', value: '⭐' },
+    { key: 'cards_count', value: '12' },
     { key: 'bg_image_url', value: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80' },
-    { key: 'loading_image_url', value: 'https://via.placeholder.com/200/1a1a2e/FFD700?text=🎡' },
-    { key: 'spin_duration', value: '3500' }
+    { key: 'loading_image_url', value: 'https://media.giphy.com/media/3o7bu8sRnYpTOG1p8k/giphy.gif' },
+    { key: 'flip_duration', value: '800' },
+    { key: 'card_reveal_delay', value: '300' }
 ];
 
 // ================================================================
@@ -125,52 +127,33 @@ async function updateTableSchema() {
     try {
         console.log('📋 ===== التحقق من هيكل الجداول =====');
         
-        // التحقق من وجود أعمدة الألوان في جدول wheel_prizes
+        // التحقق من وجود أعمدة الألوان في جدول flip_prizes
         const checkColumns = await client.query(`
             SELECT column_name 
             FROM information_schema.columns 
-            WHERE table_name = 'wheel_prizes' 
-            AND column_name IN ('color', 'color2')
+            WHERE table_name = 'flip_prizes' 
+            AND column_name IN ('color', 'card_color', 'card_back_color')
         `);
         
         const existingColumns = checkColumns.rows.map(row => row.column_name);
         console.log('📋 الأعمدة الموجودة:', existingColumns);
         
-        // إضافة عمود color إذا لم يكن موجوداً
-        if (!existingColumns.includes('color')) {
-            console.log('➕ إضافة عمود color...');
-            await client.query(`
-                ALTER TABLE wheel_prizes 
-                ADD COLUMN color VARCHAR(50) DEFAULT '#1a1a2e'
-            `);
-            console.log('✅ تم إضافة عمود color');
-        }
+        // إضافة الأعمدة المفقودة
+        const columnsToAdd = {
+            'color': 'VARCHAR(50) DEFAULT \'#FFD700\'',
+            'card_color': 'VARCHAR(50) DEFAULT \'#1a1a2e\'',
+            'card_back_color': 'VARCHAR(50) DEFAULT \'#16213e\''
+        };
         
-        // إضافة عمود color2 إذا لم يكن موجوداً
-        if (!existingColumns.includes('color2')) {
-            console.log('➕ إضافة عمود color2...');
-            await client.query(`
-                ALTER TABLE wheel_prizes 
-                ADD COLUMN color2 VARCHAR(50) DEFAULT '#16213e'
-            `);
-            console.log('✅ تم إضافة عمود color2');
-        }
-        
-        // التأكد من وجود عمود updated_at
-        const checkUpdatedAt = await client.query(`
-            SELECT column_name 
-            FROM information_schema.columns 
-            WHERE table_name = 'wheel_prizes' 
-            AND column_name = 'updated_at'
-        `);
-        
-        if (checkUpdatedAt.rows.length === 0) {
-            console.log('➕ إضافة عمود updated_at...');
-            await client.query(`
-                ALTER TABLE wheel_prizes 
-                ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            `);
-            console.log('✅ تم إضافة عمود updated_at');
+        for (const [col, def] of Object.entries(columnsToAdd)) {
+            if (!existingColumns.includes(col)) {
+                console.log(`➕ إضافة عمود ${col}...`);
+                await client.query(`
+                    ALTER TABLE flip_prizes 
+                    ADD COLUMN ${col} ${def}
+                `);
+                console.log(`✅ تم إضافة عمود ${col}`);
+            }
         }
         
         console.log('✅ ===== هيكل الجدول محدث =====');
@@ -203,38 +186,29 @@ async function ensureTables() {
             }
         }
         
-        // تحديث هيكل الجدول (إضافة أعمدة الألوان)
+        // تحديث هيكل الجدول
         await updateTableSchema();
 
         // الجوائز الافتراضية
-        const prizesCount = await client.query('SELECT COUNT(*) FROM wheel_prizes');
+        const prizesCount = await client.query('SELECT COUNT(*) FROM flip_prizes');
         if (parseInt(prizesCount.rows[0].count) === 0) {
             console.log('   ⚠️ لا توجد جوائز، جاري إضافة الجوائز الافتراضية...');
             for (const prize of DEFAULT_PRIZES) {
                 await client.query(`
-                    INSERT INTO wheel_prizes (name, description, probability, icon, color, color2)
+                    INSERT INTO flip_prizes (name, description, icon, color, card_color, card_back_color)
                     VALUES ($1, $2, $3, $4, $5, $6)
-                `, [prize.name, prize.description, prize.probability, prize.icon, prize.color, prize.color2]);
+                `, [prize.name, prize.description, prize.icon, prize.color, prize.card_color, prize.card_back_color]);
             }
             console.log(`   ✅ تم إضافة ${DEFAULT_PRIZES.length} جائزة افتراضية`);
-        } else {
-            // تحديث الجوائز الموجودة بإضافة الألوان إذا كانت فارغة
-            console.log('   🔄 تحديث الجوائز الموجودة بالألوان الافتراضية...');
-            await client.query(`
-                UPDATE wheel_prizes 
-                SET color = COALESCE(color, '#1a1a2e'),
-                    color2 = COALESCE(color2, '#16213e')
-                WHERE color IS NULL OR color2 IS NULL
-            `);
         }
 
         // الإعدادات الافتراضية
-        const settingsCount = await client.query('SELECT COUNT(*) FROM wheel_settings');
+        const settingsCount = await client.query('SELECT COUNT(*) FROM flip_settings');
         if (parseInt(settingsCount.rows[0].count) === 0) {
             console.log('   ⚠️ لا توجد إعدادات، جاري إضافة الإعدادات الافتراضية...');
             for (const setting of DEFAULT_SETTINGS) {
                 await client.query(`
-                    INSERT INTO wheel_settings (setting_key, setting_value)
+                    INSERT INTO flip_settings (setting_key, setting_value)
                     VALUES ($1, $2)
                 `, [setting.key, setting.value]);
             }
@@ -242,12 +216,12 @@ async function ensureTables() {
         }
 
         // النص العلوي
-        const bannerCount = await client.query('SELECT COUNT(*) FROM wheel_banner');
+        const bannerCount = await client.query('SELECT COUNT(*) FROM flip_banner');
         if (parseInt(bannerCount.rows[0].count) === 0) {
             await client.query(`
-                INSERT INTO wheel_banner (text)
+                INSERT INTO flip_banner (text)
                 VALUES ($1)
-            `, ['🎡 IChancy · عجلة الحظ']);
+            `, ['🃏 IChancy · بطاقات الحظ']);
             console.log('   ✅ تم إضافة النص العلوي الافتراضي');
         }
 
@@ -295,7 +269,7 @@ setInterval(() => {
 app.get('/api/status', (req, res) => {
     res.json({
         status: 'running',
-        service: 'Wheel of Fortune API',
+        service: 'Flip Card Game API',
         timestamp: new Date().toISOString(),
         database: { ready: dbReady }
     });
@@ -305,11 +279,11 @@ app.get('/api/status', (req, res) => {
 app.get('/', (req, res) => {
     res.json({
         status: 'running',
-        service: 'Wheel of Fortune API',
+        service: 'Flip Card Game API',
         message: '🚀 الخادم يعمل',
         endpoints: {
-            spin: 'POST /api/wheel/spin',
-            history: 'GET /api/wheel/history/:user_id',
+            play: 'POST /api/flip/play',
+            history: 'GET /api/flip/history/:user_id',
             prizes: 'GET /api/prizes',
             admin: {
                 settings: 'GET /api/admin/settings',
@@ -327,10 +301,10 @@ app.get('/', (req, res) => {
 // -------------------- النص العلوي (Banner) --------------------
 app.get('/api/banner', async (req, res) => {
     try {
-        const result = await pool.query('SELECT text FROM wheel_banner ORDER BY id DESC LIMIT 1');
+        const result = await pool.query('SELECT text FROM flip_banner ORDER BY id DESC LIMIT 1');
         res.json({
             success: true,
-            text: result.rows[0]?.text || '🎡 IChancy · عجلة الحظ'
+            text: result.rows[0]?.text || '🃏 IChancy · بطاقات الحظ'
         });
     } catch (error) {
         res.status(500).json({
@@ -352,7 +326,7 @@ app.put('/api/banner', async (req, res) => {
 
     try {
         await pool.query(`
-            INSERT INTO wheel_banner (text, updated_at)
+            INSERT INTO flip_banner (text, updated_at)
             VALUES ($1, CURRENT_TIMESTAMP)
         `, [text]);
 
@@ -380,14 +354,14 @@ app.get('/api/admin/settings', async (req, res) => {
     }
 
     try {
-        const result = await pool.query('SELECT * FROM wheel_settings');
+        const result = await pool.query('SELECT * FROM flip_settings');
         const settings = {};
         result.rows.forEach(row => {
             settings[row.setting_key] = row.setting_value;
         });
 
-        const banner = await pool.query('SELECT text FROM wheel_banner ORDER BY id DESC LIMIT 1');
-        settings.banner_text = banner.rows[0]?.text || '🎡 IChancy · عجلة الحظ';
+        const banner = await pool.query('SELECT text FROM flip_banner ORDER BY id DESC LIMIT 1');
+        settings.banner_text = banner.rows[0]?.text || '🃏 IChancy · بطاقات الحظ';
 
         console.log('📋 Settings loaded:', Object.keys(settings).length, 'keys');
         
@@ -426,12 +400,12 @@ app.put('/api/admin/setting', async (req, res) => {
     try {
         if (key === 'banner_text') {
             await pool.query(`
-                INSERT INTO wheel_banner (text, updated_at)
+                INSERT INTO flip_banner (text, updated_at)
                 VALUES ($1, CURRENT_TIMESTAMP)
             `, [value]);
         } else {
             await pool.query(`
-                INSERT INTO wheel_settings (setting_key, setting_value, updated_at)
+                INSERT INTO flip_settings (setting_key, setting_value, updated_at)
                 VALUES ($1, $2, CURRENT_TIMESTAMP)
                 ON CONFLICT (setting_key) 
                 DO UPDATE SET setting_value = $2, updated_at = CURRENT_TIMESTAMP
@@ -466,7 +440,7 @@ app.get('/api/admin/prizes', async (req, res) => {
 
     try {
         const result = await pool.query(`
-            SELECT * FROM wheel_prizes 
+            SELECT * FROM flip_prizes 
             ORDER BY id ASC
         `);
         
@@ -484,11 +458,11 @@ app.get('/api/admin/prizes', async (req, res) => {
     }
 });
 
-// -------------------- الحصول على الجوائز النشطة (للعجلة) --------------------
+// -------------------- الحصول على الجوائز النشطة (للعبة) --------------------
 app.get('/api/prizes', async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT * FROM wheel_prizes 
+            SELECT * FROM flip_prizes 
             WHERE is_active = true
             ORDER BY id ASC
         `);
@@ -507,7 +481,7 @@ app.get('/api/prizes', async (req, res) => {
 
 // -------------------- إضافة جائزة جديدة --------------------
 app.post('/api/admin/prizes', async (req, res) => {
-    const { admin_id, name, description, probability, icon, color, color2 } = req.body;
+    const { admin_id, name, description, icon, color, card_color, card_back_color } = req.body;
 
     console.log(`📝 Adding new prize: ${name}`);
 
@@ -518,19 +492,19 @@ app.post('/api/admin/prizes', async (req, res) => {
         });
     }
 
-    if (!name || probability === undefined) {
+    if (!name) {
         return res.status(400).json({
             success: false,
-            error: 'Name and probability are required'
+            error: 'Name is required'
         });
     }
 
     try {
         const result = await pool.query(`
-            INSERT INTO wheel_prizes (name, description, probability, icon, color, color2, is_active)
+            INSERT INTO flip_prizes (name, description, icon, color, card_color, card_back_color, is_active)
             VALUES ($1, $2, $3, $4, $5, $6, true)
             RETURNING *
-        `, [name, description || '', probability, icon || '🎁', color || '#1a1a2e', color2 || '#16213e']);
+        `, [name, description || '', icon || '🎁', color || '#FFD700', card_color || '#1a1a2e', card_back_color || '#16213e']);
 
         console.log(`✅ Prize added: ${result.rows[0].id} - ${name}`);
 
@@ -548,12 +522,12 @@ app.post('/api/admin/prizes', async (req, res) => {
     }
 });
 
-// -------------------- تحديث جائزة (مع دعم الألوان والنسبة) --------------------
+// -------------------- تحديث جائزة --------------------
 app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     const { prize_id } = req.params;
-    const { admin_id, name, description, probability, icon, color, color2, is_active } = req.body;
+    const { admin_id, name, description, icon, color, card_color, card_back_color, is_active } = req.body;
 
-    console.log(`📝 Updating prize ${prize_id}:`, { name, probability, color, color2 });
+    console.log(`📝 Updating prize ${prize_id}:`, { name, color, card_color });
 
     if (parseInt(admin_id) !== ADMIN_ID) {
         return res.status(403).json({
@@ -563,7 +537,7 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 
     try {
-        let query = 'UPDATE wheel_prizes SET ';
+        let query = 'UPDATE flip_prizes SET ';
         const updates = [];
         const values = [];
         let paramIndex = 1;
@@ -576,10 +550,6 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
             updates.push(`description = $${paramIndex++}`);
             values.push(description);
         }
-        if (probability !== undefined && probability !== null) {
-            updates.push(`probability = $${paramIndex++}`);
-            values.push(parseFloat(probability));
-        }
         if (icon !== undefined && icon !== null && icon !== '') {
             updates.push(`icon = $${paramIndex++}`);
             values.push(icon);
@@ -587,12 +557,14 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
         if (color !== undefined && color !== null && color !== '') {
             updates.push(`color = $${paramIndex++}`);
             values.push(color);
-            console.log(`🎨 Setting color to: ${color}`);
         }
-        if (color2 !== undefined && color2 !== null && color2 !== '') {
-            updates.push(`color2 = $${paramIndex++}`);
-            values.push(color2);
-            console.log(`🎨 Setting color2 to: ${color2}`);
+        if (card_color !== undefined && card_color !== null && card_color !== '') {
+            updates.push(`card_color = $${paramIndex++}`);
+            values.push(card_color);
+        }
+        if (card_back_color !== undefined && card_back_color !== null && card_back_color !== '') {
+            updates.push(`card_back_color = $${paramIndex++}`);
+            values.push(card_back_color);
         }
         if (is_active !== undefined && is_active !== null) {
             updates.push(`is_active = $${paramIndex++}`);
@@ -654,15 +626,15 @@ app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 
     try {
-        // أولاً: حذف السجلات المرتبطة في wheel_spins
+        // أولاً: حذف السجلات المرتبطة في flip_games
         await pool.query(
-            'UPDATE wheel_spins SET prize_id = NULL WHERE prize_id = $1',
+            'UPDATE flip_games SET prize_id = NULL WHERE prize_id = $1',
             [prize_id]
         );
 
         // ثم: حذف الجائزة
         const result = await pool.query(
-            'DELETE FROM wheel_prizes WHERE id = $1 RETURNING id',
+            'DELETE FROM flip_prizes WHERE id = $1 RETURNING id',
             [prize_id]
         );
 
@@ -701,14 +673,14 @@ app.post('/api/admin/seed-prizes', async (req, res) => {
 
     try {
         // حذف جميع السجلات المرتبطة أولاً
-        await pool.query('UPDATE wheel_spins SET prize_id = NULL');
-        await pool.query('DELETE FROM wheel_prizes');
+        await pool.query('UPDATE flip_games SET prize_id = NULL');
+        await pool.query('DELETE FROM flip_prizes');
         
         for (const prize of DEFAULT_PRIZES) {
             await pool.query(`
-                INSERT INTO wheel_prizes (name, description, probability, icon, color, color2, is_active)
+                INSERT INTO flip_prizes (name, description, icon, color, card_color, card_back_color, is_active)
                 VALUES ($1, $2, $3, $4, $5, $6, true)
-            `, [prize.name, prize.description, prize.probability, prize.icon, prize.color, prize.color2]);
+            `, [prize.name, prize.description, prize.icon, prize.color, prize.card_color, prize.card_back_color]);
         }
 
         console.log('🔄 Prizes reset to defaults');
@@ -726,8 +698,8 @@ app.post('/api/admin/seed-prizes', async (req, res) => {
     }
 });
 
-// -------------------- تدوير العجلة --------------------
-app.post('/api/wheel/spin', async (req, res) => {
+// -------------------- لعب البطاقات --------------------
+app.post('/api/flip/play', async (req, res) => {
     const { user_id } = req.body;
 
     if (!user_id) {
@@ -753,22 +725,22 @@ app.post('/api/wheel/spin', async (req, res) => {
     }
 
     try {
-        // 1. التحقق من تفعيل العجلة
+        // 1. التحقق من تفعيل اللعبة
         const isActive = await pool.query(
-            'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
+            'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
             ['is_active']
         );
         if (isActive.rows[0]?.setting_value !== 'true') {
             releaseLock(user_id);
             return res.status(403).json({
                 success: false,
-                error: 'العجلة معطلة حالياً'
+                error: 'اللعبة معطلة حالياً'
             });
         }
 
         // 2. التحقق من شرط الإيداع
         const depositRequired = await pool.query(
-            'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
+            'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
             ['deposit_required']
         );
         const isDepositRequired = depositRequired.rows[0]?.setting_value === 'true';
@@ -777,11 +749,11 @@ app.post('/api/wheel/spin', async (req, res) => {
 
         if (isDepositRequired) {
             const minAmount = await pool.query(
-                'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
+                'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
                 ['deposit_min_amount']
             );
             const checkHours = await pool.query(
-                'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
+                'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
                 ['deposit_check_hours']
             );
             
@@ -792,7 +764,7 @@ app.post('/api/wheel/spin', async (req, res) => {
 
             const userDeposits = await pool.query(`
                 SELECT COALESCE(SUM(amount), 0) as total
-                FROM wheel_deposits
+                FROM flip_deposits
                 WHERE user_id = $1 
                 AND deposit_date >= NOW() - INTERVAL '${checkHoursValue} hours'
             `, [user_id]);
@@ -815,24 +787,24 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
-        // 3. التحقق من آخر تدوير
+        // 3. التحقق من آخر لعب
         const intervalHours = await pool.query(
-            'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
-            ['spin_interval_hours']
+            'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
+            ['play_interval_hours']
         );
         const intervalHoursValue = parseInt(intervalHours.rows[0]?.setting_value || 24);
 
-        const lastSpin = await pool.query(`
-            SELECT spin_date FROM wheel_spins 
+        const lastPlay = await pool.query(`
+            SELECT played_date FROM flip_games 
             WHERE user_id = $1 
-            ORDER BY spin_date DESC 
+            ORDER BY played_date DESC 
             LIMIT 1
         `, [user_id]);
 
-        if (lastSpin.rows.length > 0) {
-            const lastSpinDate = new Date(lastSpin.rows[0].spin_date);
+        if (lastPlay.rows.length > 0) {
+            const lastPlayDate = new Date(lastPlay.rows[0].played_date);
             const now = new Date();
-            const hoursDiff = (now - lastSpinDate) / (1000 * 60 * 60);
+            const hoursDiff = (now - lastPlayDate) / (1000 * 60 * 60);
 
             if (hoursDiff < intervalHoursValue) {
                 const remainingHours = Math.ceil(intervalHoursValue - hoursDiff);
@@ -841,16 +813,23 @@ app.post('/api/wheel/spin', async (req, res) => {
                 releaseLock(user_id);
                 return res.status(429).json({
                     success: false,
-                    error: `يمكنك التدوير مرة أخرى بعد ${remainingHours} ساعة`,
+                    error: `يمكنك اللعب مرة أخرى بعد ${remainingHours} ساعة`,
                     remaining_hours: Math.floor(remainingHours),
                     remaining_minutes: remainingMinutes % 60
                 });
             }
         }
 
-        // 4. اختيار جائزة
+        // 4. الحصول على عدد البطاقات
+        const cardsCountResult = await pool.query(
+            'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
+            ['cards_count']
+        );
+        const totalCards = parseInt(cardsCountResult.rows[0]?.setting_value || 12);
+
+        // 5. الحصول على الجوائز النشطة
         const prizes = await pool.query(`
-            SELECT * FROM wheel_prizes 
+            SELECT * FROM flip_prizes 
             WHERE is_active = true
         `);
 
@@ -862,49 +841,56 @@ app.post('/api/wheel/spin', async (req, res) => {
             });
         }
 
-        const totalProbability = prizes.rows.reduce((sum, p) => sum + parseFloat(p.probability), 0);
+        // 6. اختيار جائزة عشوائية (مع الاحتمالات)
+        const totalProbability = prizes.rows.reduce((sum, p) => sum + parseFloat(p.probability || 10), 0);
         let random = Math.random() * totalProbability;
         let selectedPrize = prizes.rows[0];
 
         for (const prize of prizes.rows) {
-            if (random <= parseFloat(prize.probability)) {
+            const prob = parseFloat(prize.probability || 10);
+            if (random <= prob) {
                 selectedPrize = prize;
                 break;
             }
-            random -= parseFloat(prize.probability);
+            random -= prob;
         }
 
-        // 5. تسجيل التدوير
-        const result = await pool.query(`
-            INSERT INTO wheel_spins (user_id, prize_id, prize_name)
-            VALUES ($1, $2, $3)
-            RETURNING id, spin_date
-        `, [user_id, selectedPrize.id, selectedPrize.name]);
+        // 7. اختيار بطاقة عشوائية
+        const cardIndex = Math.floor(Math.random() * totalCards);
 
-        // 6. إحصائيات المستخدم
+        // 8. تسجيل اللعب
+        const result = await pool.query(`
+            INSERT INTO flip_games (user_id, prize_id, prize_name, card_index)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id, played_date
+        `, [user_id, selectedPrize.id, selectedPrize.name, cardIndex]);
+
+        // 9. إحصائيات المستخدم
         const userStats = await pool.query(`
             SELECT 
-                COUNT(*) as total_spins,
+                COUNT(*) as total_plays,
                 COUNT(CASE WHEN prize_name NOT LIKE '%حظ سعيد%' THEN 1 END) as wins
-            FROM wheel_spins 
+            FROM flip_games 
             WHERE user_id = $1
         `, [user_id]);
 
         res.json({
             success: true,
-            spin: {
+            game: {
                 id: result.rows[0].id,
                 prize: selectedPrize,
-                spin_date: result.rows[0].spin_date
+                card_index: cardIndex,
+                total_cards: totalCards,
+                played_date: result.rows[0].played_date
             },
             stats: {
-                total_spins: parseInt(userStats.rows[0].total_spins),
+                total_plays: parseInt(userStats.rows[0].total_plays),
                 wins: parseInt(userStats.rows[0].wins)
             }
         });
 
     } catch (error) {
-        console.error('Spin error:', error);
+        console.error('Play error:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -915,7 +901,7 @@ app.post('/api/wheel/spin', async (req, res) => {
 });
 
 // -------------------- سجل المستخدم --------------------
-app.get('/api/wheel/history/:user_id', async (req, res) => {
+app.get('/api/flip/history/:user_id', async (req, res) => {
     const { user_id } = req.params;
 
     if (!dbReady) {
@@ -926,21 +912,21 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
     }
 
     try {
-        const lastSpin = await pool.query(`
-            SELECT spin_date FROM wheel_spins 
+        const lastPlay = await pool.query(`
+            SELECT played_date FROM flip_games 
             WHERE user_id = $1 
-            ORDER BY spin_date DESC 
+            ORDER BY played_date DESC 
             LIMIT 1
         `, [user_id]);
 
         const intervalHours = await pool.query(
-            'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
-            ['spin_interval_hours']
+            'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
+            ['play_interval_hours']
         );
         const intervalHoursValue = parseInt(intervalHours.rows[0]?.setting_value || 24);
 
         const depositRequired = await pool.query(
-            'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
+            'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
             ['deposit_required']
         );
         const isDepositRequired = depositRequired.rows[0]?.setting_value === 'true';
@@ -948,11 +934,11 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
         let depositInfo = null;
         if (isDepositRequired) {
             const minAmount = await pool.query(
-                'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
+                'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
                 ['deposit_min_amount']
             );
             const checkHours = await pool.query(
-                'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
+                'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
                 ['deposit_check_hours']
             );
             const minAmountValue = parseFloat(minAmount.rows[0]?.setting_value || 1000);
@@ -960,7 +946,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
 
             const userDeposits = await pool.query(`
                 SELECT COALESCE(SUM(amount), 0) as total
-                FROM wheel_deposits
+                FROM flip_deposits
                 WHERE user_id = $1 
                 AND deposit_date >= NOW() - INTERVAL '${checkHoursValue} hours'
             `, [user_id]);
@@ -974,17 +960,17 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             };
         }
 
-        let can_spin = true;
+        let can_play = true;
         let remaining_hours = 0;
         let remaining_minutes = 0;
 
-        if (lastSpin.rows.length > 0) {
-            const lastSpinDate = new Date(lastSpin.rows[0].spin_date);
+        if (lastPlay.rows.length > 0) {
+            const lastPlayDate = new Date(lastPlay.rows[0].played_date);
             const now = new Date();
-            const hoursDiff = (now - lastSpinDate) / (1000 * 60 * 60);
+            const hoursDiff = (now - lastPlayDate) / (1000 * 60 * 60);
 
             if (hoursDiff < intervalHoursValue) {
-                can_spin = false;
+                can_play = false;
                 remaining_hours = Math.floor(intervalHoursValue - hoursDiff);
                 remaining_minutes = Math.ceil((intervalHoursValue - hoursDiff) * 60) % 60;
             }
@@ -992,20 +978,20 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
 
         const stats = await pool.query(`
             SELECT 
-                COUNT(*) as total_spins,
+                COUNT(*) as total_plays,
                 COUNT(CASE WHEN prize_name NOT LIKE '%حظ سعيد%' THEN 1 END) as wins
-            FROM wheel_spins 
+            FROM flip_games 
             WHERE user_id = $1
         `, [user_id]);
 
         res.json({
             success: true,
             stats: {
-                total_spins: parseInt(stats.rows[0].total_spins),
+                total_plays: parseInt(stats.rows[0].total_plays),
                 wins: parseInt(stats.rows[0].wins)
             },
-            spin_status: {
-                can_spin: can_spin,
+            play_status: {
+                can_play: can_play,
                 remaining_hours: remaining_hours,
                 remaining_minutes: remaining_minutes,
                 interval_hours: intervalHoursValue
@@ -1022,7 +1008,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
 });
 
 // -------------------- تسجيل إيداع --------------------
-app.post('/api/wheel/deposit', async (req, res) => {
+app.post('/api/flip/deposit', async (req, res) => {
     const { user_id, amount, source } = req.body;
 
     if (!user_id || !amount) {
@@ -1041,7 +1027,7 @@ app.post('/api/wheel/deposit', async (req, res) => {
 
     try {
         await pool.query(`
-            INSERT INTO wheel_deposits (user_id, amount, source)
+            INSERT INTO flip_deposits (user_id, amount, source)
             VALUES ($1, $2, $3)
         `, [user_id, amount, source || 'manual']);
 

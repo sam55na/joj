@@ -98,11 +98,11 @@ const TABLE_SCHEMAS = {
 };
 
 const DEFAULT_PRIZES = [
-    { name: '🎁 1000 SYP', description: 'الفوز بـ 1000 ليرة سورية', icon: '💎', color: '#FFD700', card_color: '#1a1a2e', card_back_color: '#FFD700' },
-    { name: '🎁 500 SYP', description: 'الفوز بـ 500 ليرة سورية', icon: '👑', color: '#FF6B35', card_color: '#2d1b3d', card_back_color: '#FF6B35' },
-    { name: '🎁 200 SYP', description: 'الفوز بـ 200 ليرة سورية', icon: '🌟', color: '#00D4FF', card_color: '#0f3460', card_back_color: '#00D4FF' },
+    { name: '💎 1000 SYP', description: 'الفوز بـ 1000 ليرة سورية', icon: '💎', color: '#FFD700', card_color: '#1a1a2e', card_back_color: '#FFD700' },
+    { name: '👑 500 SYP', description: 'الفوز بـ 500 ليرة سورية', icon: '👑', color: '#FF6B35', card_color: '#2d1b3d', card_back_color: '#FF6B35' },
+    { name: '🌟 200 SYP', description: 'الفوز بـ 200 ليرة سورية', icon: '🌟', color: '#00D4FF', card_color: '#0f3460', card_back_color: '#00D4FF' },
     { name: '🎫 كود هدية', description: 'كود هدية بقيمة 50 SYP', icon: '🎫', color: '#7BFF8A', card_color: '#1a2a1a', card_back_color: '#7BFF8A' },
-    { name: '😅 حظ سعيد', description: 'لا يوجد فوز هذه المرة', icon: '🔄', color: '#FF6B6B', card_color: '#2a1a1a', card_back_color: '#FF6B6B' },
+    { name: '🔄 حظ سعيد', description: 'لا يوجد فوز هذه المرة', icon: '🔄', color: '#FF6B6B', card_color: '#2a1a1a', card_back_color: '#FF6B6B' },
     { name: '⭐ 50 SYP', description: 'الفوز بـ 50 ليرة سورية', icon: '⭐', color: '#FFB800', card_color: '#1a1a2a', card_back_color: '#FFB800' }
 ];
 
@@ -112,11 +112,11 @@ const DEFAULT_SETTINGS = [
     { key: 'deposit_required', value: 'false' },
     { key: 'deposit_min_amount', value: '1000' },
     { key: 'deposit_check_hours', value: '24' },
-    { key: 'cards_count', value: '12' },
+    { key: 'cards_count', value: '6' },
     { key: 'bg_image_url', value: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80' },
     { key: 'loading_image_url', value: 'https://media.giphy.com/media/3o7bu8sRnYpTOG1p8k/giphy.gif' },
-    { key: 'flip_duration', value: '800' },
-    { key: 'card_reveal_delay', value: '300' }
+    { key: 'flip_duration', value: '600' },
+    { key: 'card_reveal_delay', value: '200' }
 ];
 
 // ================================================================
@@ -127,7 +127,6 @@ async function updateTableSchema() {
     try {
         console.log('📋 ===== التحقق من هيكل الجداول =====');
         
-        // التحقق من وجود أعمدة الألوان في جدول flip_prizes
         const checkColumns = await client.query(`
             SELECT column_name 
             FROM information_schema.columns 
@@ -138,7 +137,6 @@ async function updateTableSchema() {
         const existingColumns = checkColumns.rows.map(row => row.column_name);
         console.log('📋 الأعمدة الموجودة:', existingColumns);
         
-        // إضافة الأعمدة المفقودة
         const columnsToAdd = {
             'color': 'VARCHAR(50) DEFAULT \'#FFD700\'',
             'card_color': 'VARCHAR(50) DEFAULT \'#1a1a2e\'',
@@ -175,7 +173,6 @@ async function ensureTables() {
     const client = await pool.connect();
 
     try {
-        // إنشاء الجداول
         for (const table of Object.keys(TABLE_SCHEMAS)) {
             try {
                 await client.query(TABLE_SCHEMAS[table]);
@@ -186,10 +183,8 @@ async function ensureTables() {
             }
         }
         
-        // تحديث هيكل الجدول
         await updateTableSchema();
 
-        // الجوائز الافتراضية
         const prizesCount = await client.query('SELECT COUNT(*) FROM flip_prizes');
         if (parseInt(prizesCount.rows[0].count) === 0) {
             console.log('   ⚠️ لا توجد جوائز، جاري إضافة الجوائز الافتراضية...');
@@ -202,7 +197,6 @@ async function ensureTables() {
             console.log(`   ✅ تم إضافة ${DEFAULT_PRIZES.length} جائزة افتراضية`);
         }
 
-        // الإعدادات الافتراضية
         const settingsCount = await client.query('SELECT COUNT(*) FROM flip_settings');
         if (parseInt(settingsCount.rows[0].count) === 0) {
             console.log('   ⚠️ لا توجد إعدادات، جاري إضافة الإعدادات الافتراضية...');
@@ -215,7 +209,6 @@ async function ensureTables() {
             console.log(`   ✅ تم إضافة ${DEFAULT_SETTINGS.length} إعداد افتراضي`);
         }
 
-        // النص العلوي
         const bannerCount = await client.query('SELECT COUNT(*) FROM flip_banner');
         if (parseInt(bannerCount.rows[0].count) === 0) {
             await client.query(`
@@ -265,7 +258,6 @@ setInterval(() => {
 //                      المسارات (API Endpoints)
 // ================================================================
 
-// -------------------- فحص الحالة --------------------
 app.get('/api/status', (req, res) => {
     res.json({
         status: 'running',
@@ -275,7 +267,6 @@ app.get('/api/status', (req, res) => {
     });
 });
 
-// -------------------- الصفحة الرئيسية --------------------
 app.get('/', (req, res) => {
     res.json({
         status: 'running',
@@ -298,7 +289,6 @@ app.get('/', (req, res) => {
     });
 });
 
-// -------------------- النص العلوي (Banner) --------------------
 app.get('/api/banner', async (req, res) => {
     try {
         const result = await pool.query('SELECT text FROM flip_banner ORDER BY id DESC LIMIT 1');
@@ -342,7 +332,6 @@ app.put('/api/banner', async (req, res) => {
     }
 });
 
-// -------------------- الحصول على جميع الإعدادات --------------------
 app.get('/api/admin/settings', async (req, res) => {
     const { admin_id } = req.query;
 
@@ -377,7 +366,6 @@ app.get('/api/admin/settings', async (req, res) => {
     }
 });
 
-// -------------------- تحديث إعداد واحد --------------------
 app.put('/api/admin/setting', async (req, res) => {
     const { admin_id, key, value } = req.body;
 
@@ -427,7 +415,6 @@ app.put('/api/admin/setting', async (req, res) => {
     }
 });
 
-// -------------------- الحصول على الجوائز (للأدمن) --------------------
 app.get('/api/admin/prizes', async (req, res) => {
     const { admin_id } = req.query;
 
@@ -458,7 +445,6 @@ app.get('/api/admin/prizes', async (req, res) => {
     }
 });
 
-// -------------------- الحصول على الجوائز النشطة (للعبة) --------------------
 app.get('/api/prizes', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -479,7 +465,6 @@ app.get('/api/prizes', async (req, res) => {
     }
 });
 
-// -------------------- إضافة جائزة جديدة --------------------
 app.post('/api/admin/prizes', async (req, res) => {
     const { admin_id, name, description, icon, color, card_color, card_back_color } = req.body;
 
@@ -522,7 +507,6 @@ app.post('/api/admin/prizes', async (req, res) => {
     }
 });
 
-// -------------------- تحديث جائزة --------------------
 app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     const { prize_id } = req.params;
     const { admin_id, name, description, icon, color, card_color, card_back_color, is_active } = req.body;
@@ -611,7 +595,6 @@ app.put('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 });
 
-// -------------------- حذف جائزة --------------------
 app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
     const { prize_id } = req.params;
     const { admin_id } = req.body;
@@ -626,13 +609,11 @@ app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 
     try {
-        // أولاً: حذف السجلات المرتبطة في flip_games
         await pool.query(
             'UPDATE flip_games SET prize_id = NULL WHERE prize_id = $1',
             [prize_id]
         );
 
-        // ثم: حذف الجائزة
         const result = await pool.query(
             'DELETE FROM flip_prizes WHERE id = $1 RETURNING id',
             [prize_id]
@@ -660,7 +641,6 @@ app.delete('/api/admin/prizes/:prize_id', async (req, res) => {
     }
 });
 
-// -------------------- إعادة تعيين الجوائز --------------------
 app.post('/api/admin/seed-prizes', async (req, res) => {
     const { admin_id } = req.body;
 
@@ -672,7 +652,6 @@ app.post('/api/admin/seed-prizes', async (req, res) => {
     }
 
     try {
-        // حذف جميع السجلات المرتبطة أولاً
         await pool.query('UPDATE flip_games SET prize_id = NULL');
         await pool.query('DELETE FROM flip_prizes');
         
@@ -698,7 +677,9 @@ app.post('/api/admin/seed-prizes', async (req, res) => {
     }
 });
 
-// -------------------- لعب البطاقات --------------------
+// ================================================================
+//                      لعب البطاقات - النقطة الرئيسية
+// ================================================================
 app.post('/api/flip/play', async (req, res) => {
     const { user_id } = req.body;
 
@@ -745,8 +726,6 @@ app.post('/api/flip/play', async (req, res) => {
         );
         const isDepositRequired = depositRequired.rows[0]?.setting_value === 'true';
 
-        console.log(`💰 Deposit required: ${isDepositRequired} for user ${user_id}`);
-
         if (isDepositRequired) {
             const minAmount = await pool.query(
                 'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
@@ -760,8 +739,6 @@ app.post('/api/flip/play', async (req, res) => {
             const minAmountValue = parseFloat(minAmount.rows[0]?.setting_value || 1000);
             const checkHoursValue = parseInt(checkHours.rows[0]?.setting_value || 24);
 
-            console.log(`💰 Min amount: ${minAmountValue}, Check hours: ${checkHoursValue}`);
-
             const userDeposits = await pool.query(`
                 SELECT COALESCE(SUM(amount), 0) as total
                 FROM flip_deposits
@@ -770,8 +747,6 @@ app.post('/api/flip/play', async (req, res) => {
             `, [user_id]);
 
             const totalDeposits = parseFloat(userDeposits.rows[0]?.total || 0);
-
-            console.log(`💰 User ${user_id} deposits: ${totalDeposits}`);
 
             if (totalDeposits < minAmountValue) {
                 releaseLock(user_id);
@@ -820,12 +795,8 @@ app.post('/api/flip/play', async (req, res) => {
             }
         }
 
-        // 4. الحصول على عدد البطاقات
-        const cardsCountResult = await pool.query(
-            'SELECT setting_value FROM flip_settings WHERE setting_key = $1',
-            ['cards_count']
-        );
-        const totalCards = parseInt(cardsCountResult.rows[0]?.setting_value || 12);
+        // 4. الحصول على عدد البطاقات (ثابت 6)
+        const totalCards = 6;
 
         // 5. الحصول على الجوائز النشطة
         const prizes = await pool.query(`
@@ -841,7 +812,7 @@ app.post('/api/flip/play', async (req, res) => {
             });
         }
 
-        // 6. اختيار جائزة عشوائية (مع الاحتمالات)
+        // 6. اختيار جائزة عشوائية
         const totalProbability = prizes.rows.reduce((sum, p) => sum + parseFloat(p.probability || 10), 0);
         let random = Math.random() * totalProbability;
         let selectedPrize = prizes.rows[0];
@@ -855,7 +826,7 @@ app.post('/api/flip/play', async (req, res) => {
             random -= prob;
         }
 
-        // 7. اختيار بطاقة عشوائية
+        // 7. اختيار بطاقة عشوائية (0-5)
         const cardIndex = Math.floor(Math.random() * totalCards);
 
         // 8. تسجيل اللعب
@@ -900,7 +871,6 @@ app.post('/api/flip/play', async (req, res) => {
     }
 });
 
-// -------------------- سجل المستخدم --------------------
 app.get('/api/flip/history/:user_id', async (req, res) => {
     const { user_id } = req.params;
 
@@ -1007,7 +977,6 @@ app.get('/api/flip/history/:user_id', async (req, res) => {
     }
 });
 
-// -------------------- تسجيل إيداع --------------------
 app.post('/api/flip/deposit', async (req, res) => {
     const { user_id, amount, source } = req.body;
 
@@ -1060,7 +1029,6 @@ async function startServer() {
         console.log(`\n✅ الخادم يعمل على المنفذ ${port}`);
         console.log(`🔗 فحص الحالة: http://localhost:${port}/api/status`);
         console.log(`🔗 الجوائز النشطة: http://localhost:${port}/api/prizes`);
-        console.log(`🔗 لوحة الإدارة: http://localhost:${port}/api/admin/prizes?admin_id=${ADMIN_ID}`);
         console.log('\n📋 ===== جاهز! =====\n');
     });
 }

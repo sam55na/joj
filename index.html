@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>🎡 عجلة الحظ</title>
-    <!-- Telegram WebApp -->
+    <title>🃏 بطاقات الحظ</title>
     <script src="https://telegram.org/js/telegram-web-app.js">
     </script>
     <style>
@@ -26,13 +25,10 @@
             background: #0a0a0a;
             overflow-x: hidden;
             padding: 12px;
-        }
-
-        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        /* خلفية ثابتة */
+        /* خلفية ثابتة متحركة */
         .bg-image-fixed {
             position: fixed;
             top: 0;
@@ -51,12 +47,8 @@
             animation: slowZoom 30s ease-in-out infinite alternate;
         }
         @keyframes slowZoom {
-            0% {
-                transform: scale(1);
-            }
-            100% {
-                transform: scale(1.05);
-            }
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
         }
 
         /* ===== النص العلوي ===== */
@@ -82,314 +74,6 @@
             margin-right: auto;
             position: relative;
             z-index: 1;
-        }
-
-        /* ===== حالة المستخدم (مخفية) ===== */
-        .user-status {
-            display: none;
-        }
-
-        /* ===== العجلة - بدون حاوية خارجية ===== */
-        .wheel-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 420px;
-            margin: 0 auto;
-            aspect-ratio: 1/1;
-            display: none;
-            z-index: 1;
-        }
-        .wheel-wrapper.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        .wheel-wrapper canvas {
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50%;
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.03), inset 0 0 60px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 215, 0, 0.05);
-            transition: filter 0.4s ease;
-            display: block;
-        }
-        .wheel-wrapper canvas.spinning {
-            filter: brightness(1.15) drop-shadow(0 0 50px rgba(255, 215, 0, 0.12));
-        }
-
-        .pointer {
-            position: absolute;
-            top: -14px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            font-size: 32px;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.25));
-            animation: pointerBounce 2s ease-in-out infinite;
-            pointer-events: none;
-        }
-        @keyframes pointerBounce {
-            0%,
-            100% {
-                transform: translateX(-50%) translateY(0);
-            }
-            50% {
-                transform: translateX(-50%) translateY(-5px);
-            }
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.94);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* ===== لا توجد جوائز ===== */
-        .no-prizes {
-            display: none;
-            text-align: center;
-            padding: 30px 16px;
-            color: #555;
-            font-size: 15px;
-            background: rgba(18, 18, 18, 0.85);
-            border-radius: 16px;
-            backdrop-filter: blur(6px);
-            max-width: 420px;
-            margin: 0 auto;
-            z-index: 1;
-        }
-
-        /* ===== الأزرار ===== */
-        .actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 12px;
-            width: 100%;
-            max-width: 380px;
-            margin-left: auto;
-            margin-right: auto;
-            z-index: 1;
-            position: relative;
-        }
-        .btn {
-            padding: 16px 20px;
-            border: none;
-            border-radius: 16px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            position: relative;
-        }
-        .btn-spin {
-            background: linear-gradient(135deg, #B8860B, #FFD700);
-            color: #0a0a0a;
-            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.1);
-            font-size: 19px;
-        }
-        .btn-spin:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 40px rgba(255, 215, 0, 0.2);
-        }
-        .btn-spin:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-spin .spinner-small {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(10, 10, 10, 0.15);
-            border-top: 2px solid #0a0a0a;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-        .btn-spin.loading .spinner-small {
-            display: inline-block;
-        }
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ===== شرط الإيداع ===== */
-        .deposit-notice {
-            background: rgba(18, 18, 18, 0.85);
-            border: 1px solid rgba(255, 215, 0, 0.06);
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-top: 10px;
-            text-align: center;
-            display: none;
-            width: 100%;
-            max-width: 380px;
-            backdrop-filter: blur(6px);
-            margin-left: auto;
-            margin-right: auto;
-            z-index: 1;
-            position: relative;
-        }
-        .deposit-notice.show {
-            display: block;
-        }
-        .deposit-notice .notice-text {
-            color: #FF8C00;
-            font-size: 14px;
-        }
-        .deposit-notice .notice-text .amount {
-            color: #FFD700;
-            font-weight: 700;
-        }
-        .deposit-notice .notice-status {
-            font-size: 13px;
-            margin-top: 4px;
-            color: #666;
-        }
-        .deposit-notice .notice-status .met {
-            color: #00FF88;
-        }
-        .deposit-notice .notice-status .not-met {
-            color: #FF4444;
-        }
-
-        /* ===== النتيجة (يظهر فيها الوصف فقط) ===== */
-        .result-box {
-            background: rgba(18, 18, 18, 0.85);
-            border: 1px solid rgba(255, 215, 0, 0.06);
-            border-radius: 18px;
-            padding: 18px 14px;
-            margin-top: 14px;
-            text-align: center;
-            display: none;
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            max-width: 380px;
-            backdrop-filter: blur(6px);
-            margin-left: auto;
-            margin-right: auto;
-            z-index: 1;
-        }
-        .result-box.show {
-            display: block;
-            animation: resultPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        @keyframes resultPop {
-            0% {
-                transform: scale(0.85) rotate(-2deg);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
-            }
-        }
-        .result-box.winner {
-            border-color: rgba(255, 215, 0, 0.25);
-            background: rgba(255, 215, 0, 0.08);
-            animation: winGlow 1.5s ease-in-out infinite alternate;
-        }
-        @keyframes winGlow {
-            0% {
-                box-shadow: 0 0 20px rgba(255, 215, 0, 0.04);
-            }
-            100% {
-                box-shadow: 0 0 80px rgba(255, 215, 0, 0.12);
-            }
-        }
-        .result-box .confetti-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .result-box .confetti {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            opacity: 0;
-            animation: confettiFall 2.2s ease-in forwards;
-        }
-        @keyframes confettiFall {
-            0% {
-                opacity: 1;
-                transform: translateY(-20px) rotate(0deg) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(220px) rotate(720deg) scale(0);
-            }
-        }
-
-        /* إخفاء الأيقونة والاسم، نعرض الوصف فقط */
-        .result-box .prize-icon {
-            display: none;
-        }
-        .result-box .prize-name {
-            display: none;
-        }
-        .result-box .prize-desc {
-            color: #FFD700;
-            font-size: 24px;
-            font-weight: 700;
-            margin-top: 4px;
-            padding: 6px 0;
-        }
-        .result-box.winner .prize-desc {
-            background: linear-gradient(135deg, #FFD700, #FF6B00, #FFD700);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: goldShine 1.5s ease-in-out infinite;
-            font-size: 28px;
-        }
-        @keyframes goldShine {
-            0%,
-            100% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-        }
-
-        /* ===== رسائل الخطأ ===== */
-        .error-msg {
-            background: rgba(18, 18, 18, 0.85);
-            border: 1px solid rgba(255, 0, 0, 0.06);
-            border-radius: 12px;
-            padding: 10px;
-            color: #FF6B6B;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 10px;
-            display: none;
-            width: 100%;
-            max-width: 380px;
-            backdrop-filter: blur(6px);
-            margin-left: auto;
-            margin-right: auto;
-            z-index: 1;
-            position: relative;
-        }
-        .error-msg.show {
-            display: block;
-            animation: fadeIn 0.3s ease;
         }
 
         /* ===== شاشة اللودينغ ===== */
@@ -424,15 +108,8 @@
             margin-bottom: 28px;
         }
         @keyframes loadingPulse {
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.02);
-                opacity: 0.85;
-            }
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.85; }
         }
         .loading-screen .progress-container {
             width: 60%;
@@ -461,6 +138,293 @@
             font-weight: 600;
             letter-spacing: 1px;
         }
+
+        /* ===== حاوية البطاقات ===== */
+        .cards-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+            z-index: 1;
+            display: none;
+            min-height: 300px;
+        }
+        .cards-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+            justify-content: center;
+            perspective: 1200px;
+        }
+
+        /* ===== البطاقة ===== */
+        .card {
+            aspect-ratio: 3/4;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+        .card:hover:not(.flipped):not(.disabled) {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 12px 40px rgba(255, 215, 0, 0.15);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card.disabled {
+            cursor: not-allowed;
+            opacity: 0.3;
+            filter: grayscale(0.8);
+        }
+
+        .card .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            overflow: hidden;
+        }
+
+        /* وجه البطاقة الأمامي (الخلفي) */
+        .card .card-back {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 2px solid rgba(255, 215, 0, 0.15);
+            box-shadow: inset 0 0 50px rgba(255, 215, 0, 0.03);
+            transform: rotateY(0deg);
+            position: relative;
+        }
+        .card .card-back::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 2px solid rgba(255, 215, 0, 0.08);
+            border-radius: 10px;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 8px,
+                rgba(255, 215, 0, 0.02) 8px,
+                rgba(255, 215, 0, 0.02) 10px
+            );
+        }
+        .card .card-back .back-pattern {
+            font-size: 32px;
+            opacity: 0.15;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.1; transform: scale(1); }
+            50% { opacity: 0.2; transform: scale(1.05); }
+        }
+        .card .card-back .card-number {
+            position: absolute;
+            bottom: 8px;
+            font-size: 10px;
+            color: rgba(255, 215, 0, 0.2);
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        /* وجه البطاقة الخلفي (الأمامي) */
+        .card .card-front {
+            background: linear-gradient(145deg, #FFD700, #FF8C00);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            transform: rotateY(180deg);
+            box-shadow: inset 0 0 60px rgba(255, 215, 0, 0.1);
+        }
+        .card .card-front .prize-icon {
+            font-size: 38px;
+            margin-bottom: 4px;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+        .card .card-front .prize-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: #0a0a0a;
+            text-align: center;
+            line-height: 1.2;
+            text-shadow: 0 1px 4px rgba(255, 255, 255, 0.2);
+        }
+        .card .card-front .prize-desc {
+            font-size: 8px;
+            color: rgba(0, 0, 0, 0.6);
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        /* تأثيرات الضوء على البطاقات */
+        .card .card-shine {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1), transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            border-radius: 14px;
+        }
+        .card:hover .card-shine {
+            opacity: 1;
+        }
+
+        /* ===== تأثيرات خاصة للبطاقات الفائزة ===== */
+        .card.winner {
+            animation: winnerPulse 1s ease-in-out infinite;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), 0 0 80px rgba(255, 215, 0, 0.1);
+        }
+        @keyframes winnerPulse {
+            0%, 100% { transform: rotateY(180deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(1.05); }
+        }
+
+        .card.loser {
+            animation: loserFade 0.8s ease forwards;
+        }
+        @keyframes loserFade {
+            0% { opacity: 1; transform: rotateY(0deg) scale(1); }
+            100% { opacity: 0.1; transform: rotateY(0deg) scale(0.8); filter: blur(2px); }
+        }
+
+        /* ===== الأزرار ===== */
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+            width: 100%;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
+            z-index: 1;
+            position: relative;
+        }
+        .btn {
+            padding: 16px 20px;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+        }
+        .btn-play {
+            background: linear-gradient(135deg, #B8860B, #FFD700);
+            color: #0a0a0a;
+            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.1);
+            font-size: 19px;
+        }
+        .btn-play:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(255, 215, 0, 0.2);
+        }
+        .btn-play:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-play .spinner-small {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(10, 10, 10, 0.15);
+            border-top: 2px solid #0a0a0a;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .btn-play.loading .spinner-small {
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== شرط الإيداع ===== */
+        .deposit-notice {
+            background: rgba(18, 18, 18, 0.85);
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+            width: 100%;
+            max-width: 380px;
+            backdrop-filter: blur(6px);
+            margin-left: auto;
+            margin-right: auto;
+            z-index: 1;
+            position: relative;
+        }
+        .deposit-notice.show { display: block; }
+        .deposit-notice .notice-text { color: #FF8C00; font-size: 14px; }
+        .deposit-notice .notice-text .amount { color: #FFD700; font-weight: 700; }
+
+        /* ===== النتيجة ===== */
+        .result-box {
+            background: rgba(18, 18, 18, 0.85);
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            border-radius: 18px;
+            padding: 18px 14px;
+            margin-top: 14px;
+            text-align: center;
+            display: none;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 380px;
+            backdrop-filter: blur(6px);
+            margin-left: auto;
+            margin-right: auto;
+            z-index: 1;
+        }
+        .result-box.show {
+            display: block;
+            animation: resultPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes resultPop {
+            0% { transform: scale(0.85) rotate(-2deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .result-box.winner {
+            border-color: rgba(255, 215, 0, 0.25);
+            background: rgba(255, 215, 0, 0.08);
+            animation: winGlow 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes winGlow {
+            0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.04); }
+            100% { box-shadow: 0 0 80px rgba(255, 215, 0, 0.12); }
+        }
+        .result-box .result-icon { font-size: 48px; margin-bottom: 6px; }
+        .result-box .result-title { color: #FFD700; font-size: 20px; font-weight: 700; }
+        .result-box .result-desc { color: #aaa; font-size: 14px; margin-top: 4px; }
 
         /* ===== إعدادات الصوت ===== */
         .sound-settings {
@@ -494,10 +458,6 @@
             height: 16px;
             cursor: pointer;
         }
-        .sound-settings .sound-indicator {
-            color: #FFD700;
-            font-size: 14px;
-        }
 
         /* ===== لوحة الإدارة ===== */
         .admin-panel {
@@ -515,10 +475,7 @@
             z-index: 1;
             position: relative;
         }
-        .admin-panel.show {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
+        .admin-panel.show { display: block; animation: fadeIn 0.4s ease; }
         .admin-panel .panel-title {
             color: #FFD700;
             font-size: 16px;
@@ -547,15 +504,8 @@
             gap: 6px;
             flex-wrap: wrap;
         }
-        .admin-panel .prize-item .prize-icon-small {
-            font-size: 22px;
-            width: 34px;
-            text-align: center;
-        }
-        .admin-panel .prize-item .prize-info {
-            flex: 1;
-            min-width: 90px;
-        }
+        .admin-panel .prize-item .prize-icon-small { font-size: 22px; width: 34px; text-align: center; }
+        .admin-panel .prize-item .prize-info { flex: 1; min-width: 90px; }
         .admin-panel .prize-item .prize-info .name-input {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -565,65 +515,15 @@
             font-weight: 600;
             padding: 2px 6px;
             width: 100%;
-            transition: border-color 0.3s;
         }
         .admin-panel .prize-item .prize-info .name-input:focus {
             outline: none;
             border-color: #FFD700;
         }
-        .admin-panel .prize-item .prize-info .desc-input {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 4px;
-            color: #666;
-            font-size: 10px;
-            padding: 2px 6px;
-            width: 100%;
-            margin-top: 2px;
-        }
-        .admin-panel .prize-item .prize-info .desc-input:focus {
-            outline: none;
-            border-color: rgba(255, 215, 0, 0.3);
-        }
-        .admin-panel .prize-item .prize-prob {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-        .admin-panel .prize-item .prize-prob .prob-input {
-            width: 44px;
-            padding: 3px 4px;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 215, 0, 0.1);
-            background: rgba(0, 0, 0, 0.3);
-            color: #FFD700;
-            font-size: 11px;
-            text-align: center;
-        }
-        .admin-panel .prize-item .prize-prob .prob-input:focus {
-            outline: none;
-            border-color: #FFD700;
-        }
-        .admin-panel .prize-item .prize-prob .prob-label {
-            color: #555;
-            font-size: 9px;
-        }
-        .admin-panel .prize-item .prize-prob .btn-save-prob {
-            padding: 2px 8px;
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.1);
-            border-radius: 4px;
-            color: #FFD700;
-            font-size: 9px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .admin-panel .prize-item .prize-prob .btn-save-prob:hover {
-            background: rgba(255, 215, 0, 0.2);
-        }
         .admin-panel .prize-item .prize-colors {
             display: flex;
             gap: 3px;
+            align-items: center;
         }
         .admin-panel .prize-item .prize-colors input[type="color"] {
             width: 26px;
@@ -634,9 +534,6 @@
             background: transparent;
             cursor: pointer;
         }
-        .admin-panel .prize-item .prize-colors input[type="color"]:hover {
-            border-color: #FFD700;
-        }
         .admin-panel .prize-item .btn-delete {
             background: rgba(255, 0, 0, 0.08);
             border: none;
@@ -645,11 +542,6 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
-            transition: all 0.3s;
-        }
-        .admin-panel .prize-item .btn-delete:hover {
-            background: rgba(255, 0, 0, 0.2);
-            transform: scale(1.05);
         }
         .admin-panel .add-prize-form {
             display: flex;
@@ -672,9 +564,6 @@
             outline: none;
             border-color: #FFD700;
         }
-        .admin-panel .add-prize-form input::placeholder {
-            color: #555;
-        }
         .admin-panel .add-prize-form .btn-add {
             padding: 6px 16px;
             background: linear-gradient(135deg, #B8860B, #FFD700);
@@ -686,14 +575,7 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        .admin-panel .add-prize-form .btn-add:hover {
-            transform: scale(1.05);
-        }
-        .admin-panel .add-prize-form .btn-add:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .admin-panel .add-prize-form .btn-add:hover { transform: scale(1.05); }
         .admin-panel .panel-actions {
             display: flex;
             gap: 6px;
@@ -708,158 +590,10 @@
             color: #FFD700;
             font-size: 10px;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-        .admin-panel .panel-actions .btn-action:hover {
-            background: rgba(255, 215, 0, 0.05);
-            border-color: #FFD700;
         }
         .admin-panel .panel-actions .btn-action.danger {
             color: #FF4444;
             border-color: rgba(255, 0, 0, 0.1);
-        }
-        .admin-panel .panel-actions .btn-action.danger:hover {
-            background: rgba(255, 0, 0, 0.05);
-            border-color: #FF4444;
-        }
-        .admin-panel .settings-section {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        .admin-panel .settings-section .setting-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-        .admin-panel .settings-section .setting-row label {
-            color: #888;
-            font-size: 11px;
-            min-width: 70px;
-        }
-        .admin-panel .settings-section .setting-row input,
-        .admin-panel .settings-section .setting-row textarea {
-            flex: 1;
-            padding: 4px 8px;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 215, 0, 0.1);
-            background: rgba(0, 0, 0, 0.3);
-            color: #fff;
-            font-size: 11px;
-            min-width: 60px;
-        }
-        .admin-panel .settings-section .setting-row input:focus,
-        .admin-panel .settings-section .setting-row textarea:focus {
-            outline: none;
-            border-color: #FFD700;
-        }
-        .admin-panel .settings-section .setting-row .btn-save {
-            padding: 4px 14px;
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 4px;
-            color: #FFD700;
-            font-size: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-        .admin-panel .settings-section .setting-row .btn-save:hover {
-            background: rgba(255, 215, 0, 0.2);
-        }
-        .admin-panel .settings-section .setting-row .btn-save.saved {
-            background: rgba(0, 255, 100, 0.1);
-            border-color: rgba(0, 255, 100, 0.2);
-            color: #00FF88;
-        }
-        .admin-panel .settings-section .toggle-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        .admin-panel .settings-section .toggle-row label {
-            color: #888;
-            font-size: 11px;
-            min-width: 70px;
-        }
-        .admin-panel .settings-section .toggle-row input[type="checkbox"] {
-            accent-color: #FFD700;
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-        }
-        .admin-panel .settings-section .toggle-row .btn-save {
-            padding: 4px 14px;
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 4px;
-            color: #FFD700;
-            font-size: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .admin-panel .settings-section .toggle-row .btn-save:hover {
-            background: rgba(255, 215, 0, 0.2);
-        }
-        .admin-panel .settings-section .toggle-row .btn-save.saved {
-            background: rgba(0, 255, 100, 0.1);
-            border-color: rgba(0, 255, 100, 0.2);
-            color: #00FF88;
-        }
-
-        /* ===== خطأ أولي ===== */
-        .error-container {
-            display: none;
-            text-align: center;
-            padding: 30px 16px;
-            background: rgba(18, 18, 18, 0.85);
-            border-radius: 20px;
-            backdrop-filter: blur(6px);
-            max-width: 420px;
-            margin: 0 auto;
-            z-index: 1;
-            position: relative;
-        }
-        .error-container.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        .error-container .error-icon {
-            font-size: 44px;
-            margin-bottom: 10px;
-        }
-        .error-container .error-title {
-            color: #FFD700;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-        .error-container .error-text {
-            color: #777;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        .error-container .error-text .highlight {
-            color: #FFD700;
-        }
-        .error-container .btn-open-bot {
-            margin-top: 16px;
-            padding: 12px 32px;
-            background: linear-gradient(135deg, #B8860B, #FFD700);
-            border: none;
-            border-radius: 14px;
-            color: #0a0a0a;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .error-container .btn-open-bot:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
         }
 
         /* ===== إشعار منبثق ===== */
@@ -881,96 +615,43 @@
             max-width: 90%;
             text-align: center;
         }
-        .notification-bar.show {
-            display: block;
-        }
+        .notification-bar.show { display: block; }
         @keyframes notifSlideDown {
-            0% {
-                transform: translateX(-50%) translateY(-100px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateX(-50%) translateY(0);
-                opacity: 1;
-            }
+            0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+            100% { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
+
+        /* ===== خطأ ===== */
+        .error-msg {
+            background: rgba(18, 18, 18, 0.85);
+            border: 1px solid rgba(255, 0, 0, 0.06);
+            border-radius: 12px;
+            padding: 10px;
+            color: #FF6B6B;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+            width: 100%;
+            max-width: 380px;
+            backdrop-filter: blur(6px);
+        }
+        .error-msg.show { display: block; }
 
         /* ===== تجاوب ===== */
         @media (max-width: 480px) {
-            .banner-text {
-                font-size: 17px;
-                padding: 8px 10px;
-                min-height: 40px;
-            }
-            .btn {
-                font-size: 16px;
-                padding: 14px 16px;
-            }
-            .btn-spin {
-                font-size: 17px;
-            }
-            .pointer {
-                font-size: 26px;
-                top: -12px;
-            }
-            .result-box .prize-desc {
-                font-size: 20px;
-            }
-            .result-box.winner .prize-desc {
-                font-size: 24px;
-            }
-            .admin-panel .prize-item {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .admin-panel .prize-item .prize-colors {
-                justify-content: center;
-            }
-            .admin-panel .settings-section .setting-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .admin-panel .settings-section .setting-row label {
-                min-width: auto;
-            }
-            .loading-screen .loading-image {
-                width: 60vw;
-                max-width: 220px;
-            }
-            .admin-panel .add-prize-form input {
-                min-width: 40px;
-                font-size: 10px;
-            }
-            .admin-panel .prize-item .prize-info {
-                min-width: 70px;
-            }
-            .admin-panel .prize-item .prize-prob .prob-input {
-                width: 38px;
-            }
-            .sound-settings {
-                gap: 12px;
-                padding: 4px 12px;
-            }
+            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 8px; }
+            .card .card-front .prize-icon { font-size: 28px; }
+            .card .card-front .prize-name { font-size: 9px; }
+            .card .card-back .back-pattern { font-size: 24px; }
+            .banner-text { font-size: 17px; padding: 8px 10px; }
+            .btn { font-size: 16px; padding: 14px 16px; }
         }
 
         @media (max-width: 380px) {
-            .banner-text {
-                font-size: 15px;
-            }
-            .btn-spin {
-                font-size: 15px;
-                padding: 12px 14px;
-            }
-            .result-box .prize-desc {
-                font-size: 17px;
-            }
-            .result-box.winner .prize-desc {
-                font-size: 20px;
-            }
-            .pointer {
-                font-size: 22px;
-                top: -10px;
-            }
+            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 6px; }
+            .card .card-front .prize-icon { font-size: 22px; }
+            .card .card-front .prize-name { font-size: 8px; }
         }
     </style>
 </head>
@@ -983,29 +664,15 @@
 
     <!-- ===== إشعار ===== -->
     <div class="notification-bar" id="notificationBar">
-        🎉 مبروك! لقد فزت بـ <span id="notifPrizeName">جائزة</span>!
+        🎉 مبروك! <span id="notifPrizeName">جائزة</span>
     </div>
 
     <!-- ===== النص العلوي ===== -->
-    <div class="banner-text" id="bannerText">🎡 IChancy · عجلة الحظ</div>
-
-    <!-- ===== حالة المستخدم (مخفي) ===== -->
-    <div class="user-status" id="userStatus"></div>
-
-    <!-- ===== خطأ ===== -->
-    <div class="error-container" id="errorContainer">
-        <div class="error-icon">⚠️</div>
-        <div class="error-title">يجب الدخول من البوت</div>
-        <div class="error-text">
-            لا يمكن الوصول إلى معرف المستخدم.<br>
-            يرجى فتح العجلة من خلال <span class="highlight">بوت IChancy</span>.
-        </div>
-        <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
-    </div>
+    <div class="banner-text" id="bannerText">🃏 IChancy · بطاقات الحظ</div>
 
     <!-- ===== شاشة لودينغ ===== -->
     <div class="loading-screen" id="loadingScreen">
-        <img class="loading-image" id="loadingImage" src="https://via.placeholder.com/200/1a1a2e/FFD700?text=🎡" alt="Loading">
+        <img class="loading-image" id="loadingImage" src="https://media.giphy.com/media/3o7bu8sRnYpTOG1p8k/giphy.gif" alt="Loading">
         <div class="progress-container">
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill" id="loaderProgressBar"></div>
@@ -1014,23 +681,16 @@
         </div>
     </div>
 
-    <!-- ===== العجلة - بدون حاوية خارجية ===== -->
-    <div class="wheel-wrapper" id="wheelWrapper">
-        <div class="pointer" id="pointer">🔽</div>
-        <canvas id="wheelCanvas" width="500" height="500"></canvas>
-    </div>
-
-    <!-- ===== لا توجد جوائز ===== -->
-    <div class="no-prizes" id="noPrizes">
-        <div style="font-size:28px;">⚠️</div>
-        <div style="margin-top:6px;">لا توجد جوائز متاحة</div>
+    <!-- ===== البطاقات ===== -->
+    <div class="cards-container" id="cardsContainer">
+        <div class="cards-grid" id="cardsGrid"></div>
     </div>
 
     <!-- ===== أزرار ===== -->
     <div class="actions">
-        <button class="btn btn-spin" id="spinBtn" disabled>
+        <button class="btn btn-play" id="playBtn" disabled>
             <span class="spinner-small"></span>
-            <span id="spinBtnText">🎰 تدوير العجلة</span>
+            <span id="playBtnText">🃏 اختر بطاقة</span>
         </button>
     </div>
 
@@ -1040,27 +700,23 @@
             💰 مطلوب إيداع <span class="amount" id="depositMinAmount">0</span> SYP
             خلال <span id="depositCheckHours">24</span> ساعة
         </div>
-        <div class="notice-status" id="depositStatus">
-            الحالة: <span class="not-met">❌ غير مكتمل</span>
-        </div>
     </div>
 
-    <!-- ===== النتيجة (يظهر الوصف فقط) ===== -->
+    <!-- ===== النتيجة ===== -->
     <div class="result-box" id="resultBox">
-        <div class="confetti-container" id="confettiContainer"></div>
-        <div class="prize-icon" id="prizeIcon">🎁</div>
-        <div class="prize-name" id="prizeName">جائزة!</div>
-        <div class="prize-desc" id="prizeDesc"></div>
+        <div class="result-icon" id="resultIcon">🎁</div>
+        <div class="result-title" id="resultTitle">جائزة!</div>
+        <div class="result-desc" id="resultDesc"></div>
     </div>
 
     <!-- ===== إعدادات الصوت ===== -->
     <div class="sound-settings">
         <label>
-            <span class="sound-indicator">🔊</span>
+            <span>🔊</span>
             <input type="checkbox" id="soundToggle" checked> مؤثرات
         </label>
         <label>
-            <span class="sound-indicator">🎵</span>
+            <span>🎵</span>
             <input type="checkbox" id="musicToggle" checked> موسيقى
         </label>
     </div>
@@ -1074,74 +730,35 @@
         <div id="prizesList"></div>
 
         <div class="add-prize-form">
-            <input type="text" id="newPrizeName" placeholder="الاسم (للإدارة)">
+            <input type="text" id="newPrizeName" placeholder="الاسم">
             <input type="text" id="newPrizeIcon" placeholder="🎁" style="max-width:44px;">
-            <input type="text" id="newPrizeDesc" placeholder="الوصف (يظهر للجمهور)" style="flex:1.5;">
-            <input type="number" id="newPrizeProb" placeholder="نسبة" style="max-width:55px;">
-            <input type="color" id="newPrizeColor" value="#1a1a2e" style="max-width:34px;padding:2px;">
-            <input type="color" id="newPrizeColor2" value="#16213e" style="max-width:34px;padding:2px;">
+            <input type="text" id="newPrizeDesc" placeholder="الوصف" style="flex:1.5;">
+            <input type="color" id="newPrizeColor" value="#FFD700" style="max-width:34px;padding:2px;">
+            <input type="color" id="newPrizeCardColor" value="#1a1a2e" style="max-width:34px;padding:2px;">
             <button class="btn-add" id="addPrizeBtn">➕</button>
         </div>
 
         <div class="panel-actions">
-            <button class="btn-action" id="refreshPrizesBtn">🔄 تحديث الكل</button>
+            <button class="btn-action" id="refreshPrizesBtn">🔄 تحديث</button>
             <button class="btn-action danger" id="resetPrizesBtn">🗑️ إعادة تعيين</button>
         </div>
 
-        <div class="settings-section">
-            <div class="setting-row">
-                <label>النص العلوي</label>
-                <input type="text" id="editBannerText" placeholder="النص الذي يظهر في الأعلى">
-                <button class="btn-save" data-setting="banner_text" data-field="editBannerText">💾 حفظ</button>
+        <div class="settings-section" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.04);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+                <label style="color:#888;font-size:11px;min-width:70px;">النص العلوي</label>
+                <input type="text" id="editBannerText" style="flex:1;padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:11px;">
+                <button class="btn-save" data-setting="banner_text" data-field="editBannerText" style="padding:4px 14px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);border-radius:4px;color:#FFD700;font-size:10px;cursor:pointer;">💾</button>
             </div>
-            <div class="setting-row">
-                <label>صورة الخلفية</label>
-                <input type="text" id="editBgImage" placeholder="رابط الصورة">
-                <button class="btn-save" data-setting="bg_image_url" data-field="editBgImage">💾 حفظ</button>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+                <label style="color:#888;font-size:11px;min-width:70px;">عدد البطاقات</label>
+                <input type="number" id="editCardsCount" value="12" style="max-width:60px;padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:11px;">
+                <button class="btn-save" data-setting="cards_count" data-field="editCardsCount" style="padding:4px 14px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);border-radius:4px;color:#FFD700;font-size:10px;cursor:pointer;">💾</button>
             </div>
-            <div class="setting-row">
-                <label>صورة اللودينغ</label>
-                <input type="text" id="editLoadingImage" placeholder="رابط صورة اللودينغ">
-                <button class="btn-save" data-setting="loading_image_url" data-field="editLoadingImage">💾 حفظ</button>
-            </div>
-            <div class="setting-row">
-                <label>مركز العجلة</label>
-                <input type="text" id="editCenterIcon" placeholder="🎯" style="max-width:80px;">
-                <button class="btn-save" data-setting="center_icon" data-field="editCenterIcon">💾 حفظ</button>
-            </div>
-            <div class="setting-row">
-                <label>مدة التدوير</label>
-                <input type="number" id="editSpinDuration" placeholder="3500" style="max-width:80px;">
-                <span style="color:#555;font-size:11px;">مللي ثانية</span>
-                <button class="btn-save" data-setting="spin_duration" data-field="editSpinDuration">💾 حفظ</button>
-            </div>
-            <div class="setting-row">
-                <label>فترة التبريد</label>
-                <input type="number" id="editIntervalHours" placeholder="24" style="max-width:60px;">
-                <span style="color:#555;font-size:11px;">ساعة</span>
-                <button class="btn-save" data-setting="spin_interval_hours" data-field="editIntervalHours">💾 حفظ</button>
-            </div>
-            <div class="toggle-row">
-                <label>تفعيل العجلة</label>
-                <input type="checkbox" id="editIsActive">
-                <button class="btn-save" data-setting="is_active" data-field="editIsActive" data-type="checkbox">💾 حفظ</button>
-            </div>
-            <div class="toggle-row">
-                <label>تفعيل شرط الإيداع</label>
-                <input type="checkbox" id="editDepositRequired">
-                <button class="btn-save" data-setting="deposit_required" data-field="editDepositRequired" data-type="checkbox">💾 حفظ</button>
-            </div>
-            <div class="setting-row">
-                <label>الحد الأدنى للإيداع</label>
-                <input type="number" id="editDepositMin" placeholder="1000" style="max-width:80px;">
-                <span style="color:#555;font-size:11px;">SYP</span>
-                <button class="btn-save" data-setting="deposit_min_amount" data-field="editDepositMin">💾 حفظ</button>
-            </div>
-            <div class="setting-row">
-                <label>مدة صلاحية الإيداع</label>
-                <input type="number" id="editDepositHours" placeholder="24" style="max-width:60px;">
-                <span style="color:#555;font-size:11px;">ساعة</span>
-                <button class="btn-save" data-setting="deposit_check_hours" data-field="editDepositHours">💾 حفظ</button>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+                <label style="color:#888;font-size:11px;min-width:70px;">مدة التقليب</label>
+                <input type="number" id="editFlipDuration" value="800" style="max-width:60px;padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:11px;">
+                <span style="color:#555;font-size:11px;">مللي</span>
+                <button class="btn-save" data-setting="flip_duration" data-field="editFlipDuration" style="padding:4px 14px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);border-radius:4px;color:#FFD700;font-size:10px;cursor:pointer;">💾</button>
             </div>
         </div>
     </div>
@@ -1158,13 +775,15 @@
         const API_BASE = 'https://joj-d0kl.onrender.com';
         const ADMIN_ID = 7011476249;
         let USER_ID = null;
-        let isSpinning = false;
+        let isPlaying = false;
         let prizesCache = [];
-        let currentRotation = 0;
+        let settingsCache = {};
+        let flipDuration = 800;
+        let cardRevealDelay = 300;
+        let totalCards = 12;
+        let selectedCardIndex = -1;
         let soundEnabled = true;
         let musicEnabled = true;
-        let settingsCache = {};
-        let spinDuration = 3500;
 
         // ================================================================
         //                      نظام الصوت
@@ -1174,7 +793,6 @@
                 this.initialized = false;
                 this.audioContext = null;
                 this.bgInterval = null;
-                this.isPlaying = false;
             }
 
             init() {
@@ -1195,7 +813,28 @@
                     } catch (e) {}
                 }
                 this.stopBackgroundMusic();
-                this.isPlaying = false;
+            }
+
+            playFlipSound() {
+                if (!soundEnabled || !this.initialized) return;
+                try {
+                    const ctx = this.audioContext;
+                    const now = ctx.currentTime;
+                    // صوت تقليب البطاقة
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
+                    osc.type = 'sawtooth';
+                    gain.gain.setValueAtTime(0.04, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } catch (e) {
+                    console.warn('Sound error:', e);
+                }
             }
 
             playWinSound() {
@@ -1204,54 +843,29 @@
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
                     const melody = [
-                        [523, 0.1],
-                        [587, 0.1],
-                        [659, 0.1],
-                        [784, 0.15],
-                        [659, 0.1],
-                        [880, 0.1],
-                        [988, 0.1],
-                        [1175, 0.2],
-                        [1047, 0.1],
-                        [1175, 0.1],
-                        [1319, 0.1],
-                        [1568, 0.25],
-                        [1319, 0.1],
-                        [1175, 0.1],
-                        [1047, 0.1],
-                        [880, 0.3]
+                        [523, 0.08],
+                        [659, 0.08],
+                        [784, 0.08],
+                        [1047, 0.12],
+                        [784, 0.08],
+                        [988, 0.08],
+                        [1175, 0.12],
+                        [1319, 0.15]
                     ];
                     melody.forEach(([freq, dur], i) => {
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, now + i * 0.08);
-                        osc.type = i % 3 === 0 ? 'sine' : 'triangle';
-                        gain.gain.setValueAtTime(0.1, now + i * 0.08);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + dur);
-                        osc.start(now + i * 0.08);
-                        osc.stop(now + i * 0.08 + dur);
+                        osc.frequency.setValueAtTime(freq, now + i * 0.07);
+                        osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+                        gain.gain.setValueAtTime(0.06, now + i * 0.07);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + dur);
+                        osc.start(now + i * 0.07);
+                        osc.stop(now + i * 0.07 + dur);
                     });
-                    setTimeout(() => {
-                        const chords = [523, 659, 784, 1047];
-                        chords.forEach((freq, i) => {
-                            const osc = ctx.createOscillator();
-                            const gain = ctx.createGain();
-                            osc.connect(gain);
-                            gain.connect(ctx.destination);
-                            osc.frequency.setValueAtTime(freq, now + 1.3 + i * 0.05);
-                            osc.type = 'sine';
-                            gain.gain.setValueAtTime(0.05, now + 1.3 + i * 0.05);
-                            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8 + i * 0.05);
-                            osc.start(now + 1.3 + i * 0.05);
-                            osc.stop(now + 1.8 + i * 0.05);
-                        });
-                    }, 800);
-                    setTimeout(() => { this.isPlaying = false; }, 3000);
                 } catch (e) {
                     console.warn('Sound error:', e);
-                    this.isPlaying = false;
                 }
             }
 
@@ -1264,30 +878,15 @@
                     const gain = ctx.createGain();
                     osc.connect(gain);
                     gain.connect(ctx.destination);
-                    osc.frequency.setValueAtTime(500, now);
-                    osc.frequency.exponentialRampToValueAtTime(120, now + 0.5);
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.4);
                     osc.type = 'sawtooth';
-                    gain.gain.setValueAtTime(0.06, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                    gain.gain.setValueAtTime(0.04, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
                     osc.start(now);
-                    osc.stop(now + 0.5);
-                    setTimeout(() => {
-                        const osc2 = ctx.createOscillator();
-                        const gain2 = ctx.createGain();
-                        osc2.connect(gain2);
-                        gain2.connect(ctx.destination);
-                        osc2.frequency.setValueAtTime(300, now + 0.3);
-                        osc2.frequency.exponentialRampToValueAtTime(100, now + 0.6);
-                        osc2.type = 'square';
-                        gain2.gain.setValueAtTime(0.04, now + 0.3);
-                        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-                        osc2.start(now + 0.3);
-                        osc2.stop(now + 0.6);
-                    }, 200);
-                    setTimeout(() => { this.isPlaying = false; }, 1000);
+                    osc.stop(now + 0.4);
                 } catch (e) {
                     console.warn('Sound error:', e);
-                    this.isPlaying = false;
                 }
             }
 
@@ -1296,7 +895,6 @@
                 if (this.bgInterval) return;
                 try {
                     const ctx = this.audioContext;
-                    const now = ctx.currentTime;
                     const playNote = (freq, time, dur, vol, type = 'sine') => {
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
@@ -1304,27 +902,20 @@
                         gain.connect(ctx.destination);
                         osc.frequency.setValueAtTime(freq, time);
                         osc.type = type;
-                        gain.gain.setValueAtTime(vol || 0.025, time);
+                        gain.gain.setValueAtTime(vol || 0.02, time);
                         gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
                         osc.start(time);
                         osc.stop(time + dur);
                     };
+                    // موسيقى خلفية خفيفة
                     const pattern = [
-                        [262, 0.25, 0.02],
-                        [330, 0.25, 0.02],
-                        [392, 0.25, 0.02],
-                        [523, 0.35, 0.025],
-                        [330, 0.25, 0.02],
-                        [392, 0.25, 0.02],
-                        [523, 0.25, 0.02],
-                        [659, 0.35, 0.025],
-                        [392, 0.25, 0.02],
-                        [523, 0.25, 0.02],
-                        [659, 0.25, 0.02],
-                        [784, 0.35, 0.025]
+                        [262, 0.3, 0.015],
+                        [330, 0.3, 0.015],
+                        [392, 0.3, 0.015],
+                        [523, 0.4, 0.02]
                     ];
                     pattern.forEach(([freq, dur, vol], i) => {
-                        const time = now + i * 0.3;
+                        const time = ctx.currentTime + i * 0.35;
                         playNote(freq, time, dur, vol, i % 2 === 0 ? 'sine' : 'triangle');
                     });
                     this.bgInterval = setInterval(() => {
@@ -1333,9 +924,9 @@
                             return;
                         }
                         const t = ctx.currentTime;
-                        const bassNotes = [131, 165, 196, 262, 196, 165];
-                        bassNotes.forEach((freq, i) => {
-                            playNote(freq, t + i * 0.25, 0.2, 0.015, 'square');
+                        const notes = [131, 165, 196, 262];
+                        notes.forEach((freq, i) => {
+                            playNote(freq, t + i * 0.2, 0.15, 0.01, 'square');
                         });
                     }, 1500);
                 } catch (e) {
@@ -1361,7 +952,7 @@
             let id = params.get('user_id') || params.get('userId') || params.get('id');
             if (id && !isNaN(id)) {
                 USER_ID = parseInt(id);
-                localStorage.setItem('wheel_user_id', USER_ID);
+                localStorage.setItem('flip_user_id', USER_ID);
                 return USER_ID;
             }
             try {
@@ -1369,12 +960,12 @@
                     const user = window.Telegram.WebApp.initDataUnsafe?.user;
                     if (user && user.id) {
                         USER_ID = user.id;
-                        localStorage.setItem('wheel_user_id', USER_ID);
+                        localStorage.setItem('flip_user_id', USER_ID);
                         return USER_ID;
                     }
                 }
             } catch (e) {}
-            id = localStorage.getItem('wheel_user_id');
+            id = localStorage.getItem('flip_user_id');
             if (id) {
                 USER_ID = parseInt(id);
                 return USER_ID;
@@ -1383,494 +974,200 @@
         }
 
         // ================================================================
-        //                      رسم العجلة (نص مصغر /2)
+        //                      إنشاء البطاقات
         // ================================================================
-        function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
-            const canvas = document.getElementById('wheelCanvas');
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width,
-                h = canvas.height;
-            const cx = w / 2,
-                cy = h / 2;
-            const r = Math.min(w, h) / 2 - 12;
-            const noPrizes = document.getElementById('noPrizes');
-            const wrapper = document.getElementById('wheelWrapper');
-
-            if (!prizes || prizes.length === 0) {
-                noPrizes.style.display = 'block';
-                wrapper.classList.remove('show');
-                return;
-            }
-
-            noPrizes.style.display = 'none';
-            wrapper.classList.add('show');
-            ctx.clearRect(0, 0, w, h);
-
-            const total = prizes.length;
-            const step = (2 * Math.PI) / total;
-
-            prizes.forEach((p, i) => {
-                const start = i * step + rotation - Math.PI / 2;
-                const end = start + step;
-                const isHighlight = (i === highlightIndex);
-
-                ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.arc(cx, cy, r, start, end);
-                ctx.closePath();
-
-                const color1 = p.color || '#1a1a2e';
-                const color2 = p.color2 || '#16213e';
-                const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-
-                if (isHighlight) {
-                    grad.addColorStop(0, '#FFD700');
-                    grad.addColorStop(0.5, '#FF8C00');
-                    grad.addColorStop(1, '#B8860B');
-                } else {
-                    grad.addColorStop(0, color1);
-                    grad.addColorStop(1, color2);
+        function createCards(count, prize = null) {
+            const grid = document.getElementById('cardsGrid');
+            grid.innerHTML = '';
+            
+            // نستخدم جوائز عشوائية للبطاقات الأخرى
+            const availablePrizes = prizesCache.length > 0 ? prizesCache : [];
+            
+            for (let i = 0; i < count; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = i;
+                
+                // اختيار جائزة عشوائية للبطاقة (للعرض)
+                let randomPrize = availablePrizes.length > 0 ? 
+                    availablePrizes[Math.floor(Math.random() * availablePrizes.length)] : 
+                    { icon: '🎁', name: 'جائزة', description: '' };
+                
+                // إذا كانت هذه البطاقة هي البطاقة الفائزة
+                if (prize && i === prize.card_index) {
+                    randomPrize = prize.prize;
                 }
-                ctx.fillStyle = grad;
-                ctx.fill();
-
-                if (isHighlight) {
-                    ctx.shadowColor = '#FFD700';
-                    ctx.shadowBlur = 50;
-                } else {
-                    ctx.shadowColor = 'transparent';
-                    ctx.shadowBlur = 0;
-                }
-
-                ctx.strokeStyle = isHighlight ? '#FFD700' : 'rgba(255,215,0,0.05)';
-                ctx.lineWidth = isHighlight ? 2.5 : 0.5;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-
-                // عرض الإيموجي فقط (بدون اسم) - حجم الإيموجي المصغر /2
-                const mid = start + step / 2;
-                const tr = r * 0.62;
-                const x = cx + Math.cos(mid) * tr;
-                const y = cy + Math.sin(mid) * tr;
-
-                ctx.save();
-                ctx.translate(x, y);
-                ctx.rotate(mid + (mid > Math.PI / 2 ? Math.PI : 0));
-
-                ctx.fillStyle = isHighlight ? '#0a0a0a' : '#fff';
-                ctx.font = isHighlight ? 'bold 19px sans-serif' : '17px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.shadowColor = 'rgba(0,0,0,0.8)';
-                ctx.shadowBlur = 8;
-                ctx.fillText(p.icon || '🎁', 0, 0);
-                ctx.shadowBlur = 0;
-                ctx.restore();
-            });
-
-            // مركز العجلة
-            const centerR = r * 0.16;
-            const centerIcon = settingsCache.center_icon || '⭐';
-
-            const grad = ctx.createRadialGradient(cx - 4, cy - 4, 0, cx, cy, centerR);
-            grad.addColorStop(0, '#FFD700');
-            grad.addColorStop(0.3, '#FFA500');
-            grad.addColorStop(0.7, '#FF8C00');
-            grad.addColorStop(1, '#B8860B');
-
-            ctx.beginPath();
-            ctx.arc(cx, cy, centerR, 0, 2 * Math.PI);
-            ctx.fillStyle = grad;
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
-            ctx.shadowBlur = 40;
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            ctx.beginPath();
-            ctx.arc(cx, cy, centerR + 5, 0, 2 * Math.PI);
-            ctx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.fillStyle = '#0a0a0a';
-            ctx.font = '32px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 10;
-            ctx.fillText(centerIcon, cx, cy + 1);
-            ctx.shadowBlur = 0;
-        }
-
-        // ================================================================
-        //                      دوران العجلة
-        // ================================================================
-        function animateSpin(targetRotation, duration, callback) {
-            const canvas = document.getElementById('wheelCanvas');
-            canvas.classList.add('spinning');
-
-            const startRotation = currentRotation;
-            const startTime = performance.now();
-
-            function animate(time) {
-                const elapsed = time - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-                const easedProgress = easeOutCubic;
-
-                const currentAngle = startRotation + (targetRotation - startRotation) * easedProgress;
-                currentRotation = currentAngle;
-
-                drawWheel(prizesCache, -1, currentAngle);
-
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    currentRotation = targetRotation;
-                    canvas.classList.remove('spinning');
-                    if (callback) callback();
-                }
-            }
-
-            requestAnimationFrame(animate);
-        }
-
-        // ================================================================
-        //                      دوال الإدارة
-        // ================================================================
-        async function loadSettings() {
-            try {
-                const res = await fetch(`${API_BASE}/api/admin/settings?admin_id=${ADMIN_ID}`);
-                const data = await res.json();
-                if (data.success) {
-                    settingsCache = data.settings;
-                    if (settingsCache.banner_text) {
-                        document.getElementById('bannerText').textContent = settingsCache.banner_text;
-                    }
-                    if (settingsCache.bg_image_url) {
-                        document.getElementById('bgImage').src = settingsCache.bg_image_url;
-                    }
-                    if (settingsCache.loading_image_url) {
-                        document.getElementById('loadingImage').src = settingsCache.loading_image_url;
-                    }
-                    if (settingsCache.spin_duration) {
-                        spinDuration = parseInt(settingsCache.spin_duration) || 3500;
-                    }
-                    document.getElementById('editBannerText').value = settingsCache.banner_text || '';
-                    document.getElementById('editBgImage').value = settingsCache.bg_image_url || '';
-                    document.getElementById('editLoadingImage').value = settingsCache.loading_image_url || '';
-                    document.getElementById('editCenterIcon').value = settingsCache.center_icon || '⭐';
-                    document.getElementById('editSpinDuration').value = settingsCache.spin_duration || 3500;
-                    document.getElementById('editIntervalHours').value = settingsCache.spin_interval_hours || 24;
-                    document.getElementById('editIsActive').checked = settingsCache.is_active === 'true';
-                    document.getElementById('editDepositRequired').checked = settingsCache.deposit_required === 'true';
-                    document.getElementById('editDepositMin').value = settingsCache.deposit_min_amount || 1000;
-                    document.getElementById('editDepositHours').value = settingsCache.deposit_check_hours || 24;
-                    return data.settings;
-                }
-                return {};
-            } catch (e) {
-                console.error('Error loading settings:', e);
-                return {};
-            }
-        }
-
-        async function saveSetting(key, value) {
-            try {
-                let finalValue = value;
-                if (typeof value === 'boolean') {
-                    finalValue = value ? 'true' : 'false';
-                }
-                const response = await fetch(`${API_BASE}/api/admin/setting`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        admin_id: ADMIN_ID,
-                        key: key,
-                        value: String(finalValue)
-                    })
-                });
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || 'فشل الحفظ');
-                }
-                return data.success === true;
-            } catch (e) {
-                console.error('Error saving setting:', e);
-                showError('فشل حفظ الإعداد: ' + e.message);
-                return false;
-            }
-        }
-
-        async function loadAdminPrizes() {
-            try {
-                const res = await fetch(`${API_BASE}/api/admin/prizes?admin_id=${ADMIN_ID}`);
-                const data = await res.json();
-                if (data.success) {
-                    return data.prizes || [];
-                }
-                return [];
-            } catch (e) {
-                console.error('Error loading admin prizes:', e);
-                return [];
-            }
-        }
-
-        async function loadPublicPrizes() {
-            try {
-                const res = await fetch(`${API_BASE}/api/prizes`);
-                const data = await res.json();
-                if (data.success) {
-                    return data.prizes || [];
-                }
-                return [];
-            } catch (e) {
-                console.error('Error loading public prizes:', e);
-                return [];
-            }
-        }
-
-        async function updatePrize(prizeId, data) {
-            try {
-                const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ admin_id: ADMIN_ID, ...data })
-                });
-                const result = await response.json();
-                if (!response.ok) {
-                    throw new Error(result.error || 'فشل التحديث');
-                }
-                return result.success === true;
-            } catch (e) {
-                console.error('Error updating prize:', e);
-                showError('❌ فشل تحديث الجائزة: ' + e.message);
-                return false;
-            }
-        }
-
-        async function deletePrize(prizeId) {
-            try {
-                const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ admin_id: ADMIN_ID })
-                });
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || 'فشل الحذف');
-                }
-                return data.success === true;
-            } catch (e) {
-                console.error('Error deleting prize:', e);
-                showError('❌ فشل حذف الجائزة: ' + e.message);
-                return false;
-            }
-        }
-
-        async function addPrize(name, icon, description, probability, color, color2) {
-            try {
-                const response = await fetch(`${API_BASE}/api/admin/prizes`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        admin_id: ADMIN_ID,
-                        name: name,
-                        icon: icon || '🎁',
-                        description: description || '',
-                        probability: parseFloat(probability) || 10,
-                        color: color || '#1a1a2e',
-                        color2: color2 || '#16213e'
-                    })
-                });
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || 'فشل الإضافة');
-                }
-                return data.success === true;
-            } catch (e) {
-                console.error('Error adding prize:', e);
-                showError('❌ فشل إضافة الجائزة: ' + e.message);
-                return false;
-            }
-        }
-
-        async function resetPrizes() {
-            try {
-                const res = await fetch(`${API_BASE}/api/admin/seed-prizes`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ admin_id: ADMIN_ID })
-                });
-                const data = await res.json();
-                return data.success;
-            } catch (e) {
-                console.error('Error resetting prizes:', e);
-                return false;
-            }
-        }
-
-        // ================================================================
-        //                      عرض لوحة الإدارة
-        // ================================================================
-        async function renderAdminPanel() {
-            const panel = document.getElementById('adminPanel');
-            const list = document.getElementById('prizesList');
-
-            if (USER_ID !== ADMIN_ID) {
-                panel.classList.remove('show');
-                return;
-            }
-
-            panel.classList.add('show');
-
-            const prizes = await loadAdminPrizes();
-            if (!prizes || prizes.length === 0) {
-                list.innerHTML = `
-                        <div style="color:#555;font-size:13px;text-align:center;padding:20px;">
-                            <div style="font-size:30px;margin-bottom:10px;">📭</div>
-                            لا توجد جوائز<br>
-                            <span style="font-size:11px;color:#444;">أضف جائزة جديدة باستخدام النموذج أدناه</span>
-                        </div>
-                    `;
-                return;
-            }
-
-            list.innerHTML = prizes.map((p, index) => `
-                    <div class="prize-item" data-id="${p.id}" data-index="${index}">
-                        <div class="prize-icon-small">${p.icon || '🎁'}</div>
-                        <div class="prize-info">
-                            <div class="name">
-                                <input type="text" class="name-input" value="${p.name}" placeholder="اسم الجائزة">
-                            </div>
-                            <div class="desc">
-                                <input type="text" class="desc-input" value="${p.description || ''}" placeholder="الوصف (يظهر للجمهور)">
-                            </div>
-                        </div>
-                        <div class="prize-prob">
-                            <input type="number" class="prob-input" value="${p.probability}" min="0" max="100" step="0.1">
-                            <span class="prob-label">%</span>
-                            <button class="btn-save-prob" data-id="${p.id}">💾</button>
-                        </div>
-                        <div class="prize-colors">
-                            <input type="color" class="color-input" value="${p.color || '#1a1a2e'}" data-field="color" data-id="${p.id}">
-                            <input type="color" class="color-input" value="${p.color2 || '#16213e'}" data-field="color2" data-id="${p.id}">
-                        </div>
-                        <button class="btn-delete" data-id="${p.id}">✕</button>
+                
+                card.innerHTML = `
+                    <div class="card-face card-back">
+                        <div class="back-pattern">🃏</div>
+                        <div class="card-number">#${String(i + 1).padStart(2, '0')}</div>
+                        <div class="card-shine"></div>
                     </div>
-                `).join('');
+                    <div class="card-face card-front" style="background: linear-gradient(145deg, ${randomPrize.card_color || '#1a1a2e'}, ${randomPrize.card_back_color || '#16213e'});">
+                        <div class="prize-icon">${randomPrize.icon || '🎁'}</div>
+                        <div class="prize-name">${randomPrize.name || 'جائزة'}</div>
+                        <div class="prize-desc">${randomPrize.description || ''}</div>
+                        <div class="card-shine"></div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => handleCardClick(i));
+                grid.appendChild(card);
+            }
+        }
 
-            list.querySelectorAll('.name-input').forEach(input => {
-                input.addEventListener('change', async function() {
-                    const item = this.closest('.prize-item');
-                    const id = parseInt(item.dataset.id);
-                    const value = this.value.trim();
-                    if (!value) {
-                        showError('⚠️ الاسم مطلوب');
-                        this.value = item.querySelector('.name-input').dataset.oldValue || '';
-                        return;
-                    }
-                    const success = await updatePrize(id, { name: value });
-                    if (success) {
-                        await refreshAll();
-                        showNotification('✅ تم تحديث الاسم');
+        // ================================================================
+        //                      التعامل مع البطاقات
+        // ================================================================
+        async function handleCardClick(index) {
+            if (isPlaying) return;
+            if (document.getElementById('playBtn').disabled) return;
+            if (selectedCardIndex !== -1) return; // تم الاختيار بالفعل
+            
+            // اختيار البطاقة
+            selectedCardIndex = index;
+            isPlaying = true;
+            
+            const playBtn = document.getElementById('playBtn');
+            playBtn.disabled = true;
+            playBtn.classList.add('loading');
+            document.getElementById('playBtnText').textContent = 'جاري اللعب...';
+            
+            soundManager.init();
+            soundManager.playBackgroundMusic();
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/flip/play`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: USER_ID })
+                });
+                
+                const data = await response.json();
+                playBtn.classList.remove('loading');
+                
+                if (data.success) {
+                    const prize = data.game.prize;
+                    const winningIndex = data.game.card_index;
+                    const totalCards = data.game.total_cards;
+                    
+                    // عرض جميع البطاقات
+                    await revealAllCards(winningIndex, prize);
+                    
+                    // إظهار النتيجة
+                    const isWin = !prize.name.includes('حظ سعيد');
+                    showResult(prize, isWin);
+                    
+                    if (isWin) {
+                        soundManager.playWinSound();
+                        showNotification(`🎉 مبروك! ${prize.description || prize.name}!`);
                     } else {
-                        showError('❌ فشل تحديث الاسم');
-                        await refreshAll();
+                        soundManager.playLoseSound();
                     }
-                });
-                input.addEventListener('focus', function() {
-                    this.dataset.oldValue = this.value;
-                });
-            });
+                    
+                } else {
+                    showError(data.error || 'حدث خطأ');
+                    if (data.remaining_hours !== undefined) {
+                        const btn = document.getElementById('playBtn');
+                        btn.disabled = true;
+                        document.getElementById('playBtnText').textContent = `⏳ ${data.remaining_hours}h ${data.remaining_minutes}m`;
+                        soundManager.stopAll();
+                    }
+                }
+                
+            } catch (e) {
+                playBtn.classList.remove('loading');
+                showError('خطأ في الاتصال: ' + e.message);
+                soundManager.stopAll();
+            }
+            
+            isPlaying = false;
+            if (!document.getElementById('playBtn').disabled) {
+                document.getElementById('playBtnText').textContent = '🃏 اختر بطاقة';
+            }
+        }
 
-            list.querySelectorAll('.desc-input').forEach(input => {
-                input.addEventListener('change', async function() {
-                    const item = this.closest('.prize-item');
-                    const id = parseInt(item.dataset.id);
-                    const value = this.value.trim();
-                    const success = await updatePrize(id, { description: value });
-                    if (success) {
-                        await refreshAll();
-                        showNotification('✅ تم تحديث الوصف');
-                    } else {
-                        showError('❌ فشل تحديث الوصف');
-                        await refreshAll();
+        // ================================================================
+        //                      كشف البطاقات
+        // ================================================================
+        async function revealAllCards(winningIndex, prize) {
+            const cards = document.querySelectorAll('.card');
+            const total = cards.length;
+            
+            // صوت التقليب
+            soundManager.playFlipSound();
+            
+            // كشف البطاقة الفائزة أولاً
+            const winnerCard = cards[winningIndex];
+            if (winnerCard) {
+                // تحديث محتوى البطاقة الفائزة
+                const front = winnerCard.querySelector('.card-front');
+                front.style.background = `linear-gradient(145deg, ${prize.color || '#FFD700'}, ${prize.card_color || '#1a1a2e'})`;
+                front.querySelector('.prize-icon').textContent = prize.icon || '🎁';
+                front.querySelector('.prize-name').textContent = prize.name || 'جائزة';
+                front.querySelector('.prize-desc').textContent = prize.description || '';
+                
+                setTimeout(() => {
+                    winnerCard.classList.add('flipped');
+                    winnerCard.classList.add('winner');
+                }, 300);
+            }
+            
+            // كشف البطاقات الأخرى مع تأخير
+            const otherCards = Array.from(cards).filter((_, i) => i !== winningIndex);
+            for (let i = 0; i < otherCards.length; i++) {
+                const card = otherCards[i];
+                const delay = 200 + (i * 80);
+                
+                setTimeout(() => {
+                    // تحديث محتوى البطاقة بجائزة عشوائية
+                    const randomPrize = prizesCache.length > 0 ? 
+                        prizesCache[Math.floor(Math.random() * prizesCache.length)] : 
+                        { icon: '🎁', name: 'جائزة', description: '' };
+                    
+                    const front = card.querySelector('.card-front');
+                    front.style.background = `linear-gradient(145deg, ${randomPrize.card_color || '#1a1a2e'}, ${randomPrize.card_back_color || '#16213e'})`;
+                    front.querySelector('.prize-icon').textContent = randomPrize.icon || '🎁';
+                    front.querySelector('.prize-name').textContent = randomPrize.name || 'جائزة';
+                    front.querySelector('.prize-desc').textContent = randomPrize.description || '';
+                    
+                    card.classList.add('flipped');
+                    card.classList.add('disabled');
+                    
+                    // إذا لم تكن البطاقة الفائزة، أضف تأثير التلاشي
+                    if (i !== winningIndex) {
+                        card.classList.add('loser');
                     }
-                });
+                    
+                    soundManager.playFlipSound();
+                }, delay);
+            }
+            
+            // انتظار انتهاء جميع التأثيرات
+            return new Promise(resolve => {
+                const totalDelay = 200 + (otherCards.length * 80) + 500;
+                setTimeout(resolve, totalDelay);
             });
+        }
 
-            list.querySelectorAll('.prob-input').forEach(input => {
-                input.addEventListener('change', async function() {
-                    const item = this.closest('.prize-item');
-                    const id = parseInt(item.dataset.id);
-                    const val = parseFloat(this.value);
-                    if (isNaN(val) || val < 0) { this.value = 0; return; }
-                    if (val > 100) { this.value = 100; }
-                    const success = await updatePrize(id, { probability: parseFloat(this.value) });
-                    if (success) {
-                        await refreshAll();
-                        showNotification('✅ تم تحديث النسبة');
-                    } else {
-                        showError('❌ فشل تحديث النسبة');
-                        await refreshAll();
-                    }
-                });
-            });
-
-            list.querySelectorAll('.btn-save-prob').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    const item = this.closest('.prize-item');
-                    const id = parseInt(item.dataset.id);
-                    const input = item.querySelector('.prob-input');
-                    const val = parseFloat(input.value);
-                    if (isNaN(val) || val < 0) { input.value = 0; return; }
-                    if (val > 100) { input.value = 100; }
-                    const success = await updatePrize(id, { probability: parseFloat(input.value) });
-                    if (success) {
-                        await refreshAll();
-                        showNotification('✅ تم حفظ النسبة');
-                    } else {
-                        showError('❌ فشل حفظ النسبة');
-                        await refreshAll();
-                    }
-                });
-            });
-
-            list.querySelectorAll('.color-input').forEach(input => {
-                input.addEventListener('change', async function() {
-                    const id = parseInt(this.dataset.id);
-                    const field = this.dataset.field;
-                    const value = this.value;
-                    const updateData = {};
-                    updateData[field] = value;
-                    const success = await updatePrize(id, updateData);
-                    if (success) {
-                        await refreshAll();
-                        showNotification(`✅ تم تحديث اللون`);
-                    } else {
-                        showError('❌ فشل تحديث اللون');
-                        await refreshAll();
-                    }
-                });
-            });
-
-            list.querySelectorAll('.btn-delete').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    const id = parseInt(this.dataset.id);
-                    const item = this.closest('.prize-item');
-                    const name = item.querySelector('.name-input').value || 'هذه الجائزة';
-                    if (confirm(`⚠️ هل أنت متأكد من حذف "${name}"؟`)) {
-                        const success = await deletePrize(id);
-                        if (success) {
-                            await refreshAll();
-                            showNotification(`✅ تم حذف "${name}"`);
-                        } else {
-                            showError('❌ فشل حذف الجائزة');
-                        }
-                    }
-                });
-            });
+        // ================================================================
+        //                      عرض النتيجة
+        // ================================================================
+        function showResult(prize, isWin) {
+            const resultBox = document.getElementById('resultBox');
+            document.getElementById('resultIcon').textContent = prize.icon || '🎁';
+            document.getElementById('resultTitle').textContent = prize.name || 'جائزة!';
+            document.getElementById('resultDesc').textContent = prize.description || '';
+            
+            resultBox.classList.add('show');
+            if (isWin) {
+                resultBox.classList.add('winner');
+            } else {
+                resultBox.classList.remove('winner');
+            }
+            
+            loadUserStatus();
         }
 
         // ================================================================
@@ -1892,62 +1189,262 @@
         }
 
         // ================================================================
+        //                      تحميل الإعدادات
+        // ================================================================
+        async function loadSettings() {
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/settings?admin_id=${ADMIN_ID}`);
+                const data = await res.json();
+                if (data.success) {
+                    settingsCache = data.settings;
+                    
+                    if (settingsCache.banner_text) {
+                        document.getElementById('bannerText').textContent = settingsCache.banner_text;
+                    }
+                    if (settingsCache.bg_image_url) {
+                        document.getElementById('bgImage').src = settingsCache.bg_image_url;
+                    }
+                    if (settingsCache.loading_image_url) {
+                        document.getElementById('loadingImage').src = settingsCache.loading_image_url;
+                    }
+                    
+                    totalCards = parseInt(settingsCache.cards_count) || 12;
+                    flipDuration = parseInt(settingsCache.flip_duration) || 800;
+                    cardRevealDelay = parseInt(settingsCache.card_reveal_delay) || 300;
+                    
+                    document.getElementById('editBannerText').value = settingsCache.banner_text || '';
+                    document.getElementById('editCardsCount').value = totalCards;
+                    document.getElementById('editFlipDuration').value = flipDuration;
+                    
+                    return data.settings;
+                }
+                return {};
+            } catch (e) {
+                console.error('Error loading settings:', e);
+                return {};
+            }
+        }
+
+        // ================================================================
         //                      تحميل حالة المستخدم
         // ================================================================
         async function loadUserStatus() {
             if (!USER_ID) return;
             try {
-                const res = await fetch(`${API_BASE}/api/wheel/history/${USER_ID}`);
+                const res = await fetch(`${API_BASE}/api/flip/history/${USER_ID}`);
                 const data = await res.json();
                 if (data.success) {
                     const depositNotice = document.getElementById('depositNotice');
-                    const depositStatus = document.getElementById('depositStatus');
-
+                    
                     if (data.deposit_requirement?.required) {
                         const minAmount = data.deposit_requirement.min_amount || 0;
                         const checkHours = data.deposit_requirement.check_hours || 24;
-                        const currentDeposits = data.deposit_requirement.current_deposits || 0;
-                        const isMet = data.deposit_requirement.is_met || false;
-
                         document.getElementById('depositMinAmount').textContent = minAmount;
                         document.getElementById('depositCheckHours').textContent = checkHours;
-
                         depositNotice.classList.add('show');
-                        if (isMet) {
-                            depositStatus.innerHTML =
-                                `الحالة: <span class="met">✅ مكتمل (${currentDeposits} SYP)</span>`;
-                        } else {
-                            depositStatus.innerHTML =
-                                `الحالة: <span class="not-met">❌ غير مكتمل (${currentDeposits}/${minAmount} SYP)</span>`;
-                        }
                     } else {
                         depositNotice.classList.remove('show');
                     }
-
-                    const spinBtn = document.getElementById('spinBtn');
-                    const canSpin = data.spin_status?.can_spin !== false &&
+                    
+                    const playBtn = document.getElementById('playBtn');
+                    const canPlay = data.play_status?.can_play !== false &&
                         (!data.deposit_requirement?.required || data.deposit_requirement?.is_met);
-
-                    if (canSpin && prizesCache.length > 0) {
-                        spinBtn.disabled = false;
-                        document.getElementById('spinBtnText').textContent = '🎰 تدوير العجلة';
-                    } else if (!data.spin_status?.can_spin) {
-                        spinBtn.disabled = true;
-                        const h = data.spin_status?.remaining_hours || 0;
-                        const m = data.spin_status?.remaining_minutes || 0;
-                        document.getElementById('spinBtnText').textContent = `⏳ ${h}h ${m}m`;
+                    
+                    if (canPlay && prizesCache.length > 0) {
+                        playBtn.disabled = false;
+                        document.getElementById('playBtnText').textContent = '🃏 اختر بطاقة';
+                    } else if (!data.play_status?.can_play) {
+                        playBtn.disabled = true;
+                        const h = data.play_status?.remaining_hours || 0;
+                        const m = data.play_status?.remaining_minutes || 0;
+                        document.getElementById('playBtnText').textContent = `⏳ ${h}h ${m}m`;
                         soundManager.stopAll();
                     } else if (data.deposit_requirement?.required && !data.deposit_requirement?.is_met) {
-                        spinBtn.disabled = true;
-                        document.getElementById('spinBtnText').textContent = '💰 إيداع مطلوب';
+                        playBtn.disabled = true;
+                        document.getElementById('playBtnText').textContent = '💰 إيداع مطلوب';
                         soundManager.stopAll();
                     } else {
-                        spinBtn.disabled = true;
-                        document.getElementById('spinBtnText').textContent = '⏳ جاري التحميل...';
+                        playBtn.disabled = true;
+                        document.getElementById('playBtnText').textContent = '⏳ جاري التحميل...';
                     }
                 }
             } catch (e) {
                 console.error('Error loading user status:', e);
+            }
+        }
+
+        // ================================================================
+        //                      عرض لوحة الإدارة
+        // ================================================================
+        async function renderAdminPanel() {
+            const panel = document.getElementById('adminPanel');
+            const list = document.getElementById('prizesList');
+            
+            if (USER_ID !== ADMIN_ID) {
+                panel.classList.remove('show');
+                return;
+            }
+            
+            panel.classList.add('show');
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/prizes?admin_id=${ADMIN_ID}`);
+                const data = await res.json();
+                
+                if (!data.success || !data.prizes || data.prizes.length === 0) {
+                    list.innerHTML = `
+                        <div style="color:#555;font-size:13px;text-align:center;padding:20px;">
+                            <div style="font-size:30px;margin-bottom:10px;">📭</div>
+                            لا توجد جوائز
+                        </div>
+                    `;
+                    return;
+                }
+                
+                list.innerHTML = data.prizes.map(p => `
+                    <div class="prize-item" data-id="${p.id}">
+                        <div class="prize-icon-small">${p.icon || '🎁'}</div>
+                        <div class="prize-info">
+                            <input type="text" class="name-input" value="${p.name}" placeholder="الاسم">
+                        </div>
+                        <div class="prize-colors">
+                            <input type="color" class="color-input" value="${p.color || '#FFD700'}" data-field="color" data-id="${p.id}">
+                            <input type="color" class="color-input" value="${p.card_color || '#1a1a2e'}" data-field="card_color" data-id="${p.id}">
+                            <input type="color" class="color-input" value="${p.card_back_color || '#16213e'}" data-field="card_back_color" data-id="${p.id}">
+                        </div>
+                        <button class="btn-delete" data-id="${p.id}">✕</button>
+                    </div>
+                `).join('');
+                
+                // أحداث التعديل
+                list.querySelectorAll('.name-input').forEach(input => {
+                    input.addEventListener('change', async function() {
+                        const id = parseInt(this.closest('.prize-item').dataset.id);
+                        const value = this.value.trim();
+                        if (!value) { showError('⚠️ الاسم مطلوب'); return; }
+                        const success = await updatePrize(id, { name: value });
+                        if (success) { await refreshAll(); showNotification('✅ تم التحديث'); }
+                    });
+                });
+                
+                list.querySelectorAll('.color-input').forEach(input => {
+                    input.addEventListener('change', async function() {
+                        const id = parseInt(this.dataset.id);
+                        const field = this.dataset.field;
+                        const value = this.value;
+                        const updateData = {};
+                        updateData[field] = value;
+                        const success = await updatePrize(id, updateData);
+                        if (success) { await refreshAll(); showNotification('✅ تم تحديث اللون'); }
+                    });
+                });
+                
+                list.querySelectorAll('.btn-delete').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const id = parseInt(this.dataset.id);
+                        if (confirm('⚠️ هل أنت متأكد من الحذف؟')) {
+                            const success = await deletePrize(id);
+                            if (success) { await refreshAll(); showNotification('✅ تم الحذف'); }
+                        }
+                    });
+                });
+                
+            } catch (e) {
+                console.error('Error rendering admin panel:', e);
+            }
+        }
+
+        // ================================================================
+        //                      دوال الإدارة
+        // ================================================================
+        async function updatePrize(prizeId, data) {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ admin_id: ADMIN_ID, ...data })
+                });
+                const result = await response.json();
+                return result.success === true;
+            } catch (e) {
+                console.error('Error updating prize:', e);
+                return false;
+            }
+        }
+
+        async function deletePrize(prizeId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ admin_id: ADMIN_ID })
+                });
+                const data = await response.json();
+                return data.success === true;
+            } catch (e) {
+                console.error('Error deleting prize:', e);
+                return false;
+            }
+        }
+
+        async function addPrize(name, icon, description, color, card_color, card_back_color) {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/prizes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        admin_id: ADMIN_ID,
+                        name: name,
+                        icon: icon || '🎁',
+                        description: description || '',
+                        color: color || '#FFD700',
+                        card_color: card_color || '#1a1a2e',
+                        card_back_color: card_back_color || '#16213e'
+                    })
+                });
+                const data = await response.json();
+                return data.success === true;
+            } catch (e) {
+                console.error('Error adding prize:', e);
+                return false;
+            }
+        }
+
+        async function resetPrizes() {
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/seed-prizes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ admin_id: ADMIN_ID })
+                });
+                const data = await res.json();
+                return data.success;
+            } catch (e) {
+                console.error('Error resetting prizes:', e);
+                return false;
+            }
+        }
+
+        async function saveSetting(key, value) {
+            try {
+                let finalValue = value;
+                if (typeof value === 'boolean') {
+                    finalValue = value ? 'true' : 'false';
+                }
+                const response = await fetch(`${API_BASE}/api/admin/setting`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        admin_id: ADMIN_ID,
+                        key: key,
+                        value: String(finalValue)
+                    })
+                });
+                const data = await response.json();
+                return data.success === true;
+            } catch (e) {
+                console.error('Error saving setting:', e);
+                return false;
             }
         }
 
@@ -1957,213 +1454,45 @@
         async function refreshAll() {
             await loadSettings();
             const prizes = await loadPrizes();
-            drawWheel(prizes, -1, currentRotation);
+            if (prizes.length > 0) {
+                createCards(totalCards);
+                document.getElementById('cardsContainer').classList.add('show');
+            }
             await loadUserStatus();
             await renderAdminPanel();
         }
 
         // ================================================================
-        //                      تأثيرات الاحتفال
+        //                      دوال مساعدة
         // ================================================================
-        function createConfetti(count = 60) {
-            const container = document.getElementById('confettiContainer');
-            container.innerHTML = '';
-            const colors = ['#FFD700', '#FF6B00', '#FF0000', '#00FF00', '#00BFFF', '#FF00FF', '#FF69B4', '#FF4500',
-                '#7CFC00'
-            ];
-            for (let i = 0; i < count; i++) {
-                const el = document.createElement('div');
-                el.className = 'confetti';
-                const size = 6 + Math.random() * 14;
-                el.style.width = size + 'px';
-                el.style.height = size + 'px';
-                el.style.background = colors[Math.floor(Math.random() * colors.length)];
-                el.style.left = Math.random() * 100 + '%';
-                el.style.top = Math.random() * 40 + '%';
-                el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-                el.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
-                el.style.animationDelay = Math.random() * 0.8 + 's';
-                container.appendChild(el);
-            }
-            setTimeout(() => { container.innerHTML = ''; }, 3500);
-        }
-
-        function createWinEffects(prizeName) {
-            const resultBox = document.getElementById('resultBox');
-            resultBox.classList.add('winner');
-            const name = document.getElementById('prizeName');
-            name.classList.add('win-text');
-            createConfetti(60);
-            showNotification(`🎉 مبروك! لقد فزت بـ ${prizeName}!`);
-        }
-
-        function clearWinEffects() {
-            const resultBox = document.getElementById('resultBox');
-            resultBox.classList.remove('winner');
-            const name = document.getElementById('prizeName');
-            name.classList.remove('win-text');
-        }
-
         function showNotification(message) {
             const bar = document.getElementById('notificationBar');
-            document.getElementById('notifPrizeName').textContent = message.replace('🎉 مبروك! لقد فزت بـ ', '').replace('!',
-            '');
+            document.getElementById('notifPrizeName').textContent = message;
             bar.classList.add('show');
             setTimeout(() => { bar.classList.remove('show'); }, 4000);
         }
 
-        // ================================================================
-        //                      شاشة اللودينغ
-        // ================================================================
-        function updateLoading(progress) {
-            const bar = document.getElementById('loaderProgressBar');
-            const text = document.getElementById('loaderStatusText');
-            bar.style.width = progress + '%';
-            text.textContent = progress + '%';
-        }
-
-        function showLoading(show) {
-            const screen = document.getElementById('loadingScreen');
-            const wrapper = document.getElementById('wheelWrapper');
-            if (show) {
-                screen.classList.add('active');
-                wrapper.classList.remove('show');
-            } else {
-                screen.classList.remove('active');
-                wrapper.classList.add('show');
-            }
-        }
-
-        // ================================================================
-        //                      التحقق من الاتصال
-        // ================================================================
-        async function checkConnection() {
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
-                const response = await fetch(`${API_BASE}/api/status`, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return true;
-            } catch (e) {
-                console.error('Connection failed:', e);
-                return false;
-            }
-        }
-
-        // ================================================================
-        //                      تدوير العجلة
-        // ================================================================
-        async function spinWheel() {
-            if (isSpinning || !USER_ID) return;
-            if (document.getElementById('spinBtn').disabled) return;
-            if (prizesCache.length === 0) {
-                showError('لا توجد جوائز متاحة');
-                return;
-            }
-
-            isSpinning = true;
-            const spinBtn = document.getElementById('spinBtn');
-            spinBtn.disabled = true;
-            spinBtn.classList.add('loading');
-            document.getElementById('spinBtnText').textContent = 'جاري التدوير...';
-
-            document.getElementById('resultBox').classList.remove('show');
-            document.getElementById('errorMsg').classList.remove('show');
-            clearWinEffects();
-
-            soundManager.init();
-            soundManager.playBackgroundMusic();
-
-            try {
-                const response = await fetch(`${API_BASE}/api/wheel/spin`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: USER_ID })
-                });
-
-                const data = await response.json();
-                spinBtn.classList.remove('loading');
-
-                if (data.success) {
-                    const prize = data.spin.prize;
-                    const step = (2 * Math.PI) / prizesCache.length;
-
-                    const prizeIndex = prizesCache.findIndex(p => p.id === prize.id);
-                    const isWin = !prize.name.includes('حظ سعيد');
-
-                    if (prizeIndex === -1) {
-                        const randomIndex = Math.floor(Math.random() * prizesCache.length);
-                        const targetAngle = (randomIndex / prizesCache.length) * 2 * Math.PI;
-                        const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step /
-                        2));
-
-                        animateSpin(totalRotation, spinDuration, () => {
-                            drawWheel(prizesCache, randomIndex, totalRotation);
-                            showResult(prizesCache[randomIndex], isWin);
-                        });
-                    } else {
-                        const targetAngle = (prizeIndex / prizesCache.length) * 2 * Math.PI;
-                        const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step /
-                        2));
-
-                        animateSpin(totalRotation, spinDuration, () => {
-                            drawWheel(prizesCache, prizeIndex, totalRotation);
-                            showResult(prize, isWin);
-                        });
-                    }
-
-                } else {
-                    showError(data.error || 'حدث خطأ');
-                    if (data.remaining_hours !== undefined) {
-                        const btn = document.getElementById('spinBtn');
-                        btn.disabled = true;
-                        document.getElementById('spinBtnText').textContent = `⏳ ${data.remaining_hours}h ${data.remaining_minutes}m`;
-                        soundManager.stopAll();
-                    }
-                    drawWheel(prizesCache, -1, currentRotation);
-                }
-
-            } catch (e) {
-                spinBtn.classList.remove('loading');
-                showError('خطأ في الاتصال: ' + e.message);
-                drawWheel(prizesCache, -1, currentRotation);
-                soundManager.stopAll();
-            }
-
-            isSpinning = false;
-            if (!document.getElementById('spinBtn').disabled) {
-                document.getElementById('spinBtnText').textContent = '🎰 تدوير العجلة';
-            }
-        }
-
-        // ================================================================
-        //                      عرض النتيجة (يظهر الوصف فقط)
-        // ================================================================
-        function showResult(prize, isWin) {
-            document.getElementById('prizeDesc').textContent = prize.description || prize.name || 'جائزة!';
-            document.getElementById('resultBox').classList.add('show');
-
-            soundManager.stopAll();
-
-            if (isWin) {
-                createWinEffects(prize.description || prize.name);
-                soundManager.playWinSound();
-            } else {
-                soundManager.playLoseSound();
-            }
-
-            loadUserStatus();
-        }
-
-        // ================================================================
-        //                      عرض الخطأ
-        // ================================================================
         function showError(msg) {
             const el = document.getElementById('errorMsg');
             document.getElementById('errorText').textContent = '❌ ' + msg;
             el.classList.add('show');
             setTimeout(() => el.classList.remove('show'), 5000);
+        }
+
+        function updateLoading(progress) {
+            document.getElementById('loaderProgressBar').style.width = progress + '%';
+            document.getElementById('loaderStatusText').textContent = progress + '%';
+        }
+
+        function showLoading(show) {
+            const screen = document.getElementById('loadingScreen');
+            if (show) {
+                screen.classList.add('active');
+                document.getElementById('cardsContainer').classList.remove('show');
+            } else {
+                screen.classList.remove('active');
+                document.getElementById('cardsContainer').classList.add('show');
+            }
         }
 
         // ================================================================
@@ -2173,92 +1502,68 @@
             btn.addEventListener('click', async function() {
                 const key = this.dataset.setting;
                 const fieldId = this.dataset.field;
-                const type = this.dataset.type || 'text';
-                let value = '';
-                if (type === 'checkbox') {
-                    value = document.getElementById(fieldId).checked;
-                } else {
-                    value = document.getElementById(fieldId).value;
-                }
+                const value = document.getElementById(fieldId).value;
                 const originalText = this.textContent;
-                this.textContent = '⏳ جاري...';
+                this.textContent = '⏳';
                 this.disabled = true;
                 const success = await saveSetting(key, value);
                 if (success) {
-                    this.textContent = '✅ تم الحفظ';
-                    this.classList.add('saved');
+                    this.textContent = '✅';
                     await refreshAll();
                     setTimeout(() => {
                         this.textContent = originalText;
-                        this.classList.remove('saved');
                         this.disabled = false;
-                    }, 2000);
+                    }, 1500);
                 } else {
-                    this.textContent = '❌ فشل';
+                    this.textContent = '❌';
                     setTimeout(() => {
                         this.textContent = originalText;
                         this.disabled = false;
-                    }, 2000);
+                    }, 1500);
                 }
             });
         });
 
         document.getElementById('addPrizeBtn').addEventListener('click', async function() {
-            const nameInput = document.getElementById('newPrizeName');
-            const iconInput = document.getElementById('newPrizeIcon');
-            const descInput = document.getElementById('newPrizeDesc');
-            const probInput = document.getElementById('newPrizeProb');
-            const colorInput = document.getElementById('newPrizeColor');
-            const color2Input = document.getElementById('newPrizeColor2');
-
-            const name = nameInput.value.trim();
-            const icon = iconInput.value.trim() || '🎁';
-            const description = descInput.value.trim() || '';
-            const prob = parseFloat(probInput.value) || 10;
-            const color = colorInput.value || '#1a1a2e';
-            const color2 = color2Input.value || '#16213e';
-
+            const name = document.getElementById('newPrizeName').value.trim();
+            const icon = document.getElementById('newPrizeIcon').value.trim() || '🎁';
+            const desc = document.getElementById('newPrizeDesc').value.trim() || '';
+            const color = document.getElementById('newPrizeColor').value || '#FFD700';
+            const cardColor = document.getElementById('newPrizeCardColor').value || '#1a1a2e';
+            
             if (!name) {
                 showError('⚠️ الرجاء إدخال اسم الجائزة');
-                nameInput.focus();
                 return;
             }
-            if (prob < 0 || prob > 100) {
-                showError('⚠️ النسبة يجب أن تكون بين 0 و 100');
-                probInput.focus();
-                return;
-            }
-
-            const btn = this;
-            btn.disabled = true;
-            btn.textContent = '⏳';
-
-            const success = await addPrize(name, icon, description, prob, color, color2);
+            
+            this.disabled = true;
+            this.textContent = '⏳';
+            
+            const success = await addPrize(name, icon, desc, color, cardColor, '#16213e');
             if (success) {
-                nameInput.value = '';
-                iconInput.value = '';
-                descInput.value = '';
-                probInput.value = '';
+                document.getElementById('newPrizeName').value = '';
+                document.getElementById('newPrizeIcon').value = '';
+                document.getElementById('newPrizeDesc').value = '';
                 await refreshAll();
-                showNotification(`✅ تم إضافة "${name}" بنجاح`);
+                showNotification(`✅ تم إضافة "${name}"`);
             } else {
                 showError('❌ فشل إضافة الجائزة');
             }
-            btn.disabled = false;
-            btn.textContent = '➕';
+            this.disabled = false;
+            this.textContent = '➕';
         });
 
         document.getElementById('refreshPrizesBtn').addEventListener('click', async function() {
             await refreshAll();
-            showNotification('🔄 تم تحديث الكل');
+            showNotification('🔄 تم التحديث');
         });
 
         document.getElementById('resetPrizesBtn').addEventListener('click', async function() {
-            if (confirm('⚠️ هل أنت متأكد من إعادة تعيين جميع الجوائز إلى الإعدادات الافتراضية؟')) {
+            if (confirm('⚠️ هل أنت متأكد من إعادة تعيين جميع الجوائز؟')) {
                 const success = await resetPrizes();
                 if (success) {
                     await refreshAll();
-                    showNotification('✅ تم إعادة تعيين الجوائز');
+                    showNotification('✅ تم إعادة التعيين');
                 } else {
                     showError('❌ فشل إعادة التعيين');
                 }
@@ -2267,22 +1572,14 @@
 
         document.getElementById('soundToggle').addEventListener('change', function() {
             soundEnabled = this.checked;
-            if (!soundEnabled) {
-                soundManager.stopAll();
-            } else {
-                soundManager.init();
-                soundManager.playBackgroundMusic();
-            }
+            if (!soundEnabled) soundManager.stopAll();
+            else { soundManager.init(); soundManager.playBackgroundMusic(); }
         });
 
         document.getElementById('musicToggle').addEventListener('change', function() {
             musicEnabled = this.checked;
-            if (!musicEnabled) {
-                soundManager.stopBackgroundMusic();
-            } else {
-                soundManager.init();
-                soundManager.playBackgroundMusic();
-            }
+            if (!musicEnabled) soundManager.stopBackgroundMusic();
+            else { soundManager.init(); soundManager.playBackgroundMusic(); }
         });
 
         // ================================================================
@@ -2290,16 +1587,15 @@
         // ================================================================
         async function init() {
             USER_ID = getUserId();
-
+            
             if (!USER_ID) {
                 document.getElementById('errorContainer').classList.add('show');
-                document.getElementById('userStatus').style.display = 'none';
                 return;
             }
-
+            
             showLoading(true);
             updateLoading(0);
-
+            
             try {
                 let progress = 0;
                 const interval = setInterval(() => {
@@ -2307,57 +1603,46 @@
                     if (progress > 85) progress = 85;
                     updateLoading(Math.round(progress));
                 }, 150);
-
-                const isConnected = await checkConnection();
-                if (!isConnected) {
-                    clearInterval(interval);
-                    updateLoading(100);
-                    await new Promise(r => setTimeout(r, 400));
-                    showLoading(false);
-                    showError('⚠️ لا يمكن الاتصال بالخادم. تأكد من اتصالك بالإنترنت.');
-                    return;
-                }
-
+                
+                await loadSettings();
                 updateLoading(30);
                 await new Promise(r => setTimeout(r, 300));
-
-                await loadSettings();
+                
+                const prizes = await loadPrizes();
                 updateLoading(50);
                 await new Promise(r => setTimeout(r, 300));
-
-                const prizes = await loadPrizes();
-                drawWheel(prizes, -1, 0);
+                
+                if (prizes.length > 0) {
+                    createCards(totalCards);
+                    document.getElementById('cardsContainer').classList.add('show');
+                }
                 updateLoading(70);
                 await new Promise(r => setTimeout(r, 300));
-
+                
                 await loadUserStatus();
                 updateLoading(85);
                 await new Promise(r => setTimeout(r, 300));
-
+                
                 await renderAdminPanel();
                 updateLoading(95);
                 await new Promise(r => setTimeout(r, 300));
-
+                
                 clearInterval(interval);
                 updateLoading(100);
                 await new Promise(r => setTimeout(r, 500));
-
+                
                 soundManager.init();
                 soundManager.playBackgroundMusic();
-
+                
             } catch (e) {
                 console.error('Init error:', e);
-                updateLoading(100);
-                await new Promise(r => setTimeout(r, 600));
                 showError('⚠️ فشل تحميل البيانات: ' + e.message);
             }
-
+            
             showLoading(false);
-            document.getElementById('spinBtn').onclick = spinWheel;
         }
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
-
 </body>
 </html>

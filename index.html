@@ -36,7 +36,7 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 0.15;
+            opacity: 0.12;
             pointer-events: none;
             overflow: hidden;
         }
@@ -49,6 +49,11 @@
         @keyframes slowZoom {
             0% { transform: scale(1); }
             100% { transform: scale(1.05); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         /* ===== النص العلوي ===== */
@@ -143,7 +148,7 @@
         .cards-container {
             position: relative;
             width: 100%;
-            max-width: 600px;
+            max-width: 480px;
             margin: 0 auto;
             padding: 10px;
             z-index: 1;
@@ -157,7 +162,7 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             justify-content: center;
             perspective: 1200px;
@@ -169,9 +174,10 @@
             cursor: pointer;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border-radius: 14px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            min-height: 140px;
         }
         .card:hover:not(.flipped):not(.disabled) {
             transform: translateY(-8px) scale(1.03);
@@ -186,6 +192,7 @@
             cursor: not-allowed;
             opacity: 0.3;
             filter: grayscale(0.8);
+            transform: scale(0.9);
         }
 
         .card .card-face {
@@ -205,7 +212,7 @@
         /* وجه البطاقة الأمامي (الخلفي) */
         .card .card-back {
             background: linear-gradient(145deg, #1a1a2e, #16213e);
-            border: 2px solid rgba(255, 215, 0, 0.15);
+            border: 2px solid rgba(255, 215, 0, 0.12);
             box-shadow: inset 0 0 50px rgba(255, 215, 0, 0.03);
             transform: rotateY(0deg);
             position: relative;
@@ -213,37 +220,39 @@
         .card .card-back::before {
             content: '';
             position: absolute;
-            top: 8px;
-            left: 8px;
-            right: 8px;
-            bottom: 8px;
-            border: 2px solid rgba(255, 215, 0, 0.08);
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            bottom: 6px;
+            border: 2px solid rgba(255, 215, 0, 0.06);
             border-radius: 10px;
             background: repeating-linear-gradient(
                 45deg,
                 transparent,
-                transparent 8px,
-                rgba(255, 215, 0, 0.02) 8px,
-                rgba(255, 215, 0, 0.02) 10px
+                transparent 6px,
+                rgba(255, 215, 0, 0.02) 6px,
+                rgba(255, 215, 0, 0.02) 8px
             );
         }
         .card .card-back .back-pattern {
-            font-size: 32px;
-            opacity: 0.15;
+            font-size: 28px;
+            opacity: 0.2;
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
             animation: shimmer 3s ease-in-out infinite;
+            z-index: 1;
         }
         @keyframes shimmer {
-            0%, 100% { opacity: 0.1; transform: scale(1); }
-            50% { opacity: 0.2; transform: scale(1.05); }
+            0%, 100% { opacity: 0.15; transform: scale(1) rotate(0deg); }
+            50% { opacity: 0.25; transform: scale(1.05) rotate(5deg); }
         }
         .card .card-back .card-number {
             position: absolute;
-            bottom: 8px;
-            font-size: 10px;
-            color: rgba(255, 215, 0, 0.2);
+            bottom: 6px;
+            font-size: 9px;
+            color: rgba(255, 215, 0, 0.15);
             font-weight: 700;
             letter-spacing: 2px;
+            z-index: 1;
         }
 
         /* وجه البطاقة الخلفي (الأمامي) */
@@ -254,12 +263,12 @@
             box-shadow: inset 0 0 60px rgba(255, 215, 0, 0.1);
         }
         .card .card-front .prize-icon {
-            font-size: 38px;
+            font-size: 32px;
             margin-bottom: 4px;
             text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
         }
         .card .card-front .prize-name {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: #0a0a0a;
             text-align: center;
@@ -267,8 +276,8 @@
             text-shadow: 0 1px 4px rgba(255, 255, 255, 0.2);
         }
         .card .card-front .prize-desc {
-            font-size: 8px;
-            color: rgba(0, 0, 0, 0.6);
+            font-size: 7px;
+            color: rgba(0, 0, 0, 0.5);
             text-align: center;
             margin-top: 2px;
         }
@@ -280,7 +289,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1), transparent 70%);
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08), transparent 70%);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.5s ease;
@@ -290,14 +299,15 @@
             opacity: 1;
         }
 
-        /* ===== تأثيرات خاصة للبطاقات الفائزة ===== */
+        /* ===== تأثيرات خاصة للبطاقات ===== */
         .card.winner {
             animation: winnerPulse 1s ease-in-out infinite;
             box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), 0 0 80px rgba(255, 215, 0, 0.1);
+            z-index: 10;
         }
         @keyframes winnerPulse {
             0%, 100% { transform: rotateY(180deg) scale(1); }
-            50% { transform: rotateY(180deg) scale(1.05); }
+            50% { transform: rotateY(180deg) scale(1.06); }
         }
 
         .card.loser {
@@ -305,7 +315,7 @@
         }
         @keyframes loserFade {
             0% { opacity: 1; transform: rotateY(0deg) scale(1); }
-            100% { opacity: 0.1; transform: rotateY(0deg) scale(0.8); filter: blur(2px); }
+            100% { opacity: 0.05; transform: rotateY(0deg) scale(0.7); filter: blur(3px); }
         }
 
         /* ===== الأزرار ===== */
@@ -640,18 +650,27 @@
 
         /* ===== تجاوب ===== */
         @media (max-width: 480px) {
-            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 8px; }
-            .card .card-front .prize-icon { font-size: 28px; }
+            .cards-grid { gap: 8px; }
+            .card { min-height: 110px; }
+            .card .card-front .prize-icon { font-size: 26px; }
             .card .card-front .prize-name { font-size: 9px; }
-            .card .card-back .back-pattern { font-size: 24px; }
+            .card .card-back .back-pattern { font-size: 22px; }
             .banner-text { font-size: 17px; padding: 8px 10px; }
             .btn { font-size: 16px; padding: 14px 16px; }
         }
 
         @media (max-width: 380px) {
-            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 6px; }
-            .card .card-front .prize-icon { font-size: 22px; }
+            .cards-grid { gap: 6px; }
+            .card { min-height: 90px; }
+            .card .card-front .prize-icon { font-size: 20px; }
             .card .card-front .prize-name { font-size: 8px; }
+        }
+
+        @media (min-width: 600px) {
+            .cards-grid { gap: 16px; }
+            .card { min-height: 180px; }
+            .card .card-front .prize-icon { font-size: 40px; }
+            .card .card-front .prize-name { font-size: 13px; }
         }
     </style>
 </head>
@@ -681,7 +700,7 @@
         </div>
     </div>
 
-    <!-- ===== البطاقات ===== -->
+    <!-- ===== 6 بطاقات ===== -->
     <div class="cards-container" id="cardsContainer">
         <div class="cards-grid" id="cardsGrid"></div>
     </div>
@@ -742,25 +761,6 @@
             <button class="btn-action" id="refreshPrizesBtn">🔄 تحديث</button>
             <button class="btn-action danger" id="resetPrizesBtn">🗑️ إعادة تعيين</button>
         </div>
-
-        <div class="settings-section" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.04);">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-                <label style="color:#888;font-size:11px;min-width:70px;">النص العلوي</label>
-                <input type="text" id="editBannerText" style="flex:1;padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:11px;">
-                <button class="btn-save" data-setting="banner_text" data-field="editBannerText" style="padding:4px 14px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);border-radius:4px;color:#FFD700;font-size:10px;cursor:pointer;">💾</button>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-                <label style="color:#888;font-size:11px;min-width:70px;">عدد البطاقات</label>
-                <input type="number" id="editCardsCount" value="12" style="max-width:60px;padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:11px;">
-                <button class="btn-save" data-setting="cards_count" data-field="editCardsCount" style="padding:4px 14px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);border-radius:4px;color:#FFD700;font-size:10px;cursor:pointer;">💾</button>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-                <label style="color:#888;font-size:11px;min-width:70px;">مدة التقليب</label>
-                <input type="number" id="editFlipDuration" value="800" style="max-width:60px;padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:11px;">
-                <span style="color:#555;font-size:11px;">مللي</span>
-                <button class="btn-save" data-setting="flip_duration" data-field="editFlipDuration" style="padding:4px 14px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);border-radius:4px;color:#FFD700;font-size:10px;cursor:pointer;">💾</button>
-            </div>
-        </div>
     </div>
 
     <!-- ===== خطأ ===== -->
@@ -778,12 +778,12 @@
         let isPlaying = false;
         let prizesCache = [];
         let settingsCache = {};
-        let flipDuration = 800;
-        let cardRevealDelay = 300;
-        let totalCards = 12;
+        let flipDuration = 600;
+        let totalCards = 6;
         let selectedCardIndex = -1;
         let soundEnabled = true;
         let musicEnabled = true;
+        let gameResult = null;
 
         // ================================================================
         //                      نظام الصوت
@@ -820,18 +820,17 @@
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
-                    // صوت تقليب البطاقة
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.connect(gain);
                     gain.connect(ctx.destination);
                     osc.frequency.setValueAtTime(800, now);
-                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
+                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.12);
                     osc.type = 'sawtooth';
                     gain.gain.setValueAtTime(0.04, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
                     osc.start(now);
-                    osc.stop(now + 0.15);
+                    osc.stop(now + 0.12);
                 } catch (e) {
                     console.warn('Sound error:', e);
                 }
@@ -843,26 +842,26 @@
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
                     const melody = [
-                        [523, 0.08],
-                        [659, 0.08],
-                        [784, 0.08],
-                        [1047, 0.12],
-                        [784, 0.08],
-                        [988, 0.08],
-                        [1175, 0.12],
-                        [1319, 0.15]
+                        [523, 0.06],
+                        [659, 0.06],
+                        [784, 0.06],
+                        [1047, 0.1],
+                        [784, 0.06],
+                        [988, 0.06],
+                        [1175, 0.1],
+                        [1319, 0.12]
                     ];
                     melody.forEach(([freq, dur], i) => {
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, now + i * 0.07);
+                        osc.frequency.setValueAtTime(freq, now + i * 0.06);
                         osc.type = i % 2 === 0 ? 'sine' : 'triangle';
-                        gain.gain.setValueAtTime(0.06, now + i * 0.07);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + dur);
-                        osc.start(now + i * 0.07);
-                        osc.stop(now + i * 0.07 + dur);
+                        gain.gain.setValueAtTime(0.05, now + i * 0.06);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + dur);
+                        osc.start(now + i * 0.06);
+                        osc.stop(now + i * 0.06 + dur);
                     });
                 } catch (e) {
                     console.warn('Sound error:', e);
@@ -879,12 +878,12 @@
                     osc.connect(gain);
                     gain.connect(ctx.destination);
                     osc.frequency.setValueAtTime(400, now);
-                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.4);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.3);
                     osc.type = 'sawtooth';
                     gain.gain.setValueAtTime(0.04, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
                     osc.start(now);
-                    osc.stop(now + 0.4);
+                    osc.stop(now + 0.3);
                 } catch (e) {
                     console.warn('Sound error:', e);
                 }
@@ -902,20 +901,19 @@
                         gain.connect(ctx.destination);
                         osc.frequency.setValueAtTime(freq, time);
                         osc.type = type;
-                        gain.gain.setValueAtTime(vol || 0.02, time);
+                        gain.gain.setValueAtTime(vol || 0.015, time);
                         gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
                         osc.start(time);
                         osc.stop(time + dur);
                     };
-                    // موسيقى خلفية خفيفة
                     const pattern = [
-                        [262, 0.3, 0.015],
-                        [330, 0.3, 0.015],
-                        [392, 0.3, 0.015],
-                        [523, 0.4, 0.02]
+                        [262, 0.25, 0.012],
+                        [330, 0.25, 0.012],
+                        [392, 0.25, 0.012],
+                        [523, 0.3, 0.015]
                     ];
                     pattern.forEach(([freq, dur, vol], i) => {
-                        const time = ctx.currentTime + i * 0.35;
+                        const time = ctx.currentTime + i * 0.3;
                         playNote(freq, time, dur, vol, i % 2 === 0 ? 'sine' : 'triangle');
                     });
                     this.bgInterval = setInterval(() => {
@@ -926,9 +924,9 @@
                         const t = ctx.currentTime;
                         const notes = [131, 165, 196, 262];
                         notes.forEach((freq, i) => {
-                            playNote(freq, t + i * 0.2, 0.15, 0.01, 'square');
+                            playNote(freq, t + i * 0.15, 0.12, 0.008, 'square');
                         });
-                    }, 1500);
+                    }, 1200);
                 } catch (e) {
                     console.warn('Music error:', e);
                 }
@@ -974,29 +972,21 @@
         }
 
         // ================================================================
-        //                      إنشاء البطاقات
+        //                      إنشاء 6 بطاقات
         // ================================================================
-        function createCards(count, prize = null) {
+        function createCards(count = 6) {
             const grid = document.getElementById('cardsGrid');
             grid.innerHTML = '';
-            
-            // نستخدم جوائز عشوائية للبطاقات الأخرى
-            const availablePrizes = prizesCache.length > 0 ? prizesCache : [];
             
             for (let i = 0; i < count; i++) {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.dataset.index = i;
                 
-                // اختيار جائزة عشوائية للبطاقة (للعرض)
-                let randomPrize = availablePrizes.length > 0 ? 
-                    availablePrizes[Math.floor(Math.random() * availablePrizes.length)] : 
-                    { icon: '🎁', name: 'جائزة', description: '' };
-                
-                // إذا كانت هذه البطاقة هي البطاقة الفائزة
-                if (prize && i === prize.card_index) {
-                    randomPrize = prize.prize;
-                }
+                // اختيار جائزة عشوائية للخلفية
+                const randomPrize = prizesCache.length > 0 ? 
+                    prizesCache[Math.floor(Math.random() * prizesCache.length)] : 
+                    { icon: '🎁', name: 'جائزة', description: '', card_color: '#1a1a2e', card_back_color: '#16213e' };
                 
                 card.innerHTML = `
                     <div class="card-face card-back">
@@ -1018,14 +1008,13 @@
         }
 
         // ================================================================
-        //                      التعامل مع البطاقات
+        //                      التعامل مع اختيار البطاقة
         // ================================================================
         async function handleCardClick(index) {
             if (isPlaying) return;
             if (document.getElementById('playBtn').disabled) return;
-            if (selectedCardIndex !== -1) return; // تم الاختيار بالفعل
+            if (selectedCardIndex !== -1) return;
             
-            // اختيار البطاقة
             selectedCardIndex = index;
             isPlaying = true;
             
@@ -1050,16 +1039,17 @@
                 if (data.success) {
                     const prize = data.game.prize;
                     const winningIndex = data.game.card_index;
-                    const totalCards = data.game.total_cards;
                     
-                    // عرض جميع البطاقات
-                    await revealAllCards(winningIndex, prize);
+                    // حفظ النتيجة
+                    gameResult = { prize, isWin: !prize.name.includes('حظ سعيد') };
                     
-                    // إظهار النتيجة
-                    const isWin = !prize.name.includes('حظ سعيد');
-                    showResult(prize, isWin);
+                    // كشف البطاقات
+                    await revealCards(winningIndex, prize);
                     
-                    if (isWin) {
+                    // عرض النتيجة
+                    showResult(prize, gameResult.isWin);
+                    
+                    if (gameResult.isWin) {
                         soundManager.playWinSound();
                         showNotification(`🎉 مبروك! ${prize.description || prize.name}!`);
                     } else {
@@ -1074,16 +1064,19 @@
                         document.getElementById('playBtnText').textContent = `⏳ ${data.remaining_hours}h ${data.remaining_minutes}m`;
                         soundManager.stopAll();
                     }
+                    selectedCardIndex = -1;
+                    isPlaying = false;
                 }
                 
             } catch (e) {
                 playBtn.classList.remove('loading');
                 showError('خطأ في الاتصال: ' + e.message);
                 soundManager.stopAll();
+                selectedCardIndex = -1;
+                isPlaying = false;
             }
             
-            isPlaying = false;
-            if (!document.getElementById('playBtn').disabled) {
+            if (!document.getElementById('playBtn').disabled && !isPlaying) {
                 document.getElementById('playBtnText').textContent = '🃏 اختر بطاقة';
             }
         }
@@ -1091,64 +1084,63 @@
         // ================================================================
         //                      كشف البطاقات
         // ================================================================
-        async function revealAllCards(winningIndex, prize) {
+        async function revealCards(winningIndex, prize) {
             const cards = document.querySelectorAll('.card');
             const total = cards.length;
             
-            // صوت التقليب
-            soundManager.playFlipSound();
-            
-            // كشف البطاقة الفائزة أولاً
+            // 1. تحديث البطاقة الفائزة
             const winnerCard = cards[winningIndex];
             if (winnerCard) {
-                // تحديث محتوى البطاقة الفائزة
                 const front = winnerCard.querySelector('.card-front');
                 front.style.background = `linear-gradient(145deg, ${prize.color || '#FFD700'}, ${prize.card_color || '#1a1a2e'})`;
                 front.querySelector('.prize-icon').textContent = prize.icon || '🎁';
                 front.querySelector('.prize-name').textContent = prize.name || 'جائزة';
                 front.querySelector('.prize-desc').textContent = prize.description || '';
-                
-                setTimeout(() => {
-                    winnerCard.classList.add('flipped');
-                    winnerCard.classList.add('winner');
-                }, 300);
             }
             
-            // كشف البطاقات الأخرى مع تأخير
+            // 2. كشف البطاقة الفائزة أولاً مع تأخير
+            await new Promise(resolve => {
+                setTimeout(() => {
+                    if (winnerCard) {
+                        winnerCard.classList.add('flipped');
+                        winnerCard.classList.add('winner');
+                        soundManager.playFlipSound();
+                    }
+                    resolve();
+                }, 300);
+            });
+            
+            // 3. كشف البطاقات الأخرى مع تأخير متدرج
             const otherCards = Array.from(cards).filter((_, i) => i !== winningIndex);
             for (let i = 0; i < otherCards.length; i++) {
                 const card = otherCards[i];
-                const delay = 200 + (i * 80);
+                const delay = 200 + (i * 100);
                 
-                setTimeout(() => {
-                    // تحديث محتوى البطاقة بجائزة عشوائية
-                    const randomPrize = prizesCache.length > 0 ? 
-                        prizesCache[Math.floor(Math.random() * prizesCache.length)] : 
-                        { icon: '🎁', name: 'جائزة', description: '' };
-                    
-                    const front = card.querySelector('.card-front');
-                    front.style.background = `linear-gradient(145deg, ${randomPrize.card_color || '#1a1a2e'}, ${randomPrize.card_back_color || '#16213e'})`;
-                    front.querySelector('.prize-icon').textContent = randomPrize.icon || '🎁';
-                    front.querySelector('.prize-name').textContent = randomPrize.name || 'جائزة';
-                    front.querySelector('.prize-desc').textContent = randomPrize.description || '';
-                    
-                    card.classList.add('flipped');
-                    card.classList.add('disabled');
-                    
-                    // إذا لم تكن البطاقة الفائزة، أضف تأثير التلاشي
-                    if (i !== winningIndex) {
+                await new Promise(resolve => {
+                    setTimeout(() => {
+                        // تحديث محتوى البطاقة بجائزة عشوائية
+                        const randomPrize = prizesCache.length > 0 ? 
+                            prizesCache[Math.floor(Math.random() * prizesCache.length)] : 
+                            { icon: '🎁', name: 'جائزة', description: '', card_color: '#1a1a2e', card_back_color: '#16213e' };
+                        
+                        const front = card.querySelector('.card-front');
+                        front.style.background = `linear-gradient(145deg, ${randomPrize.card_color || '#1a1a2e'}, ${randomPrize.card_back_color || '#16213e'})`;
+                        front.querySelector('.prize-icon').textContent = randomPrize.icon || '🎁';
+                        front.querySelector('.prize-name').textContent = randomPrize.name || 'جائزة';
+                        front.querySelector('.prize-desc').textContent = randomPrize.description || '';
+                        
+                        card.classList.add('flipped');
+                        card.classList.add('disabled');
                         card.classList.add('loser');
-                    }
-                    
-                    soundManager.playFlipSound();
-                }, delay);
+                        
+                        soundManager.playFlipSound();
+                        resolve();
+                    }, delay);
+                });
             }
             
-            // انتظار انتهاء جميع التأثيرات
-            return new Promise(resolve => {
-                const totalDelay = 200 + (otherCards.length * 80) + 500;
-                setTimeout(resolve, totalDelay);
-            });
+            // 4. انتظار انتهاء جميع التأثيرات
+            await new Promise(resolve => setTimeout(resolve, 400));
         }
 
         // ================================================================
@@ -1171,7 +1163,7 @@
         }
 
         // ================================================================
-        //                      تحميل الجوائز
+        //                      تحميل البيانات
         // ================================================================
         async function loadPrizes() {
             try {
@@ -1188,9 +1180,6 @@
             }
         }
 
-        // ================================================================
-        //                      تحميل الإعدادات
-        // ================================================================
         async function loadSettings() {
             try {
                 const res = await fetch(`${API_BASE}/api/admin/settings?admin_id=${ADMIN_ID}`);
@@ -1208,13 +1197,8 @@
                         document.getElementById('loadingImage').src = settingsCache.loading_image_url;
                     }
                     
-                    totalCards = parseInt(settingsCache.cards_count) || 12;
-                    flipDuration = parseInt(settingsCache.flip_duration) || 800;
-                    cardRevealDelay = parseInt(settingsCache.card_reveal_delay) || 300;
-                    
-                    document.getElementById('editBannerText').value = settingsCache.banner_text || '';
-                    document.getElementById('editCardsCount').value = totalCards;
-                    document.getElementById('editFlipDuration').value = flipDuration;
+                    totalCards = parseInt(settingsCache.cards_count) || 6;
+                    flipDuration = parseInt(settingsCache.flip_duration) || 600;
                     
                     return data.settings;
                 }
@@ -1225,9 +1209,6 @@
             }
         }
 
-        // ================================================================
-        //                      تحميل حالة المستخدم
-        // ================================================================
         async function loadUserStatus() {
             if (!USER_ID) return;
             try {
@@ -1250,9 +1231,12 @@
                     const canPlay = data.play_status?.can_play !== false &&
                         (!data.deposit_requirement?.required || data.deposit_requirement?.is_met);
                     
-                    if (canPlay && prizesCache.length > 0) {
+                    if (canPlay && prizesCache.length > 0 && selectedCardIndex === -1) {
                         playBtn.disabled = false;
                         document.getElementById('playBtnText').textContent = '🃏 اختر بطاقة';
+                    } else if (selectedCardIndex !== -1) {
+                        playBtn.disabled = true;
+                        document.getElementById('playBtnText').textContent = '✅ تم الاختيار';
                     } else if (!data.play_status?.can_play) {
                         playBtn.disabled = true;
                         const h = data.play_status?.remaining_hours || 0;
@@ -1274,7 +1258,7 @@
         }
 
         // ================================================================
-        //                      عرض لوحة الإدارة
+        //                      لوحة الإدارة
         // ================================================================
         async function renderAdminPanel() {
             const panel = document.getElementById('adminPanel');
@@ -1316,7 +1300,6 @@
                     </div>
                 `).join('');
                 
-                // أحداث التعديل
                 list.querySelectorAll('.name-input').forEach(input => {
                     input.addEventListener('change', async function() {
                         const id = parseInt(this.closest('.prize-item').dataset.id);
@@ -1354,9 +1337,6 @@
             }
         }
 
-        // ================================================================
-        //                      دوال الإدارة
-        // ================================================================
         async function updatePrize(prizeId, data) {
             try {
                 const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
@@ -1425,37 +1405,14 @@
             }
         }
 
-        async function saveSetting(key, value) {
-            try {
-                let finalValue = value;
-                if (typeof value === 'boolean') {
-                    finalValue = value ? 'true' : 'false';
-                }
-                const response = await fetch(`${API_BASE}/api/admin/setting`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        admin_id: ADMIN_ID,
-                        key: key,
-                        value: String(finalValue)
-                    })
-                });
-                const data = await response.json();
-                return data.success === true;
-            } catch (e) {
-                console.error('Error saving setting:', e);
-                return false;
-            }
-        }
-
         // ================================================================
-        //                      تحديث كل شيء
+        //                      تحديث الكل
         // ================================================================
         async function refreshAll() {
             await loadSettings();
             const prizes = await loadPrizes();
             if (prizes.length > 0) {
-                createCards(totalCards);
+                createCards(6);
                 document.getElementById('cardsContainer').classList.add('show');
             }
             await loadUserStatus();
@@ -1498,32 +1455,6 @@
         // ================================================================
         //                      أحداث الإدارة
         // ================================================================
-        document.querySelectorAll('.btn-save').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                const key = this.dataset.setting;
-                const fieldId = this.dataset.field;
-                const value = document.getElementById(fieldId).value;
-                const originalText = this.textContent;
-                this.textContent = '⏳';
-                this.disabled = true;
-                const success = await saveSetting(key, value);
-                if (success) {
-                    this.textContent = '✅';
-                    await refreshAll();
-                    setTimeout(() => {
-                        this.textContent = originalText;
-                        this.disabled = false;
-                    }, 1500);
-                } else {
-                    this.textContent = '❌';
-                    setTimeout(() => {
-                        this.textContent = originalText;
-                        this.disabled = false;
-                    }, 1500);
-                }
-            });
-        });
-
         document.getElementById('addPrizeBtn').addEventListener('click', async function() {
             const name = document.getElementById('newPrizeName').value.trim();
             const icon = document.getElementById('newPrizeIcon').value.trim() || '🎁';
@@ -1599,7 +1530,7 @@
             try {
                 let progress = 0;
                 const interval = setInterval(() => {
-                    progress += Math.random() * 12;
+                    progress += Math.random() * 15;
                     if (progress > 85) progress = 85;
                     updateLoading(Math.round(progress));
                 }, 150);
@@ -1613,7 +1544,7 @@
                 await new Promise(r => setTimeout(r, 300));
                 
                 if (prizes.length > 0) {
-                    createCards(totalCards);
+                    createCards(6);
                     document.getElementById('cardsContainer').classList.add('show');
                 }
                 updateLoading(70);

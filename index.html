@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>🃏 بطاقات الحظ - الاحترافية</title>
+    <title>🃏 بطاقات الحظ - بريميوم</title>
     <script src="https://telegram.org/js/telegram-web-app.js">
     </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -21,79 +23,129 @@
             align-items: center;
             background: #0a0a0a;
             overflow: hidden;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Orbitron', 'Segoe UI', sans-serif;
             position: relative;
         }
 
-        /* خلفية ثلاثية الأبعاد */
-        .bg-3d {
+        /* ===== خلفية سينمائية ===== */
+        .cinematic-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
-            background: radial-gradient(ellipse at center, #1a0a2e 0%, #0a0a0a 70%);
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(88, 0, 255, 0.08), transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(255, 215, 0, 0.05), transparent 50%),
+                radial-gradient(ellipse at 50% 100%, rgba(255, 0, 100, 0.03), transparent 50%),
+                #0a0a0a;
             overflow: hidden;
         }
-        .bg-3d .particle {
+
+        /* جسيمات متحركة */
+        .particles-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .particle {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,215,0,0.3), transparent);
-            animation: floatParticle 15s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(255,215,0,0.4), transparent);
+            animation: particleFloat linear infinite;
             pointer-events: none;
         }
-        @keyframes floatParticle {
-            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-            50% { transform: translate(30px, -50px) scale(1.5); opacity: 0.8; }
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) rotate(0deg) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(720deg) scale(1); opacity: 0; }
         }
 
-        /* تأثير الضوء المتحرك */
-        .light-sweep {
+        /* وامضات ضوئية */
+        .light-flash {
             position: fixed;
             top: -50%;
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(ellipse at 30% 50%, rgba(255,215,0,0.03), transparent 60%);
-            animation: sweepLight 8s ease-in-out infinite;
+            background: radial-gradient(ellipse at 50% 50%, rgba(255,215,0,0.03), transparent 70%);
+            animation: flashMove 12s ease-in-out infinite;
             pointer-events: none;
             z-index: 0;
         }
-        @keyframes sweepLight {
-            0%, 100% { transform: translateX(-30%) rotate(0deg); }
-            50% { transform: translateX(30%) rotate(10deg); }
+        @keyframes flashMove {
+            0%, 100% { transform: translateX(-30%) rotate(0deg) scale(1); opacity: 0.5; }
+            50% { transform: translateX(30%) rotate(5deg) scale(1.2); opacity: 1; }
+        }
+
+        /* خطوط ضوئية متقاطعة */
+        .cross-lines {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.03;
+        }
+        .cross-lines::before,
+        .cross-lines::after {
+            content: '';
+            position: absolute;
+            background: linear-gradient(90deg, transparent, #FFD700, transparent);
+        }
+        .cross-lines::before {
+            width: 100%;
+            height: 1px;
+            top: 50%;
+            animation: lineMove 8s ease-in-out infinite;
+        }
+        .cross-lines::after {
+            width: 1px;
+            height: 100%;
+            left: 50%;
+            animation: lineMove 8s ease-in-out infinite reverse;
+        }
+        @keyframes lineMove {
+            0%, 100% { transform: scaleX(0.3); opacity: 0.3; }
+            50% { transform: scaleX(1); opacity: 1; }
         }
 
         /* ===== النص العلوي ===== */
         .banner-text {
             text-align: center;
-            padding: 12px 24px;
-            margin: 10px auto 15px;
+            padding: 14px 28px;
+            margin: 10px auto 12px;
             width: 100%;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 215, 0, 0.08);
+            max-width: 520px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 215, 0, 0.06);
             font-size: 22px;
-            font-weight: 800;
+            font-weight: 900;
             color: #FFD700;
-            letter-spacing: 1px;
-            backdrop-filter: blur(20px);
+            letter-spacing: 2px;
+            backdrop-filter: blur(30px);
             position: relative;
             z-index: 1;
-            text-shadow: 0 0 40px rgba(255,215,0,0.1);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            text-shadow: 0 0 60px rgba(255, 215, 0, 0.1);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+            font-family: 'Orbitron', sans-serif;
         }
-        .banner-text .glow {
-            animation: textGlow 2s ease-in-out infinite;
+        .banner-text .gold-text {
+            background: linear-gradient(135deg, #FFD700, #FF8C00, #FFD700);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: goldShine 3s ease-in-out infinite;
         }
-        @keyframes textGlow {
-            0%, 100% { text-shadow: 0 0 20px rgba(255,215,0,0.1); }
-            50% { text-shadow: 0 0 40px rgba(255,215,0,0.3), 0 0 80px rgba(255,215,0,0.1); }
+        @keyframes goldShine {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
-        /* ===== شاشة اللودينغ ===== */
+        /* ===== شاشة التحميل ===== */
         .loading-screen {
             display: none;
             position: fixed;
@@ -110,13 +162,14 @@
         }
         .loading-screen.active { display: flex; }
         .loading-screen .loader-ring {
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
-            border: 3px solid rgba(255,215,0,0.05);
+            border: 3px solid rgba(255, 215, 0, 0.03);
             border-top: 3px solid #FFD700;
-            animation: spinRing 1s linear infinite;
+            animation: spinRing 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
             position: relative;
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.05);
         }
         .loading-screen .loader-ring::before {
             content: '🃏';
@@ -124,22 +177,28 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 40px;
+            font-size: 44px;
+            animation: pulseIcon 1.5s ease-in-out infinite;
         }
         @keyframes spinRing {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        @keyframes pulseIcon {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
         .loading-screen .loader-text {
             color: #666;
-            font-size: 14px;
-            letter-spacing: 4px;
+            font-size: 12px;
+            letter-spacing: 6px;
             text-transform: uppercase;
+            font-weight: 700;
         }
         .loading-screen .progress-bar {
-            width: 200px;
+            width: 220px;
             height: 3px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 3px;
             overflow: hidden;
         }
@@ -157,48 +216,52 @@
             width: 100%;
             max-width: 520px;
             margin: 0 auto;
-            padding: 15px;
+            padding: 10px;
             z-index: 1;
             display: none;
-            perspective: 1500px;
+            perspective: 1800px;
         }
         .cards-container.show {
             display: block;
-            animation: fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: containerIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(40px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes containerIn {
+            0% { opacity: 0; transform: translateY(50px) scale(0.9) rotateX(10deg); }
+            100% { opacity: 1; transform: translateY(0) scale(1) rotateX(0); }
         }
 
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 16px;
             justify-content: center;
         }
 
-        /* ===== البطاقة 3D ===== */
+        /* ===== البطاقة الاحترافية ===== */
         .card {
             aspect-ratio: 3/4;
             cursor: pointer;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-            border-radius: 16px;
-            min-height: 150px;
-            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+            transition: transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 18px;
+            min-height: 160px;
+            filter: drop-shadow(0 15px 40px rgba(0, 0, 0, 0.6));
         }
         .card:not(.disabled):not(.flipped):hover {
-            transform: translateY(-10px) scale(1.02) rotateX(5deg);
-            filter: drop-shadow(0 20px 50px rgba(255,215,0,0.15));
+            transform: translateY(-12px) scale(1.04) rotateX(6deg) rotateZ(-2deg);
+            filter: drop-shadow(0 25px 60px rgba(255, 215, 0, 0.15));
+        }
+        .card:not(.disabled):not(.flipped):active {
+            transform: scale(0.95);
+            transition-duration: 0.1s;
         }
         .card.flipped {
-            transform: rotateY(180deg);
+            transform: rotateY(180deg) scale(1.02);
         }
         .card.disabled {
             cursor: default;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 5px 20px rgba(0, 0, 0, 0.3));
         }
 
         .card .card-face {
@@ -206,22 +269,22 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 16px;
+            border-radius: 18px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 12px;
             overflow: hidden;
-            border: 1px solid rgba(255,215,0,0.05);
+            border: 1px solid rgba(255, 215, 0, 0.03);
         }
 
-        /* الوجه الخلفي (المقفل) */
+        /* ===== الوجه الخلفي (المقفل) - تصميم فاخر ===== */
         .card .card-back {
-            background: linear-gradient(145deg, #1a1a2e, #0f0f1a);
+            background: linear-gradient(145deg, #0f0f1a, #1a1a2e);
             transform: rotateY(0deg);
-            box-shadow: inset 0 0 80px rgba(0,0,0,0.5);
-            border: 2px solid rgba(255,215,0,0.06);
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 215, 0, 0.04);
         }
         .card .card-back .back-design {
             position: relative;
@@ -232,119 +295,163 @@
             align-items: center;
             justify-content: center;
         }
-        .card .card-back .back-design .pattern {
+        .card .card-back .back-design .hex-pattern {
             position: absolute;
-            width: 80%;
-            height: 80%;
-            border: 2px solid rgba(255,215,0,0.03);
-            border-radius: 12px;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(255,215,0,0.02) 10px,
-                rgba(255,215,0,0.02) 11px
+            width: 90%;
+            height: 90%;
+            background: repeating-conic-gradient(
+                from 0deg at 50% 50%,
+                transparent 0deg,
+                rgba(255, 215, 0, 0.02) 5deg,
+                transparent 10deg,
+                rgba(255, 215, 0, 0.01) 15deg,
+                transparent 20deg
             );
+            border-radius: 12px;
         }
         .card .card-back .back-design .icon-big {
-            font-size: 40px;
-            opacity: 0.15;
-            animation: pulseIcon 3s ease-in-out infinite;
+            font-size: 44px;
+            opacity: 0.12;
+            animation: cardPulse 3s ease-in-out infinite;
             z-index: 1;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.05));
         }
-        @keyframes pulseIcon {
-            0%, 100% { transform: scale(1); opacity: 0.15; }
-            50% { transform: scale(1.1); opacity: 0.25; }
+        @keyframes cardPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.12; }
+            50% { transform: scale(1.05) rotate(3deg); opacity: 0.2; }
         }
         .card .card-back .back-design .card-number {
             position: absolute;
-            bottom: 12px;
+            bottom: 14px;
             font-size: 11px;
-            color: rgba(255,215,0,0.08);
-            font-weight: 700;
-            letter-spacing: 3px;
+            color: rgba(255, 215, 0, 0.06);
+            font-weight: 900;
+            letter-spacing: 4px;
             z-index: 1;
         }
         .card .card-back .glow-ring {
             position: absolute;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            bottom: 5px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,215,0,0.03);
-            box-shadow: inset 0 0 30px rgba(255,215,0,0.02);
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            bottom: 6px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 215, 0, 0.02);
+            box-shadow: inset 0 0 40px rgba(255, 215, 0, 0.01);
+            pointer-events: none;
         }
+        .card .card-back .corner-glow {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.03), transparent);
+            pointer-events: none;
+        }
+        .card .card-back .corner-glow.tl { top: -10px; left: -10px; }
+        .card .card-back .corner-glow.br { bottom: -10px; right: -10px; }
 
-        /* الوجه الأمامي (المكشوف) */
+        /* ===== الوجه الأمامي (المكشوف) ===== */
         .card .card-front {
             transform: rotateY(180deg);
             background: linear-gradient(145deg, #FFD700, #FF8C00);
-            box-shadow: inset 0 0 60px rgba(255,215,0,0.1);
-            border: 2px solid rgba(255,215,0,0.2);
+            box-shadow: inset 0 0 80px rgba(255, 215, 0, 0.15);
+            border: 2px solid rgba(255, 215, 0, 0.15);
         }
         .card .card-front .prize-icon {
-            font-size: 42px;
+            font-size: 46px;
             margin-bottom: 6px;
-            filter: drop-shadow(0 4px 20px rgba(0,0,0,0.2));
-            animation: iconFloat 2s ease-in-out infinite;
+            filter: drop-shadow(0 4px 30px rgba(0, 0, 0, 0.15));
+            animation: prizeFloat 2.5s ease-in-out infinite;
         }
-        @keyframes iconFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
+        @keyframes prizeFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.05); }
         }
         .card .card-front .prize-name {
-            font-size: 12px;
-            font-weight: 800;
+            font-size: 13px;
+            font-weight: 900;
             color: #0a0a0a;
             text-align: center;
             line-height: 1.3;
-            text-shadow: 0 1px 8px rgba(255,255,255,0.1);
+            text-shadow: 0 2px 12px rgba(255, 255, 255, 0.1);
+            font-family: 'Orbitron', sans-serif;
         }
         .card .card-front .prize-desc {
             font-size: 9px;
-            color: rgba(0,0,0,0.5);
+            color: rgba(0, 0, 0, 0.4);
             text-align: center;
-            margin-top: 3px;
-            font-weight: 500;
+            margin-top: 4px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        .card .card-front .shine-effect {
+        .card .card-front .shine-overlay {
             position: absolute;
-            top: -30%;
-            left: -30%;
-            width: 160%;
-            height: 160%;
-            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.2), transparent 70%);
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.15), transparent 60%);
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.8s ease;
         }
-        .card.flipped .card-front .shine-effect {
+        .card.flipped .card-front .shine-overlay {
             opacity: 1;
+            animation: shineSweep 3s ease-in-out infinite;
+        }
+        @keyframes shineSweep {
+            0%, 100% { transform: translateX(-30%) rotate(0deg); }
+            50% { transform: translateX(30%) rotate(5deg); }
         }
 
-        /* ===== البطاقة الفائزة ===== */
+        /* ===== البطاقة الفائزة - تأثير سينمائي ===== */
         .card.winner {
-            animation: winnerGlow 1.5s ease-in-out infinite !important;
-            filter: drop-shadow(0 0 40px rgba(255,215,0,0.3)) !important;
-            z-index: 10;
+            animation: winnerCinematic 1.2s ease-in-out infinite !important;
+            filter: drop-shadow(0 0 50px rgba(255, 215, 0, 0.3)) !important;
+            z-index: 20;
+        }
+        @keyframes winnerCinematic {
+            0%, 100% { 
+                transform: rotateY(180deg) scale(1); 
+                filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
+            }
+            50% { 
+                transform: rotateY(180deg) scale(1.06) translateY(-8px); 
+                filter: drop-shadow(0 0 80px rgba(255, 215, 0, 0.5));
+            }
+        }
+        .card.winner .card-front {
+            animation: winnerGlow 1.5s ease-in-out infinite;
         }
         @keyframes winnerGlow {
-            0%, 100% { transform: rotateY(180deg) scale(1); filter: drop-shadow(0 0 30px rgba(255,215,0,0.2)); }
-            50% { transform: rotateY(180deg) scale(1.05); filter: drop-shadow(0 0 60px rgba(255,215,0,0.4)); }
+            0%, 100% { box-shadow: inset 0 0 80px rgba(255, 215, 0, 0.15), 0 0 60px rgba(255, 215, 0, 0.1); }
+            50% { box-shadow: inset 0 0 120px rgba(255, 215, 0, 0.3), 0 0 100px rgba(255, 215, 0, 0.2); }
         }
 
-        /* ===== البطاقات الخاسرة ===== */
+        /* ===== البطاقات الخاسرة - تأثير درامي ===== */
         .card.loser {
-            animation: loserFade 0.6s ease forwards;
+            animation: loserDramatic 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
         }
-        @keyframes loserFade {
-            0% { opacity: 1; transform: rotateY(0deg) scale(1) translateY(0); }
-            100% { opacity: 0; transform: rotateY(0deg) scale(0.7) translateY(30px); filter: blur(5px); }
+        @keyframes loserDramatic {
+            0% { 
+                opacity: 1; 
+                transform: rotateY(0deg) scale(1) translateY(0) rotateZ(0deg);
+                filter: blur(0px);
+            }
+            30% { 
+                transform: rotateY(0deg) scale(1.02) translateY(-10px) rotateZ(2deg);
+                filter: blur(0px);
+            }
+            100% { 
+                opacity: 0; 
+                transform: rotateY(0deg) scale(0.5) translateY(60px) rotateZ(10deg);
+                filter: blur(8px);
+            }
         }
 
-        /* ===== التأثيرات الخاصة ===== */
-        .card .sparkle-container {
+        /* ===== جزيئات متلألئة على البطاقة الفائزة ===== */
+        .sparkle-container {
             position: absolute;
             top: 0;
             left: 0;
@@ -352,15 +459,13 @@
             height: 100%;
             pointer-events: none;
             overflow: hidden;
-            border-radius: 16px;
+            border-radius: 18px;
         }
         .sparkle {
             position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #FFD700;
             border-radius: 50%;
-            animation: sparkleAnim 1.5s ease-in infinite;
+            background: #FFD700;
+            animation: sparkleAnim var(--duration) ease-in infinite;
         }
         @keyframes sparkleAnim {
             0% { transform: scale(0) rotate(0deg); opacity: 0; }
@@ -368,7 +473,7 @@
             100% { transform: scale(0) rotate(360deg); opacity: 0; }
         }
 
-        /* ===== الأزرار ===== */
+        /* ===== أزرار ===== */
         .actions {
             display: flex;
             flex-direction: column;
@@ -381,44 +486,45 @@
             padding: 0 10px;
         }
         .btn {
-            padding: 18px 24px;
+            padding: 18px 28px;
             border: none;
-            border-radius: 16px;
+            border-radius: 18px;
             font-size: 18px;
-            font-weight: 700;
+            font-weight: 900;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             width: 100%;
             position: relative;
             overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
         }
-        .btn::after {
+        .btn::before {
             content: '';
             position: absolute;
             top: -50%;
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent 70%);
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08), transparent 70%);
             opacity: 0;
             transition: opacity 0.4s ease;
         }
-        .btn:hover:not(:disabled)::after {
+        .btn:hover:not(:disabled)::before {
             opacity: 1;
         }
         .btn-play {
             background: linear-gradient(135deg, #B8860B, #FFD700);
             color: #0a0a0a;
-            box-shadow: 0 4px 30px rgba(255,215,0,0.15);
+            box-shadow: 0 4px 40px rgba(255, 215, 0, 0.1);
             font-size: 20px;
-            letter-spacing: 1px;
         }
         .btn-play:hover:not(:disabled) {
             transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 50px rgba(255,215,0,0.25);
+            box-shadow: 0 8px 60px rgba(255, 215, 0, 0.2);
         }
         .btn-play:disabled {
-            opacity: 0.3;
+            opacity: 0.25;
             cursor: not-allowed;
             transform: none !important;
         }
@@ -426,7 +532,7 @@
             display: none;
             width: 22px;
             height: 22px;
-            border: 2px solid rgba(10,10,10,0.1);
+            border: 2px solid rgba(10, 10, 10, 0.1);
             border-top: 2px solid #0a0a0a;
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
@@ -443,11 +549,11 @@
 
         /* ===== نتيجة اللعبة ===== */
         .result-box {
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255,215,0,0.05);
-            border-radius: 20px;
-            padding: 20px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 215, 0, 0.04);
+            border-radius: 22px;
+            padding: 22px 20px;
             margin-top: 15px;
             text-align: center;
             display: none;
@@ -455,44 +561,68 @@
             max-width: 380px;
             z-index: 1;
             position: relative;
-            animation: resultPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: resultIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        @keyframes resultPop {
-            0% { transform: scale(0.8) rotate(-3deg); opacity: 0; }
+        @keyframes resultIn {
+            0% { transform: scale(0.8) rotate(-5deg); opacity: 0; }
             100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
         .result-box.show { display: block; }
         .result-box.winner {
-            border-color: rgba(255,215,0,0.2);
-            box-shadow: 0 0 60px rgba(255,215,0,0.05);
+            border-color: rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 80px rgba(255, 215, 0, 0.04);
         }
         .result-box .result-icon {
-            font-size: 52px;
+            font-size: 56px;
             margin-bottom: 8px;
-            animation: iconFloat 2s ease-in-out infinite;
+            animation: prizeFloat 2s ease-in-out infinite;
         }
         .result-box .result-title {
             color: #FFD700;
             font-size: 22px;
-            font-weight: 800;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
         }
         .result-box .result-desc {
             color: #888;
             font-size: 14px;
             margin-top: 6px;
+            font-weight: 400;
+        }
+        .result-box .confetti-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 22px;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            animation: confettiFall var(--duration) ease-in forwards;
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(-20px) rotate(0deg) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(200px) rotate(720deg) scale(1); opacity: 0; }
         }
 
         /* ===== إعدادات الصوت ===== */
         .sound-settings {
             display: flex;
             justify-content: center;
-            gap: 24px;
+            gap: 28px;
             margin-top: 12px;
-            padding: 8px 20px;
-            background: rgba(0,0,0,0.4);
+            padding: 10px 24px;
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(20px);
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
             width: 100%;
             max-width: 380px;
             z-index: 1;
@@ -506,6 +636,7 @@
             gap: 8px;
             cursor: pointer;
             transition: color 0.3s;
+            font-weight: 700;
         }
         .sound-settings label:hover {
             color: #FFD700;
@@ -520,39 +651,41 @@
         /* ===== لوحة الإدارة ===== */
         .admin-panel {
             display: none;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255,215,0,0.05);
-            border-radius: 20px;
-            padding: 16px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 215, 0, 0.04);
+            border-radius: 22px;
+            padding: 18px;
             margin-top: 14px;
             width: 100%;
             max-width: 420px;
             z-index: 1;
             position: relative;
         }
-        .admin-panel.show { display: block; animation: fadeInUp 0.4s ease; }
+        .admin-panel.show { display: block; animation: containerIn 0.4s ease; }
         .admin-panel .panel-title {
             color: #FFD700;
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 12px;
+            font-size: 15px;
+            font-weight: 900;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
         }
         .admin-panel .panel-title .badge {
-            background: #FFD700;
+            background: linear-gradient(135deg, #FFD700, #FF8C00);
             color: #0a0a0a;
-            font-size: 9px;
-            padding: 2px 12px;
+            font-size: 8px;
+            padding: 2px 14px;
             border-radius: 20px;
-            font-weight: 700;
+            font-weight: 900;
         }
         .admin-panel .prize-item {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.03);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
             padding: 8px 10px;
             margin-bottom: 6px;
             display: flex;
@@ -564,14 +697,15 @@
         .admin-panel .prize-item .prize-info { flex: 1; min-width: 90px; }
         .admin-panel .prize-item .prize-info .name-input {
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 6px;
             color: #fff;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             padding: 4px 8px;
             width: 100%;
             transition: border-color 0.3s;
+            font-family: 'Orbitron', sans-serif;
         }
         .admin-panel .prize-item .prize-info .name-input:focus {
             outline: none;
@@ -585,14 +719,14 @@
         .admin-panel .prize-item .prize-colors input[type="color"] {
             width: 28px;
             height: 28px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 6px;
             padding: 2px;
             background: transparent;
             cursor: pointer;
         }
         .admin-panel .prize-item .btn-delete {
-            background: rgba(255,0,0,0.05);
+            background: rgba(255, 0, 0, 0.05);
             border: none;
             color: #FF4444;
             padding: 4px 12px;
@@ -600,9 +734,10 @@
             cursor: pointer;
             font-size: 14px;
             transition: all 0.3s;
+            font-weight: 700;
         }
         .admin-panel .prize-item .btn-delete:hover {
-            background: rgba(255,0,0,0.15);
+            background: rgba(255, 0, 0, 0.15);
         }
         .admin-panel .add-prize-form {
             display: flex;
@@ -615,11 +750,13 @@
             flex: 1;
             padding: 6px 10px;
             border-radius: 8px;
-            border: 1px solid rgba(255,215,0,0.05);
-            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 215, 0, 0.04);
+            background: rgba(0, 0, 0, 0.3);
             color: #fff;
             font-size: 11px;
             min-width: 50px;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
         }
         .admin-panel .add-prize-form input:focus {
             outline: none;
@@ -631,10 +768,11 @@
             border: none;
             border-radius: 8px;
             color: #0a0a0a;
-            font-weight: 700;
+            font-weight: 900;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
         }
         .admin-panel .add-prize-form .btn-add:hover { transform: scale(1.05); }
         .admin-panel .panel-actions {
@@ -645,24 +783,26 @@
         }
         .admin-panel .panel-actions .btn-action {
             padding: 5px 14px;
-            border: 1px solid rgba(255,215,0,0.05);
+            border: 1px solid rgba(255, 215, 0, 0.04);
             border-radius: 8px;
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
             color: #FFD700;
             font-size: 10px;
             cursor: pointer;
             transition: all 0.3s;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
         }
         .admin-panel .panel-actions .btn-action:hover {
-            background: rgba(255,215,0,0.05);
+            background: rgba(255, 215, 0, 0.05);
             border-color: #FFD700;
         }
         .admin-panel .panel-actions .btn-action.danger {
             color: #FF4444;
-            border-color: rgba(255,0,0,0.05);
+            border-color: rgba(255, 0, 0, 0.04);
         }
         .admin-panel .panel-actions .btn-action.danger:hover {
-            background: rgba(255,0,0,0.05);
+            background: rgba(255, 0, 0, 0.05);
             border-color: #FF4444;
         }
 
@@ -674,29 +814,31 @@
             transform: translateX(-50%);
             background: linear-gradient(135deg, #FFD700, #FF8C00);
             color: #0a0a0a;
-            padding: 16px 32px;
-            border-radius: 16px;
+            padding: 16px 36px;
+            border-radius: 18px;
             font-size: 18px;
-            font-weight: 700;
+            font-weight: 900;
             z-index: 1000;
-            box-shadow: 0 10px 60px rgba(255,215,0,0.2);
-            animation: notifSlide 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 60px rgba(255, 215, 0, 0.15);
+            animation: notifIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: none;
             max-width: 90%;
             text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
         }
         .notification.show { display: block; }
-        @keyframes notifSlide {
-            0% { transform: translateX(-50%) translateY(-80px); opacity: 0; }
-            100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+        @keyframes notifIn {
+            0% { transform: translateX(-50%) translateY(-80px) scale(0.8); opacity: 0; }
+            100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
         }
 
         /* ===== خطأ ===== */
         .error-msg {
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,0,0,0.05);
-            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 0, 0, 0.04);
+            border-radius: 16px;
             padding: 12px 16px;
             color: #FF6B6B;
             text-align: center;
@@ -707,50 +849,54 @@
             max-width: 380px;
             z-index: 1;
             position: relative;
+            font-weight: 700;
         }
-        .error-msg.show { display: block; animation: fadeInUp 0.3s ease; }
+        .error-msg.show { display: block; animation: containerIn 0.3s ease; }
 
         /* ===== تجاوب ===== */
         @media (max-width: 480px) {
             .cards-grid { gap: 10px; }
             .card { min-height: 120px; }
-            .card .card-front .prize-icon { font-size: 32px; }
+            .card .card-front .prize-icon { font-size: 34px; }
             .card .card-front .prize-name { font-size: 10px; }
-            .card .card-back .back-design .icon-big { font-size: 30px; }
-            .banner-text { font-size: 18px; padding: 10px 16px; }
-            .btn { font-size: 16px; padding: 15px 20px; }
+            .card .card-back .back-design .icon-big { font-size: 32px; }
+            .banner-text { font-size: 17px; padding: 10px 16px; }
+            .btn { font-size: 15px; padding: 14px 18px; }
         }
 
         @media (max-width: 380px) {
             .cards-grid { gap: 8px; }
             .card { min-height: 100px; }
-            .card .card-front .prize-icon { font-size: 26px; }
+            .card .card-front .prize-icon { font-size: 28px; }
             .card .card-front .prize-name { font-size: 9px; }
         }
 
         @media (min-width: 600px) {
             .cards-grid { gap: 20px; }
             .card { min-height: 200px; }
-            .card .card-front .prize-icon { font-size: 50px; }
+            .card .card-front .prize-icon { font-size: 54px; }
             .card .card-front .prize-name { font-size: 14px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- خلفية ثلاثية الأبعاد -->
-    <div class="bg-3d" id="bg3d"></div>
-    <div class="light-sweep"></div>
+    <!-- ===== خلفية سينمائية ===== -->
+    <div class="cinematic-bg">
+        <div class="particles-container" id="particles"></div>
+    </div>
+    <div class="light-flash"></div>
+    <div class="cross-lines"></div>
 
-    <!-- إشعار -->
+    <!-- ===== إشعار ===== -->
     <div class="notification" id="notification">🎉 مبروك!</div>
 
-    <!-- النص العلوي -->
+    <!-- ===== النص العلوي ===== -->
     <div class="banner-text" id="bannerText">
-        <span class="glow">🃏 IChancy · بطاقات الحظ</span>
+        <span class="gold-text">🃏 IChancy · بطاقات الحظ</span>
     </div>
 
-    <!-- شاشة تحميل -->
+    <!-- ===== شاشة تحميل ===== -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loader-ring"></div>
         <div class="loader-text">جاري التحميل</div>
@@ -759,12 +905,12 @@
         </div>
     </div>
 
-    <!-- 6 بطاقات -->
+    <!-- ===== 6 بطاقات ===== -->
     <div class="cards-container" id="cardsContainer">
         <div class="cards-grid" id="cardsGrid"></div>
     </div>
 
-    <!-- أزرار -->
+    <!-- ===== أزرار ===== -->
     <div class="actions">
         <button class="btn btn-play" id="playBtn" disabled>
             <span class="spinner"></span>
@@ -772,17 +918,15 @@
         </button>
     </div>
 
-    <!-- شرط الإيداع -->
-    <div class="deposit-notice" id="depositNotice" style="display:none;"></div>
-
-    <!-- النتيجة -->
+    <!-- ===== النتيجة ===== -->
     <div class="result-box" id="resultBox">
+        <div class="confetti-container" id="confettiContainer"></div>
         <div class="result-icon" id="resultIcon">🎁</div>
         <div class="result-title" id="resultTitle">جائزة!</div>
         <div class="result-desc" id="resultDesc"></div>
     </div>
 
-    <!-- إعدادات الصوت -->
+    <!-- ===== إعدادات الصوت ===== -->
     <div class="sound-settings">
         <label>
             🔊
@@ -794,7 +938,7 @@
         </label>
     </div>
 
-    <!-- لوحة الإدارة -->
+    <!-- ===== لوحة الإدارة ===== -->
     <div class="admin-panel" id="adminPanel">
         <div class="panel-title">
             ⚙️ الإدارة <span class="badge">ADMIN</span>
@@ -814,7 +958,7 @@
         </div>
     </div>
 
-    <!-- خطأ -->
+    <!-- ===== خطأ ===== -->
     <div class="error-msg" id="errorMsg">
         <span id="errorText"></span>
     </div>
@@ -834,74 +978,79 @@
         let musicEnabled = true;
 
         // ================================================================
-        //                      نظام الصوت المتقدم
+        //                      نظام الصوت الاحترافي
         // ================================================================
-        class ProSoundManager {
+        class ProSound {
             constructor() {
                 this.ctx = null;
                 this.bgInterval = null;
-                this.initialized = false;
+                this.ready = false;
             }
 
             init() {
-                if (this.initialized) return;
+                if (this.ready) return;
                 try {
                     this.ctx = new(window.AudioContext || window.webkitAudioContext)();
-                    this.initialized = true;
+                    this.ready = true;
                 } catch (e) { console.warn('Audio not supported'); }
             }
 
             playFlip() {
-                if (!soundEnabled || !this.initialized) return;
+                if (!soundEnabled || !this.ready) return;
                 try {
                     const ctx = this.ctx;
                     const now = ctx.currentTime;
+                    
                     // صوت تقليب عالي الجودة
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.connect(gain);
                     gain.connect(ctx.destination);
-                    osc.frequency.setValueAtTime(900, now);
-                    osc.frequency.exponentialRampToValueAtTime(500, now + 0.08);
-                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+                    osc.frequency.setValueAtTime(1200, now);
+                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.06);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.12);
                     osc.type = 'square';
-                    gain.gain.setValueAtTime(0.03, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    gain.gain.setValueAtTime(0.035, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
                     osc.start(now);
-                    osc.stop(now + 0.15);
+                    osc.stop(now + 0.12);
                     
-                    // تأثير إضافي
+                    // تأثير رنين
                     setTimeout(() => {
                         const osc2 = ctx.createOscillator();
                         const gain2 = ctx.createGain();
                         osc2.connect(gain2);
                         gain2.connect(ctx.destination);
-                        osc2.frequency.setValueAtTime(600, now + 0.1);
-                        osc2.frequency.exponentialRampToValueAtTime(400, now + 0.2);
+                        osc2.frequency.setValueAtTime(800, now + 0.08);
+                        osc2.frequency.exponentialRampToValueAtTime(500, now + 0.16);
                         osc2.type = 'sine';
-                        gain2.gain.setValueAtTime(0.02, now + 0.1);
-                        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-                        osc2.start(now + 0.1);
-                        osc2.stop(now + 0.2);
-                    }, 50);
+                        gain2.gain.setValueAtTime(0.02, now + 0.08);
+                        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+                        osc2.start(now + 0.08);
+                        osc2.stop(now + 0.16);
+                    }, 60);
                 } catch (e) { console.warn('Sound error:', e); }
             }
 
             playWin() {
-                if (!soundEnabled || !this.initialized) return;
+                if (!soundEnabled || !this.ready) return;
                 try {
                     const ctx = this.ctx;
                     const now = ctx.currentTime;
+                    
+                    // لحن انتصاري ملحمي
                     const melody = [
-                        [523, 0.06, 0.05],
-                        [659, 0.06, 0.05],
-                        [784, 0.06, 0.05],
-                        [1047, 0.1, 0.06],
-                        [784, 0.06, 0.05],
-                        [988, 0.06, 0.05],
-                        [1175, 0.1, 0.06],
-                        [1319, 0.15, 0.07],
-                        [1568, 0.2, 0.08]
+                        [523, 0.05, 0.05],
+                        [659, 0.05, 0.05],
+                        [784, 0.05, 0.05],
+                        [1047, 0.08, 0.06],
+                        [784, 0.05, 0.05],
+                        [988, 0.05, 0.05],
+                        [1175, 0.08, 0.06],
+                        [1319, 0.1, 0.07],
+                        [1568, 0.12, 0.08],
+                        [1760, 0.15, 0.09],
+                        [1976, 0.2, 0.1]
                     ];
                     melody.forEach(([freq, dur, vol], i) => {
                         const osc = ctx.createOscillator();
@@ -915,44 +1064,63 @@
                         osc.start(now + i * 0.06);
                         osc.stop(now + i * 0.06 + dur);
                     });
+                    
+                    // كورد ختامي
+                    setTimeout(() => {
+                        [523, 659, 784].forEach((freq, i) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.frequency.setValueAtTime(freq, now + 1.2 + i * 0.04);
+                            osc.type = 'sine';
+                            gain.gain.setValueAtTime(0.04, now + 1.2 + i * 0.04);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.6 + i * 0.04);
+                            osc.start(now + 1.2 + i * 0.04);
+                            osc.stop(now + 1.6 + i * 0.04);
+                        });
+                    }, 800);
                 } catch (e) { console.warn('Sound error:', e); }
             }
 
             playLose() {
-                if (!soundEnabled || !this.initialized) return;
+                if (!soundEnabled || !this.ready) return;
                 try {
                     const ctx = this.ctx;
                     const now = ctx.currentTime;
+                    
+                    // صوت خسارة درامي
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.connect(gain);
                     gain.connect(ctx.destination);
-                    osc.frequency.setValueAtTime(500, now);
-                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.4);
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.5);
                     osc.type = 'sawtooth';
-                    gain.gain.setValueAtTime(0.04, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    gain.gain.setValueAtTime(0.045, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
                     osc.start(now);
-                    osc.stop(now + 0.4);
+                    osc.stop(now + 0.5);
                     
+                    // تأثير إضافي
                     setTimeout(() => {
                         const osc2 = ctx.createOscillator();
                         const gain2 = ctx.createGain();
                         osc2.connect(gain2);
                         gain2.connect(ctx.destination);
-                        osc2.frequency.setValueAtTime(300, now + 0.2);
-                        osc2.frequency.exponentialRampToValueAtTime(80, now + 0.5);
+                        osc2.frequency.setValueAtTime(400, now + 0.15);
+                        osc2.frequency.exponentialRampToValueAtTime(50, now + 0.45);
                         osc2.type = 'square';
-                        gain2.gain.setValueAtTime(0.02, now + 0.2);
-                        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                        osc2.start(now + 0.2);
-                        osc2.stop(now + 0.5);
-                    }, 100);
+                        gain2.gain.setValueAtTime(0.025, now + 0.15);
+                        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                        osc2.start(now + 0.15);
+                        osc2.stop(now + 0.45);
+                    }, 120);
                 } catch (e) { console.warn('Sound error:', e); }
             }
 
             playBgMusic() {
-                if (!musicEnabled || !this.initialized) return;
+                if (!musicEnabled || !this.ready) return;
                 if (this.bgInterval) return;
                 try {
                     const ctx = this.ctx;
@@ -963,38 +1131,43 @@
                         gain.connect(ctx.destination);
                         osc.frequency.setValueAtTime(freq, time);
                         osc.type = type;
-                        gain.gain.setValueAtTime(vol || 0.015, time);
+                        gain.gain.setValueAtTime(vol || 0.012, time);
                         gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
                         osc.start(time);
                         osc.stop(time + dur);
                     };
                     
+                    // موسيقى خلفية ملحمية
                     const pattern = [
-                        [262, 0.25, 0.01],
-                        [330, 0.25, 0.01],
-                        [392, 0.25, 0.01],
-                        [523, 0.3, 0.015],
-                        [330, 0.25, 0.01],
-                        [392, 0.25, 0.01],
-                        [523, 0.25, 0.01],
-                        [659, 0.3, 0.015]
+                        [262, 0.3, 0.01],
+                        [330, 0.3, 0.01],
+                        [392, 0.3, 0.01],
+                        [523, 0.4, 0.015],
+                        [330, 0.3, 0.01],
+                        [392, 0.3, 0.01],
+                        [523, 0.3, 0.01],
+                        [659, 0.4, 0.015],
+                        [392, 0.3, 0.01],
+                        [523, 0.3, 0.01],
+                        [659, 0.3, 0.01],
+                        [784, 0.4, 0.015]
                     ];
                     pattern.forEach(([freq, dur, vol], i) => {
-                        const time = ctx.currentTime + i * 0.3;
+                        const time = ctx.currentTime + i * 0.35;
                         playNote(freq, time, dur, vol, i % 2 === 0 ? 'sine' : 'triangle');
                     });
                     
                     this.bgInterval = setInterval(() => {
-                        if (!musicEnabled || !this.initialized) {
+                        if (!musicEnabled || !this.ready) {
                             this.stopBgMusic();
                             return;
                         }
                         const t = ctx.currentTime;
                         const notes = [131, 165, 196, 262, 196, 165];
                         notes.forEach((freq, i) => {
-                            playNote(freq, t + i * 0.15, 0.12, 0.008, 'square');
+                            playNote(freq, t + i * 0.2, 0.15, 0.007, 'square');
                         });
-                    }, 1200);
+                    }, 1400);
                 } catch (e) { console.warn('Music error:', e); }
             }
 
@@ -1014,23 +1187,24 @@
             }
         }
 
-        const sound = new ProSoundManager();
+        const sound = new ProSound();
 
         // ================================================================
-        //                      الخلفية ثلاثية الأبعاد
+        //                      جسيمات الخلفية
         // ================================================================
-        function createBgParticles() {
-            const container = document.getElementById('bg3d');
-            for (let i = 0; i < 30; i++) {
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 40; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle';
-                const size = 2 + Math.random() * 6;
+                const size = 2 + Math.random() * 8;
                 p.style.width = size + 'px';
                 p.style.height = size + 'px';
                 p.style.left = Math.random() * 100 + '%';
-                p.style.top = Math.random() * 100 + '%';
-                p.style.animationDelay = Math.random() * 15 + 's';
-                p.style.animationDuration = (10 + Math.random() * 20) + 's';
+                p.style.animationDuration = (15 + Math.random() * 30) + 's';
+                p.style.animationDelay = (Math.random() * 20) + 's';
+                const colors = ['rgba(255,215,0,0.3)', 'rgba(255,100,0,0.2)', 'rgba(200,0,255,0.15)'];
+                p.style.background = `radial-gradient(circle, ${colors[i % colors.length]}, transparent)`;
                 container.appendChild(p);
             }
         }
@@ -1080,17 +1254,19 @@
                 card.innerHTML = `
                     <div class="card-face card-back">
                         <div class="back-design">
-                            <div class="pattern"></div>
+                            <div class="hex-pattern"></div>
                             <div class="icon-big">🃏</div>
                             <div class="card-number">#${String(i + 1).padStart(2, '0')}</div>
                         </div>
                         <div class="glow-ring"></div>
+                        <div class="corner-glow tl"></div>
+                        <div class="corner-glow br"></div>
                     </div>
                     <div class="card-face card-front" style="background: linear-gradient(145deg, ${randomPrize.card_color || '#1a1a2e'}, ${randomPrize.card_back_color || '#16213e'});">
                         <div class="prize-icon">${randomPrize.icon || '🎁'}</div>
                         <div class="prize-name">${randomPrize.name || 'جائزة'}</div>
                         <div class="prize-desc">${randomPrize.description || ''}</div>
-                        <div class="shine-effect"></div>
+                        <div class="shine-overlay"></div>
                         <div class="sparkle-container"></div>
                     </div>
                 `;
@@ -1101,13 +1277,14 @@
         }
 
         // ================================================================
-        //                      اختيار البطاقة
+        //                      اختيار البطاقة - البطاقة المختارة فقط
         // ================================================================
         async function handleCardClick(index) {
             if (isPlaying) return;
             if (document.getElementById('playBtn').disabled) return;
             if (selectedCardIndex !== -1) return;
             
+            // حفظ البطاقة المختارة
             selectedCardIndex = index;
             isPlaying = true;
             
@@ -1132,14 +1309,26 @@
                 if (data.success) {
                     const prize = data.game.prize;
                     const winningIndex = data.game.card_index;
-                    gameResult = { prize, isWin: !prize.name.includes('حظ سعيد') };
                     
-                    await revealCards(winningIndex, prize);
+                    // 🔥 مهم: البطاقة التي اختارها المستخدم هي التي ستنقلب
+                    // نستخدم selectedCardIndex (البطاقة المختارة) وليس winningIndex
+                    gameResult = { 
+                        prize, 
+                        isWin: !prize.name.includes('حظ سعيد'),
+                        selectedIndex: selectedCardIndex,
+                        winningIndex: winningIndex
+                    };
+                    
+                    // كشف البطاقات - البطاقة المختارة هي التي تظهر الجائزة
+                    await revealCards(selectedCardIndex, prize);
+                    
+                    // عرض النتيجة
                     showResult(prize, gameResult.isWin);
                     
                     if (gameResult.isWin) {
                         sound.playWin();
                         showNotification(`🎉 مبروك! ${prize.description || prize.name}!`);
+                        createConfetti();
                     } else {
                         sound.playLose();
                     }
@@ -1170,53 +1359,55 @@
         // ================================================================
         //                      كشف البطاقات
         // ================================================================
-        async function revealCards(winningIndex, prize) {
+        async function revealCards(selectedIndex, prize) {
             const cards = document.querySelectorAll('.card');
             
-            // 1. تحديث البطاقة الفائزة
-            const winnerCard = cards[winningIndex];
-            if (winnerCard) {
-                const front = winnerCard.querySelector('.card-front');
+            // 1. تحديث البطاقة المختارة بالجائزة الفائزة
+            const selectedCard = cards[selectedIndex];
+            if (selectedCard) {
+                const front = selectedCard.querySelector('.card-front');
                 front.style.background = `linear-gradient(145deg, ${prize.color || '#FFD700'}, ${prize.card_color || '#1a1a2e'})`;
                 front.querySelector('.prize-icon').textContent = prize.icon || '🎁';
                 front.querySelector('.prize-name').textContent = prize.name || 'جائزة';
                 front.querySelector('.prize-desc').textContent = prize.description || '';
                 
-                // إضافة تأثيرات متلألئة
-                const sparkles = winnerCard.querySelector('.sparkle-container');
-                for (let i = 0; i < 12; i++) {
+                // إضافة جزيئات متلألئة على البطاقة الفائزة
+                const sparkles = selectedCard.querySelector('.sparkle-container');
+                for (let i = 0; i < 20; i++) {
                     const sparkle = document.createElement('div');
                     sparkle.className = 'sparkle';
                     sparkle.style.left = Math.random() * 100 + '%';
                     sparkle.style.top = Math.random() * 100 + '%';
-                    sparkle.style.animationDelay = Math.random() * 1 + 's';
-                    sparkle.style.animationDuration = (0.8 + Math.random() * 0.8) + 's';
-                    sparkle.style.width = (2 + Math.random() * 4) + 'px';
+                    sparkle.style.setProperty('--duration', (0.8 + Math.random() * 1.2) + 's');
+                    sparkle.style.animationDelay = Math.random() * 1.5 + 's';
+                    sparkle.style.width = (2 + Math.random() * 5) + 'px';
                     sparkle.style.height = sparkle.style.width;
+                    sparkle.style.background = ['#FFD700', '#FF6B00', '#FF00FF', '#00BFFF', '#00FF88'][Math.floor(Math.random() * 5)];
                     sparkles.appendChild(sparkle);
                 }
             }
             
-            // 2. كشف البطاقة الفائزة أولاً
+            // 2. كشف البطاقة المختارة أولاً (مع تأثير درامي)
             await new Promise(resolve => {
                 setTimeout(() => {
-                    if (winnerCard) {
-                        winnerCard.classList.add('flipped');
-                        winnerCard.classList.add('winner');
+                    if (selectedCard) {
+                        selectedCard.classList.add('flipped');
+                        selectedCard.classList.add('winner');
                         sound.playFlip();
                     }
                     resolve();
                 }, 400);
             });
             
-            // 3. كشف البطاقات الأخرى مع تأخير متدرج
-            const otherCards = Array.from(cards).filter((_, i) => i !== winningIndex);
+            // 3. كشف البطاقات الأخرى مع تأخير درامي
+            const otherCards = Array.from(cards).filter((_, i) => i !== selectedIndex);
             for (let i = 0; i < otherCards.length; i++) {
                 const card = otherCards[i];
-                const delay = 250 + (i * 120);
+                const delay = 300 + (i * 150);
                 
                 await new Promise(resolve => {
                     setTimeout(() => {
+                        // جائزة عشوائية للبطاقات الأخرى
                         const randomPrize = prizesCache.length > 0 ? 
                             prizesCache[Math.floor(Math.random() * prizesCache.length)] : 
                             { icon: '🎁', name: 'جائزة', card_color: '#1a1a2e', card_back_color: '#16213e' };
@@ -1237,7 +1428,34 @@
             }
             
             // 4. انتظار انتهاء التأثيرات
-            await new Promise(resolve => setTimeout(resolve, 600));
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        // ================================================================
+        //                      كونفيتي احتفالي
+        // ================================================================
+        function createConfetti() {
+            const container = document.getElementById('confettiContainer');
+            container.innerHTML = '';
+            const colors = ['#FFD700', '#FF6B00', '#FF0000', '#00FF88', '#00BFFF', '#FF00FF', '#FF69B4', '#7CFC00', '#FF4500'];
+            
+            for (let i = 0; i < 80; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                const size = 4 + Math.random() * 10;
+                piece.style.width = size + 'px';
+                piece.style.height = size + 'px';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.top = Math.random() * 30 + '%';
+                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                piece.style.setProperty('--duration', (1.5 + Math.random() * 1.5) + 's');
+                piece.style.animationDelay = Math.random() * 0.8 + 's';
+                piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+                container.appendChild(piece);
+            }
+            
+            setTimeout(() => { container.innerHTML = ''; }, 3500);
         }
 
         // ================================================================
@@ -1280,7 +1498,7 @@
                 const data = await res.json();
                 if (data.success) {
                     if (data.settings.banner_text) {
-                        document.getElementById('bannerText').innerHTML = `<span class="glow">${data.settings.banner_text}</span>`;
+                        document.getElementById('bannerText').innerHTML = `<span class="gold-text">${data.settings.banner_text}</span>`;
                     }
                     return data.settings;
                 }
@@ -1333,7 +1551,7 @@
                 const data = await res.json();
                 
                 if (!data.success || !data.prizes || data.prizes.length === 0) {
-                    list.innerHTML = `<div style="color:#555;text-align:center;padding:20px;">📭 لا توجد جوائز</div>`;
+                    list.innerHTML = `<div style="color:#555;text-align:center;padding:20px;font-weight:700;">📭 لا توجد جوائز</div>`;
                     return;
                 }
                 
@@ -1537,7 +1755,7 @@
         //                      التهيئة
         // ================================================================
         async function init() {
-            createBgParticles();
+            createParticles();
             
             USER_ID = getUserId();
             if (!USER_ID) {

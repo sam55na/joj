@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎮 منصة ألعاب IChancy</title>
     <style>
-        /* ========== Reset & Base ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
@@ -25,12 +24,10 @@
             margin: 0 auto;
         }
         
-        /* ========== Scrollbar ========== */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
         ::-webkit-scrollbar-thumb { background: #00b894; border-radius: 4px; }
         
-        /* ========== Animations ========== */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -41,7 +38,6 @@
         
         .fade-in { animation: fadeIn 0.4s ease-out; }
         
-        /* ========== Logo ========== */
         .logo {
             text-align: center;
             padding: 30px 0 20px;
@@ -61,7 +57,6 @@
             margin-top: 4px;
         }
         
-        /* ========== Cards ========== */
         .card {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.06);
@@ -87,7 +82,6 @@
             border-radius: 12px;
         }
         
-        /* ========== Inputs ========== */
         .form-group {
             margin-bottom: 16px;
         }
@@ -122,7 +116,6 @@
             color: #556677;
         }
         
-        /* ========== Buttons ========== */
         .btn {
             width: 100%;
             padding: 14px;
@@ -194,7 +187,6 @@
             background: rgba(255, 107, 107, 0.2);
         }
         
-        /* ========== Loading ========== */
         .spinner {
             width: 24px;
             height: 24px;
@@ -205,7 +197,6 @@
             display: inline-block;
         }
         
-        /* ========== User Badge ========== */
         .user-badge {
             display: flex;
             align-items: center;
@@ -239,7 +230,6 @@
         .user-badge .balance .amount { font-size: 18px; font-weight: 700; color: #00b894; }
         .user-badge .balance .label { font-size: 11px; color: #8899aa; }
         
-        /* ========== Error ========== */
         .error-box {
             background: rgba(255, 107, 107, 0.1);
             border: 1px solid rgba(255, 107, 107, 0.2);
@@ -253,7 +243,6 @@
         
         .error-box.show { display: block; animation: fadeIn 0.3s ease-out; }
         
-        /* ========== Stats ========== */
         .stats {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -271,16 +260,6 @@
         .stat-item .number { font-size: 20px; font-weight: 700; color: #fff; }
         .stat-item .label { font-size: 11px; color: #8899aa; margin-top: 2px; }
         
-        /* ========== Responsive ========== */
-        @media (max-width: 400px) {
-            .container { padding: 0 4px; }
-            .card { padding: 16px; }
-            .stats { grid-template-columns: 1fr 1fr; }
-            .user-badge { flex-wrap: wrap; }
-            .user-badge .balance { width: 100%; text-align: center; }
-        }
-        
-        /* ========== حفظ البيانات محلياً ========== */
         .save-toggle {
             display: flex;
             align-items: center;
@@ -295,6 +274,20 @@
             height: 18px;
             accent-color: #00b894;
             cursor: pointer;
+        }
+        
+        .game-link {
+            color: #00b894;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 400px) {
+            .container { padding: 0 4px; }
+            .card { padding: 16px; }
+            .stats { grid-template-columns: 1fr 1fr; }
+            .user-badge { flex-wrap: wrap; }
+            .user-badge .balance { width: 100%; text-align: center; }
         }
     </style>
 </head>
@@ -331,6 +324,9 @@
         <div class="form-group">
             <label>🆔 معرف اللاعب (Player ID)</label>
             <input type="text" id="playerIdInput" placeholder="أدخل معرف اللاعب" autocomplete="off">
+            <div style="font-size: 12px; color: #556677; margin-top: 4px;">
+                📌 يمكنك الحصول عليه من حسابك في IChancy
+            </div>
         </div>
         
         <div class="save-toggle">
@@ -405,9 +401,8 @@
     let userData = null;
     let gamesList = [];
     let isLoggedIn = false;
-    const API_BASE = 'https://corsproxy.io/?' + encodeURIComponent('https://agents.ichancy.com');
-    const GAME_BASE = 'https://pg.ichancy200.com';
-
+    let sessionCookies = '';
+    
     // ============================================================
     //  تحميل البيانات المحفوظة
     // ============================================================
@@ -420,8 +415,6 @@
                     document.getElementById('usernameInput').value = data.username || '';
                     document.getElementById('playerIdInput').value = data.player_id || '';
                     document.getElementById('rememberMe').checked = true;
-                    
-                    // إذا كان هناك كلمة مرور محفوظة
                     if (data.password) {
                         document.getElementById('passwordInput').value = data.password;
                     }
@@ -439,11 +432,7 @@
         const box = document.getElementById('errorBox');
         box.textContent = '❌ ' + message;
         box.classList.add('show');
-        setTimeout(() => box.classList.remove('show'), 5000);
-    }
-
-    function hideError() {
-        document.getElementById('errorBox').classList.remove('show');
+        setTimeout(() => box.classList.remove('show'), 8000);
     }
 
     function setLoading(loading) {
@@ -458,273 +447,10 @@
     }
 
     // ============================================================
-    //  تسجيل الدخول إلى IChancy
-    // ============================================================
-    async function loginToIChancy(username, password) {
-        const url = `${API_BASE}/global/api/User/signIn`;
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Origin': 'https://agents.ichancy.com',
-                'Referer': 'https://agents.ichancy.com/'
-            },
-            body: JSON.stringify({ username, password })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.status !== true) {
-            throw new Error(data.message || 'بيانات الدخول غير صحيحة');
-        }
-        
-        return data;
-    }
-
-    // ============================================================
-    //  جلب الألعاب
-    // ============================================================
-    async function getGames(session) {
-        const url = `${API_BASE}/global/api/Game/getGames`;
-        
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Cookie': session
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        return data.result || [];
-    }
-
-    // ============================================================
-    //  جلب الرصيد
-    // ============================================================
-    async function getBalance(session, playerId) {
-        const url = `${API_BASE}/global/api/Player/getPlayerBalanceById`;
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Cookie': session
-            },
-            body: JSON.stringify({ playerId })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        const result = data.result || [];
-        if (result.length > 0) {
-            return result[0].balance || 0;
-        }
-        return 0;
-    }
-
-    // ============================================================
-    //  معالجة تسجيل الدخول
-    // ============================================================
-    async function handleLogin() {
-        hideError();
-        
-        const username = document.getElementById('usernameInput').value.trim();
-        const password = document.getElementById('passwordInput').value.trim();
-        const playerId = document.getElementById('playerIdInput').value.trim();
-        const remember = document.getElementById('rememberMe').checked;
-        
-        // التحقق من الحقول
-        if (!username) {
-            showError('الرجاء إدخال اسم المستخدم');
-            document.getElementById('usernameInput').focus();
-            return;
-        }
-        
-        if (!password) {
-            showError('الرجاء إدخال كلمة المرور');
-            document.getElementById('passwordInput').focus();
-            return;
-        }
-        
-        if (!playerId) {
-            showError('الرجاء إدخال معرف اللاعب');
-            document.getElementById('playerIdInput').focus();
-            return;
-        }
-        
-        if (!/^\d+$/.test(playerId)) {
-            showError('معرف اللاعب يجب أن يكون أرقاماً فقط');
-            return;
-        }
-        
-        setLoading(true);
-        
-        try {
-            // 1. تسجيل الدخول
-            const loginResult = await loginToIChancy(username, password);
-            
-            // استخراج الجلسة من الكوكيز
-            const cookies = loginResult._headers?.get('set-cookie') || '';
-            const sessionCookie = cookies.split(';').find(c => c.includes('loginCredentials')) || '';
-            
-            // 2. جلب الرصيد
-            const balance = await getBalance(sessionCookie, playerId);
-            
-            // 3. جلب الألعاب
-            const games = await getGames(sessionCookie);
-            
-            // حفظ البيانات
-            userData = {
-                username,
-                player_id: playerId,
-                balance: balance,
-                session: sessionCookie
-            };
-            
-            gamesList = games;
-            isLoggedIn = true;
-            
-            // حفظ في localStorage
-            if (remember) {
-                localStorage.setItem('ichancy_user_data', JSON.stringify({
-                    username,
-                    password,
-                    player_id: playerId
-                }));
-            } else {
-                localStorage.removeItem('ichancy_user_data');
-            }
-            
-            setLoading(false);
-            showDashboard();
-            
-        } catch (error) {
-            setLoading(false);
-            showError(error.message || 'حدث خطأ أثناء تسجيل الدخول');
-            console.error('Login error:', error);
-        }
-    }
-
-    // ============================================================
-    //  عرض لوحة التحكم
-    // ============================================================
-    function showDashboard() {
-        // إخفاء نموذج تسجيل الدخول
-        document.getElementById('loginForm').style.display = 'none';
-        
-        // إظهار لوحة التحكم
-        document.getElementById('dashboard').style.display = 'block';
-        
-        // عرض معلومات المستخدم
-        document.getElementById('displayName').textContent = userData.username || 'مستخدم';
-        document.getElementById('displayId').textContent = '🆔 ' + (userData.player_id || 'غير معروف');
-        document.getElementById('displayBalance').textContent = (userData.balance || 0).toFixed(2);
-        document.getElementById('userAvatar').textContent = (userData.username || 'U')[0].toUpperCase();
-        
-        // عرض الألعاب
-        renderGames(gamesList);
-    }
-
-    // ============================================================
-    //  عرض الألعاب
-    // ============================================================
-    function renderGames(games) {
-        const container = document.getElementById('gamesList');
-        
-        // تحديث الإحصائيات
-        document.getElementById('statGames').textContent = games.length;
-        document.getElementById('gamesCount').textContent = games.length;
-        
-        // استخراج المزودين
-        const providers = new Set();
-        games.forEach(g => {
-            if (g.providerName || g.provider) {
-                providers.add(g.providerName || g.provider);
-            }
-        });
-        document.getElementById('statProviders').textContent = providers.size;
-        
-        // عدد الألعاب النشطة
-        const active = games.filter(g => g.isActive !== false).length;
-        document.getElementById('statActive').textContent = active;
-        
-        if (!games || games.length === 0) {
-            container.innerHTML = `
-                <div style="text-align:center; padding:30px; color:#8899aa;">
-                    <div style="font-size:48px; margin-bottom:12px;">📭</div>
-                    <p>لا توجد ألعاب متاحة حالياً</p>
-                    <button onclick="refreshGames()" style="margin-top:12px; padding:8px 24px; background:#00b894; color:#fff; border:none; border-radius:8px; cursor:pointer;">
-                        🔄 تحديث
-                    </button>
-                </div>
-            `;
-            return;
-        }
-        
-        // بناء قائمة الألعاب
-        let html = '';
-        
-        games.forEach((game, index) => {
-            const name = game.name || game.gameName || 'لعبة بدون اسم';
-            const provider = game.providerName || game.provider || game.vendor || '';
-            const gameId = game.id || game.gameId || index + 1;
-            const isActive = game.isActive !== false;
-            
-            html += `
-                <button class="btn-game" onclick="playGame('${gameId}')" ${!isActive ? 'disabled style="opacity:0.4;"' : ''}>
-                    <span class="icon">${isActive ? '🎰' : '⏸️'}</span>
-                    <div class="info">
-                        <div class="name">${name}</div>
-                        ${provider ? `<div class="provider">${provider}</div>` : ''}
-                    </div>
-                    <span class="arrow">▶</span>
-                </button>
-            `;
-        });
-        
-        container.innerHTML = html;
-    }
-
-    // ============================================================
-    //  تشغيل اللعبة
-    // ============================================================
-    function playGame(gameId) {
-        if (!userData || !userData.player_id) {
-            showError('الرجاء تسجيل الدخول أولاً');
-            return;
-        }
-        
-        // بناء رابط اللعبة
-        const timestamp = Date.now();
-        const tokenString = `${userData.player_id}_${gameId}_${timestamp}`;
-        const gameToken = md5(tokenString);
-        
-        const url = `${GAME_BASE}/launcher/launch?launchToken=${gameToken}&returnPath=%2F%3FpartnerId%3D18755655%26currency%3DNSP%26lan%3Dar%26gameId%3D${gameId}%26mode%3Dreal&mode=real&currency=NSP`;
-        
-        // فتح اللعبة في نافذة جديدة
-        window.open(url, '_blank');
-    }
-
-    // ============================================================
-    //  دالة MD5 بسيطة (لتوليد التوكن)
+    //  دالة MD5
     // ============================================================
     function md5(string) {
+        // دالة MD5 كاملة (مختصرة للاختصار)
         function md5cycle(x, k) {
             let a = x[0], b = x[1], c = x[2], d = x[3];
             a = ff(a, b, c, d, k[0], 7, -680876936);
@@ -824,14 +550,6 @@
             return (msw << 16) | (lsw & 0xFFFF);
         }
 
-        function md5bin(s) {
-            const bin = Array();
-            for (let i = 0; i < s.length; i += 2) {
-                bin.push(parseInt(s.substr(i, 2), 16));
-            }
-            return bin;
-        }
-
         function binl2hex(a) {
             let str = '';
             for (let i = 0; i < a.length * 4; i++) {
@@ -840,43 +558,29 @@
             return str;
         }
 
-        const x = [];
-        let a, b, c, d, i;
-        const k = [];
-        const s = [ 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+        const s = [7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
             5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
             4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
-            6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21 ];
+            6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21];
         
-        const T = [];
-        for (let i2 = 0; i2 < 64; i2++) {
-            T[i2] = Math.floor(Math.abs(Math.sin(i2 + 1)) * 4294967296);
-        }
-
         const len = s.length * 8;
         const bin = [];
-        for (let i2 = 0; i2 < s.length; i2++) {
-            bin[i2 >> 2] |= (s.charCodeAt(i2) & 0xFF) << ((i2 % 4) * 8);
+        for (let i = 0; i < s.length; i++) {
+            bin[i >> 2] |= (s.charCodeAt(i) & 0xFF) << ((i % 4) * 8);
         }
 
         bin[len >> 5] |= 0x80 << (len % 32);
         bin[(((len + 64) >> 9) << 4) + 14] = len;
 
-        a = 0x67452301;
-        b = 0xEFCDAB89;
-        c = 0x98BADCFE;
-        d = 0x10325476;
+        let a = 0x67452301, b = 0xEFCDAB89, c = 0x98BADCFE, d = 0x10325476;
 
-        for (i = 0; i < bin.length; i += 16) {
-            const olda = a;
-            const oldb = b;
-            const oldc = c;
-            const oldd = d;
-            const x2 = [];
+        for (let i = 0; i < bin.length; i += 16) {
+            const olda = a, oldb = b, oldc = c, oldd = d;
+            const x = [];
             for (let j = 0; j < 16; j++) {
-                x2[j] = bin[i + j];
+                x[j] = bin[i + j];
             }
-            md5cycle([a, b, c, d], x2);
+            md5cycle([a, b, c, d], x);
             a = add(a, olda);
             b = add(b, oldb);
             c = add(c, oldc);
@@ -884,6 +588,269 @@
         }
 
         return binl2hex([a, b, c, d]);
+    }
+
+    // ============================================================
+    //  تسجيل الدخول (في الخلفية)
+    // ============================================================
+    async function loginToIChancy(username, password) {
+        const url = 'https://agents.ichancy.com/global/api/User/signIn';
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Origin': 'https://agents.ichancy.com',
+                'Referer': 'https://agents.ichancy.com/'
+            },
+            body: JSON.stringify({ username, password })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.status !== true) {
+            throw new Error(data.message || 'بيانات الدخول غير صحيحة');
+        }
+        
+        // استخراج الكوكيز
+        const cookies = response.headers.get('set-cookie') || '';
+        sessionCookies = cookies;
+        
+        return data;
+    }
+
+    // ============================================================
+    //  جلب الألعاب
+    // ============================================================
+    async function getGames() {
+        const url = 'https://agents.ichancy.com/global/api/Game/getGames';
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Cookie': sessionCookies
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data.result || [];
+    }
+
+    // ============================================================
+    //  جلب الرصيد
+    // ============================================================
+    async function getBalance(playerId) {
+        const url = 'https://agents.ichancy.com/global/api/Player/getPlayerBalanceById';
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Cookie': sessionCookies
+            },
+            body: JSON.stringify({ playerId })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const result = data.result || [];
+        if (result.length > 0) {
+            return result[0].balance || 0;
+        }
+        return 0;
+    }
+
+    // ============================================================
+    //  معالجة تسجيل الدخول
+    // ============================================================
+    async function handleLogin() {
+        hideError();
+        
+        const username = document.getElementById('usernameInput').value.trim();
+        const password = document.getElementById('passwordInput').value.trim();
+        const playerId = document.getElementById('playerIdInput').value.trim();
+        const remember = document.getElementById('rememberMe').checked;
+        
+        if (!username) {
+            showError('الرجاء إدخال اسم المستخدم');
+            document.getElementById('usernameInput').focus();
+            return;
+        }
+        
+        if (!password) {
+            showError('الرجاء إدخال كلمة المرور');
+            document.getElementById('passwordInput').focus();
+            return;
+        }
+        
+        if (!playerId) {
+            showError('الرجاء إدخال معرف اللاعب');
+            document.getElementById('playerIdInput').focus();
+            return;
+        }
+        
+        if (!/^\d+$/.test(playerId)) {
+            showError('معرف اللاعب يجب أن يكون أرقاماً فقط');
+            return;
+        }
+        
+        setLoading(true);
+        
+        try {
+            // 1. تسجيل الدخول في الخلفية
+            const loginResult = await loginToIChancy(username, password);
+            
+            // 2. جلب الرصيد
+            const balance = await getBalance(playerId);
+            
+            // 3. جلب الألعاب
+            const games = await getGames();
+            
+            // حفظ البيانات
+            userData = {
+                username,
+                player_id: playerId,
+                balance: balance
+            };
+            
+            gamesList = games;
+            isLoggedIn = true;
+            
+            // حفظ في localStorage
+            if (remember) {
+                localStorage.setItem('ichancy_user_data', JSON.stringify({
+                    username,
+                    password,
+                    player_id: playerId
+                }));
+            } else {
+                localStorage.removeItem('ichancy_user_data');
+            }
+            
+            setLoading(false);
+            showDashboard();
+            
+        } catch (error) {
+            setLoading(false);
+            showError(error.message || 'حدث خطأ أثناء تسجيل الدخول');
+            console.error('Login error:', error);
+        }
+    }
+
+    function hideError() {
+        document.getElementById('errorBox').classList.remove('show');
+    }
+
+    // ============================================================
+    //  عرض لوحة التحكم
+    // ============================================================
+    function showDashboard() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        
+        document.getElementById('displayName').textContent = userData.username || 'مستخدم';
+        document.getElementById('displayId').textContent = '🆔 ' + (userData.player_id || 'غير معروف');
+        document.getElementById('displayBalance').textContent = (userData.balance || 0).toFixed(2);
+        document.getElementById('userAvatar').textContent = (userData.username || 'U')[0].toUpperCase();
+        
+        renderGames(gamesList);
+    }
+
+    // ============================================================
+    //  عرض الألعاب
+    // ============================================================
+    function renderGames(games) {
+        const container = document.getElementById('gamesList');
+        
+        document.getElementById('statGames').textContent = games.length;
+        document.getElementById('gamesCount').textContent = games.length;
+        
+        const providers = new Set();
+        games.forEach(g => {
+            if (g.providerName || g.provider) {
+                providers.add(g.providerName || g.provider);
+            }
+        });
+        document.getElementById('statProviders').textContent = providers.size;
+        
+        const active = games.filter(g => g.isActive !== false).length;
+        document.getElementById('statActive').textContent = active;
+        
+        if (!games || games.length === 0) {
+            container.innerHTML = `
+                <div style="text-align:center; padding:30px; color:#8899aa;">
+                    <div style="font-size:48px; margin-bottom:12px;">📭</div>
+                    <p>لا توجد ألعاب متاحة حالياً</p>
+                    <button onclick="refreshGames()" style="margin-top:12px; padding:8px 24px; background:#00b894; color:#fff; border:none; border-radius:8px; cursor:pointer;">
+                        🔄 تحديث
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        
+        games.forEach((game, index) => {
+            const name = game.name || game.gameName || 'لعبة بدون اسم';
+            const provider = game.providerName || game.provider || game.vendor || '';
+            const gameId = game.id || game.gameId || index + 1;
+            const isActive = game.isActive !== false;
+            const externalId = game.externalGameId || '';
+            
+            html += `
+                <button class="btn-game" onclick="playGame('${gameId}', '${externalId}')" ${!isActive ? 'disabled style="opacity:0.4;"' : ''}>
+                    <span class="icon">${isActive ? '🎰' : '⏸️'}</span>
+                    <div class="info">
+                        <div class="name">${name}</div>
+                        ${provider ? `<div class="provider">${provider}</div>` : ''}
+                    </div>
+                    <span class="arrow">▶</span>
+                </button>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+
+    // ============================================================
+    //  تشغيل اللعبة (مسجل دخول تلقائياً)
+    // ============================================================
+    function playGame(gameId, externalId) {
+        if (!userData || !userData.player_id) {
+            showError('الرجاء تسجيل الدخول أولاً');
+            return;
+        }
+        
+        // توليد توكن مؤقت
+        const timestamp = Date.now();
+        const tokenString = `${userData.player_id}_${gameId}_${timestamp}`;
+        const gameToken = md5(tokenString);
+        
+        // بناء رابط اللعبة مع التوكن
+        let url = `https://pg.ichancy200.com/launcher/launch?launchToken=${gameToken}&returnPath=%2F%3FpartnerId%3D18755655%26currency%3DNSP%26lan%3Dar%26gameId%3D${gameId}%26mode%3Dreal&mode=real&currency=NSP`;
+        
+        if (externalId) {
+            url += `&externalGameId=${externalId}`;
+        }
+        
+        // فتح اللعبة في نافذة جديدة
+        window.open(url, '_blank');
     }
 
     // ============================================================
@@ -902,8 +869,7 @@
             </div>
         `;
         
-        // إعادة جلب الألعاب
-        getGames(userData.session)
+        getGames()
             .then(games => {
                 gamesList = games;
                 renderGames(games);
@@ -921,11 +887,10 @@
             isLoggedIn = false;
             userData = null;
             gamesList = [];
+            sessionCookies = '';
             
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
-            
-            // لا نمسح البيانات المحفوظة
         }
     }
 

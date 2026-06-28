@@ -1,910 +1,716 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎮 منصة ألعاب IChancy</title>
+    <title>🎮 منصة الألعاب - الخادم الوسيط</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0e1a;
-            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             padding: 20px;
         }
-        
+
         .container {
             width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
+            max-width: 550px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
-        
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
-        ::-webkit-scrollbar-thumb { background: #00b894; border-radius: 4px; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        
+
+        .login-screen { display: block; }
+        .login-screen.hidden { display: none; }
+
         .logo {
             text-align: center;
-            padding: 30px 0 20px;
+            margin-bottom: 35px;
         }
-        
-        .logo h1 {
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #00b894, #00cec9);
+
+        .logo i {
+            font-size: 60px;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
-        .logo p {
-            color: #8899aa;
-            font-size: 14px;
-            margin-top: 4px;
+
+        .logo h1 {
+            color: #fff;
+            font-size: 28px;
+            margin-top: 10px;
         }
-        
-        .card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 16px;
+
+        .logo .subtitle {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            margin-top: 5px;
         }
-        
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+
+        .logo .badge {
+            display: inline-block;
+            background: rgba(245, 87, 108, 0.2);
+            color: #f5576c;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-top: 8px;
+            border: 1px solid rgba(245, 87, 108, 0.2);
         }
-        
-        .card-title .badge {
-            background: rgba(0, 184, 148, 0.2);
-            color: #00b894;
-            font-size: 12px;
-            padding: 2px 10px;
-            border-radius: 12px;
-        }
-        
+
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
-        
+
         .form-group label {
             display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: #8899aa;
-            margin-bottom: 6px;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-        
-        .form-group input:focus {
-            border-color: #00b894;
-            background: rgba(255,255,255,0.08);
-            box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.1);
-        }
-        
-        .form-group input::placeholder {
-            color: #556677;
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #00b894, #00cec9);
-            color: #fff;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 184, 148, 0.3);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .btn-game {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
             margin-bottom: 8px;
         }
-        
-        .btn-game:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateX(-4px);
+
+        .form-group label i {
+            margin-left: 8px;
+            color: #f5576c;
         }
-        
-        .btn-game .icon { font-size: 24px; }
-        .btn-game .info { flex: 1; text-align: right; }
-        .btn-game .info .name { font-size: 15px; font-weight: 500; }
-        .btn-game .info .provider { font-size: 12px; color: #8899aa; }
-        .btn-game .arrow { color: #00b894; font-size: 18px; }
-        
-        .btn-logout {
-            background: rgba(255, 107, 107, 0.1);
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+            direction: ltr;
+        }
+
+        .form-group input:focus {
+            border-color: #f5576c;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 20px rgba(245, 87, 108, 0.15);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-login i {
+            margin-left: 10px;
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.15);
+            border: 1px solid rgba(255, 0, 0, 0.3);
             color: #ff6b6b;
-            border: 1px solid rgba(255, 107, 107, 0.2);
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            font-size: 14px;
+            text-align: center;
         }
-        
-        .btn-logout:hover {
-            background: rgba(255, 107, 107, 0.2);
+
+        .error-message.show {
+            display: block;
         }
-        
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
         .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: #00b894;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
             display: inline-block;
-        }
-        
-        .user-badge {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: rgba(0, 184, 148, 0.08);
-            border: 1px solid rgba(0, 184, 148, 0.15);
-            border-radius: 10px;
-            margin-bottom: 16px;
-        }
-        
-        .user-badge .avatar {
             width: 40px;
             height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #f5576c;
             border-radius: 50%;
-            background: linear-gradient(135deg, #00b894, #00cec9);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 12px;
+        }
+
+        /* ===== لوحة التحكم ===== */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.show {
+            display: block;
+        }
+
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .user-avatar {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 28px;
+            font-weight: 700;
             color: #fff;
             flex-shrink: 0;
         }
-        
-        .user-badge .details { flex: 1; }
-        .user-badge .details .name { font-weight: 500; font-size: 15px; }
-        .user-badge .details .id { font-size: 12px; color: #8899aa; }
-        
-        .user-badge .balance { text-align: left; }
-        .user-badge .balance .amount { font-size: 18px; font-weight: 700; color: #00b894; }
-        .user-badge .balance .label { font-size: 11px; color: #8899aa; }
-        
-        .error-box {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid rgba(255, 107, 107, 0.2);
-            border-radius: 10px;
-            padding: 12px 16px;
-            color: #ff6b6b;
-            font-size: 14px;
-            display: none;
-            margin-bottom: 16px;
+
+        .user-info {
+            flex: 1;
         }
-        
-        .error-box.show { display: block; animation: fadeIn 0.3s ease-out; }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
+
+        .user-info h2 {
+            color: #fff;
+            font-size: 20px;
         }
-        
-        .stat-item {
+
+        .user-info .player-id {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            font-family: monospace;
+        }
+
+        .user-balance {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            padding: 10px 18px;
+            border-radius: 15px;
             text-align: center;
-            padding: 12px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 10px;
         }
-        
-        .stat-item .number { font-size: 20px; font-weight: 700; color: #fff; }
-        .stat-item .label { font-size: 11px; color: #8899aa; margin-top: 2px; }
-        
-        .save-toggle {
+
+        .user-balance .amount {
+            color: #ffd700;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .user-balance .label {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            display: block;
+        }
+
+        .section-title {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            font-weight: 600;
+            margin: 25px 0 15px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            font-size: 13px;
-            color: #8899aa;
+            gap: 10px;
         }
-        
-        .save-toggle input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #00b894;
+
+        .section-title i {
+            color: #f5576c;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 18px 15px;
+            text-align: center;
+            transition: all 0.3s ease;
             cursor: pointer;
-        }
-        
-        .game-link {
-            color: #00b894;
             text-decoration: none;
+            color: #fff;
+        }
+
+        .game-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            border-color: #f5576c;
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.15);
+        }
+
+        .game-card .game-icon {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .game-card .game-name {
+            font-size: 13px;
+            font-weight: 600;
+            display: block;
+        }
+
+        .game-card .game-id {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: monospace;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+
+        .status-dot.online {
+            background: #4caf50;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .status-text {
+            color: rgba(255, 255, 255, 0.4);
             font-size: 12px;
         }
-        
-        @media (max-width: 400px) {
-            .container { padding: 0 4px; }
-            .card { padding: 16px; }
-            .stats { grid-template-columns: 1fr 1fr; }
-            .user-badge { flex-wrap: wrap; }
-            .user-badge .balance { width: 100%; text-align: center; }
+
+        @media (max-width: 480px) {
+            .container { padding: 25px 20px; }
+            .games-grid { grid-template-columns: 1fr 1fr; }
+            .user-balance .amount { font-size: 20px; }
         }
     </style>
 </head>
 <body>
 
-<div class="container" id="app">
-    
-    <!-- ===== LOGO ===== -->
-    <div class="logo fade-in">
-        <h1>🎮 IChancy</h1>
-        <p>منصة الألعاب المتكاملة</p>
-    </div>
+    <div class="container">
+        <!-- ===== شاشة تسجيل الدخول ===== -->
+        <div class="login-screen" id="loginScreen">
+            <div class="logo">
+                <i class="fas fa-gamepad"></i>
+                <h1>🎮 منصة الألعاب</h1>
+                <p class="subtitle">تسجيل دخول آلي عبر الخادم الوسيط</p>
+                <span class="badge"><i class="fas fa-shield-alt"></i> اتصال مشفر</span>
+            </div>
 
-    <!-- ===== ERROR ===== -->
-    <div class="error-box" id="errorBox"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> اسم المستخدم</label>
+                    <input type="text" id="username" placeholder="أدخل اسم المستخدم" required autocomplete="username">
+                </div>
 
-    <!-- ===== LOGIN FORM ===== -->
-    <div id="loginForm" class="card fade-in">
-        <div class="card-title">
-            🔐 تسجيل الدخول
-            <span class="badge">آمن</span>
-        </div>
-        
-        <div class="form-group">
-            <label>👤 اسم المستخدم</label>
-            <input type="text" id="usernameInput" placeholder="أدخل اسم المستخدم" autocomplete="username">
-        </div>
-        
-        <div class="form-group">
-            <label>🔑 كلمة المرور</label>
-            <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور" autocomplete="current-password">
-        </div>
-        
-        <div class="form-group">
-            <label>🆔 معرف اللاعب (Player ID)</label>
-            <input type="text" id="playerIdInput" placeholder="أدخل معرف اللاعب" autocomplete="off">
-            <div style="font-size: 12px; color: #556677; margin-top: 4px;">
-                📌 يمكنك الحصول عليه من حسابك في IChancy
-            </div>
-        </div>
-        
-        <div class="save-toggle">
-            <input type="checkbox" id="rememberMe" checked>
-            <label for="rememberMe">تذكر بياناتي</label>
-        </div>
-        
-        <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()" style="margin-top:12px;">
-            🚀 تسجيل الدخول
-        </button>
-    </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> كلمة المرور</label>
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور" required autocomplete="current-password">
+                </div>
 
-    <!-- ===== DASHBOARD ===== -->
-    <div id="dashboard" style="display:none;">
-        
-        <!-- User Info -->
-        <div class="user-badge fade-in" id="userBadge">
-            <div class="avatar" id="userAvatar">👤</div>
-            <div class="details">
-                <div class="name" id="displayName">-</div>
-                <div class="id" id="displayId">🆔 -</div>
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <i class="fas fa-arrow-left"></i> دخول
+                </button>
+            </form>
+
+            <div class="error-message" id="errorMessage">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorText">فشل تسجيل الدخول</span>
             </div>
-            <div class="balance">
-                <div class="amount" id="displayBalance">0</div>
-                <div class="label">NSP</div>
-            </div>
-        </div>
-        
-        <!-- Stats -->
-        <div class="stats fade-in" id="statsContainer">
-            <div class="stat-item">
-                <div class="number" id="statGames">0</div>
-                <div class="label">🎮 ألعاب</div>
-            </div>
-            <div class="stat-item">
-                <div class="number" id="statProviders">0</div>
-                <div class="label">🏢 مزودين</div>
-            </div>
-            <div class="stat-item">
-                <div class="number" id="statActive">0</div>
-                <div class="label">🟢 نشطة</div>
+
+            <div class="loading" id="loginLoading">
+                <div class="spinner"></div>
+                <p>جاري تسجيل الدخول وجلب البيانات...</p>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.2); margin-top: 5px;">قد يستغرق هذا 5-10 ثواني</p>
             </div>
         </div>
-        
-        <!-- Games List -->
-        <div class="card fade-in">
-            <div class="card-title">
-                🎮 الألعاب المتاحة
-                <span class="badge" id="gamesCount">0</span>
+
+        <!-- ===== لوحة التحكم ===== -->
+        <div class="dashboard" id="dashboard">
+            <div class="status-bar">
+                <span class="status-text">
+                    <span class="status-dot online"></span>
+                    متصل بالخادم
+                </span>
+                <span class="status-text" id="sessionTime">جلسة نشطة</span>
             </div>
-            
-            <div id="gamesList">
-                <div style="text-align:center; padding:20px; color:#8899aa;">
-                    <div class="spinner"></div>
-                    <p style="margin-top:12px;">جاري تحميل الألعاب...</p>
+
+            <div class="user-header">
+                <div class="user-avatar" id="userAvatar">م</div>
+                <div class="user-info">
+                    <h2 id="userName">مستخدم</h2>
+                    <span class="player-id" id="userPlayerId">#---</span>
+                </div>
+                <div class="user-balance">
+                    <span class="amount" id="userBalance">0.00</span>
+                    <span class="label">💰 الرصيد</span>
                 </div>
             </div>
+
+            <div class="section-title">
+                <i class="fas fa-rocket"></i> ألعابي المتاحة
+                <span style="font-size: 12px; color: rgba(255,255,255,0.2); margin-right: auto;" id="gameCount">0 لعبة</span>
+            </div>
+
+            <div class="games-grid" id="gamesGrid">
+                <!-- سيتم إضافتها بواسطة JavaScript -->
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-logout" id="refreshBtn" style="flex:1; margin-top:0;">
+                    <i class="fas fa-sync"></i> تحديث
+                </button>
+                <button class="btn-logout" id="logoutBtn" style="flex:1; margin-top:0;">
+                    <i class="fas fa-sign-out-alt"></i> خروج
+                </button>
+            </div>
         </div>
-        
-        <!-- Logout -->
-        <button class="btn btn-logout" onclick="handleLogout()">
-            🚪 تسجيل الخروج
-        </button>
     </div>
 
-</div>
+    <script>
+        // ================================================================
+        //  🎯  التكامل مع الخادم الوسيط
+        // ================================================================
 
-<script>
-    // ============================================================
-    //  المتغيرات العامة
-    // ============================================================
-    let userData = null;
-    let gamesList = [];
-    let isLoggedIn = false;
-    let sessionCookies = '';
-    
-    // ============================================================
-    //  تحميل البيانات المحفوظة
-    // ============================================================
-    function loadSavedData() {
-        try {
-            const saved = localStorage.getItem('ichancy_user_data');
-            if (saved) {
-                const data = JSON.parse(saved);
-                if (data.username && data.player_id) {
-                    document.getElementById('usernameInput').value = data.username || '';
-                    document.getElementById('playerIdInput').value = data.player_id || '';
-                    document.getElementById('rememberMe').checked = true;
-                    if (data.password) {
-                        document.getElementById('passwordInput').value = data.password;
-                    }
+        const API_URL = 'https://joj-d0kl.onrender.com';
+
+        // عناصر DOM
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboard = document.getElementById('dashboard');
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const loginLoading = document.getElementById('loginLoading');
+
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const userPlayerId = document.getElementById('userPlayerId');
+        const userBalance = document.getElementById('userBalance');
+        const gamesGrid = document.getElementById('gamesGrid');
+        const gameCount = document.getElementById('gameCount');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const sessionTime = document.getElementById('sessionTime');
+
+        let currentSessionId = null;
+        let sessionTimer = null;
+
+        // ================================================================
+        //  📋  دوال مساعدة
+        // ================================================================
+
+        function showError(msg) {
+            errorText.textContent = msg || 'حدث خطأ، حاول مرة أخرى';
+            errorMessage.classList.add('show');
+        }
+
+        function hideError() {
+            errorMessage.classList.remove('show');
+        }
+
+        function setLoading(state) {
+            if (state) {
+                loginLoading.classList.add('show');
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+            } else {
+                loginLoading.classList.remove('show');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-arrow-left"></i> دخول';
+            }
+        }
+
+        function getInitial(name) {
+            return name ? name.charAt(0).toUpperCase() : 'م';
+        }
+
+        // ================================================================
+        //  🎨  عرض لوحة التحكم
+        // ================================================================
+
+        function showDashboard(userData) {
+            userAvatar.textContent = getInitial(userData.name);
+            userName.textContent = userData.name || 'مستخدم';
+            userPlayerId.textContent = `#${userData.playerId || '---'}`;
+            userBalance.textContent = (userData.balance || 0).toFixed(2);
+
+            // عرض الألعاب
+            gamesGrid.innerHTML = '';
+            const games = userData.games || [];
+
+            if (games.length === 0) {
+                gamesGrid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align:center; color: rgba(255,255,255,0.3); padding: 30px;">
+                            <i class="fas fa-gamepad" style="font-size: 40px; display:block; margin-bottom:10px;"></i>
+                            لا توجد ألعاب متاحة حالياً
+                        </div>
+                    `;
+                gameCount.textContent = '0 لعبة';
+            } else {
+                games.forEach(game => {
+                    const card = document.createElement('div');
+                    card.className = 'game-card';
+                    card.innerHTML = `
+                            <span class="game-icon">${game.icon || '🎮'}</span>
+                            <span class="game-name">${game.name || 'لعبة'}</span>
+                            <span class="game-id">ID: ${game.id || '---'}</span>
+                        `;
+                    card.addEventListener('click', () => {
+                        const gameUrl = game.url || 
+                            `https://pg.ichancy200.com/launcher/launch?gameId=${game.id}`;
+                        window.open(gameUrl, '_blank', 'width=900,height=650,menubar=no,toolbar=no');
+                    });
+                    gamesGrid.appendChild(card);
+                });
+                gameCount.textContent = `${games.length} لعبة`;
+            }
+
+            // تبديل الشاشات
+            loginScreen.classList.add('hidden');
+            dashboard.classList.add('show');
+            setLoading(false);
+
+            // تحديث وقت الجلسة
+            updateSessionTime();
+            if (sessionTimer) clearInterval(sessionTimer);
+            sessionTimer = setInterval(updateSessionTime, 60000);
+        }
+
+        function updateSessionTime() {
+            if (currentSessionId) {
+                const now = new Date();
+                sessionTime.textContent = `🕐 ${now.toLocaleTimeString('ar-EG')}`;
+            }
+        }
+
+        // ================================================================
+        //  🔐  تسجيل الدخول عبر الخادم
+        // ================================================================
+
+        async function performLogin(username, password) {
+            const response = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'فشل تسجيل الدخول');
+            }
+
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.error || 'فشل تسجيل الدخول');
+            }
+
+            return data;
+        }
+
+        // ================================================================
+        //  📤  تسجيل الخروج
+        // ================================================================
+
+        async function logout() {
+            if (currentSessionId) {
+                try {
+                    await fetch(`${API_URL}/logout/${currentSessionId}`, {
+                        method: 'POST'
+                    });
+                } catch (e) {
+                    console.error('خطأ في تسجيل الخروج:', e);
                 }
             }
-        } catch(e) {}
-    }
-    
-    loadSavedData();
 
-    // ============================================================
-    //  دوال مساعدة
-    // ============================================================
-    function showError(message) {
-        const box = document.getElementById('errorBox');
-        box.textContent = '❌ ' + message;
-        box.classList.add('show');
-        setTimeout(() => box.classList.remove('show'), 8000);
-    }
-
-    function setLoading(loading) {
-        const btn = document.getElementById('loginBtn');
-        if (loading) {
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> جاري تسجيل الدخول...';
-        } else {
-            btn.disabled = false;
-            btn.innerHTML = '🚀 تسجيل الدخول';
-        }
-    }
-
-    // ============================================================
-    //  دالة MD5
-    // ============================================================
-    function md5(string) {
-        // دالة MD5 كاملة (مختصرة للاختصار)
-        function md5cycle(x, k) {
-            let a = x[0], b = x[1], c = x[2], d = x[3];
-            a = ff(a, b, c, d, k[0], 7, -680876936);
-            d = ff(d, a, b, c, k[1], 12, -389564586);
-            c = ff(c, d, a, b, k[2], 17, 606105819);
-            b = ff(b, c, d, a, k[3], 22, -1044525330);
-            a = ff(a, b, c, d, k[4], 7, -176418897);
-            d = ff(d, a, b, c, k[5], 12, 1200080426);
-            c = ff(c, d, a, b, k[6], 17, -1473231341);
-            b = ff(b, c, d, a, k[7], 22, -45705983);
-            a = ff(a, b, c, d, k[8], 7, 1770035416);
-            d = ff(d, a, b, c, k[9], 12, -1958414417);
-            c = ff(c, d, a, b, k[10], 17, -42063);
-            b = ff(b, c, d, a, k[11], 22, -1990404162);
-            a = ff(a, b, c, d, k[12], 7, 1804603682);
-            d = ff(d, a, b, c, k[13], 12, -40341101);
-            c = ff(c, d, a, b, k[14], 17, -1502002290);
-            b = ff(b, c, d, a, k[15], 22, 1236535329);
-            a = gg(a, b, c, d, k[1], 5, -165796510);
-            d = gg(d, a, b, c, k[6], 9, -1069501632);
-            c = gg(c, d, a, b, k[11], 14, 643717713);
-            b = gg(b, c, d, a, k[0], 20, -373897302);
-            a = gg(a, b, c, d, k[5], 5, -701558691);
-            d = gg(d, a, b, c, k[10], 9, 38016083);
-            c = gg(c, d, a, b, k[15], 14, -660478335);
-            b = gg(b, c, d, a, k[4], 20, -405537848);
-            a = gg(a, b, c, d, k[9], 5, 568446438);
-            d = gg(d, a, b, c, k[14], 9, -1019803690);
-            c = gg(c, d, a, b, k[3], 14, -187363961);
-            b = gg(b, c, d, a, k[8], 20, 1163531501);
-            a = gg(a, b, c, d, k[13], 5, -1444681467);
-            d = gg(d, a, b, c, k[2], 9, -51403784);
-            c = gg(c, d, a, b, k[7], 14, 1735328473);
-            b = gg(b, c, d, a, k[12], 20, -1926607734);
-            a = hh(a, b, c, d, k[5], 4, -378558);
-            d = hh(d, a, b, c, k[8], 11, -2022574463);
-            c = hh(c, d, a, b, k[11], 16, 1839030562);
-            b = hh(b, c, d, a, k[14], 23, -35309556);
-            a = hh(a, b, c, d, k[1], 4, -1530992060);
-            d = hh(d, a, b, c, k[4], 11, 1272893353);
-            c = hh(c, d, a, b, k[7], 16, -155497632);
-            b = hh(b, c, d, a, k[10], 23, -1094730640);
-            a = hh(a, b, c, d, k[13], 4, 681279174);
-            d = hh(d, a, b, c, k[0], 11, -358537222);
-            c = hh(c, d, a, b, k[3], 16, -722521979);
-            b = hh(b, c, d, a, k[6], 23, 76029189);
-            a = hh(a, b, c, d, k[9], 4, -640364487);
-            d = hh(d, a, b, c, k[12], 11, -421815835);
-            c = hh(c, d, a, b, k[15], 16, 530742520);
-            b = hh(b, c, d, a, k[2], 23, -995338651);
-            a = ii(a, b, c, d, k[0], 6, -198630844);
-            d = ii(d, a, b, c, k[7], 10, 1126891415);
-            c = ii(c, d, a, b, k[14], 15, -1416354905);
-            b = ii(b, c, d, a, k[5], 21, -57434055);
-            a = ii(a, b, c, d, k[12], 6, 1700485571);
-            d = ii(d, a, b, c, k[3], 10, -1894986606);
-            c = ii(c, d, a, b, k[10], 15, -1051523);
-            b = ii(b, c, d, a, k[1], 21, -2054922799);
-            a = ii(a, b, c, d, k[8], 6, 1873313359);
-            d = ii(d, a, b, c, k[15], 10, -30611744);
-            c = ii(c, d, a, b, k[6], 15, -1560198380);
-            b = ii(b, c, d, a, k[13], 21, 1309151649);
-            a = ii(a, b, c, d, k[4], 6, -145523070);
-            d = ii(d, a, b, c, k[11], 10, -1120210379);
-            c = ii(c, d, a, b, k[2], 15, 718787259);
-            b = ii(b, c, d, a, k[9], 21, -343485551);
-            x[0] = add(a, x[0]);
-            x[1] = add(b, x[1]);
-            x[2] = add(c, x[2]);
-            x[3] = add(d, x[3]);
-        }
-
-        function cmn(q, a, b, x, s, t) {
-            a = add(add(a, q), add(x, t));
-            return add((a << s) | (a >>> (32 - s)), b);
-        }
-
-        function ff(a, b, c, d, x, s, t) {
-            return cmn((b & c) | ((~b) & d), a, b, x, s, t);
-        }
-
-        function gg(a, b, c, d, x, s, t) {
-            return cmn((b & d) | (c & (~d)), a, b, x, s, t);
-        }
-
-        function hh(a, b, c, d, x, s, t) {
-            return cmn(b ^ c ^ d, a, b, x, s, t);
-        }
-
-        function ii(a, b, c, d, x, s, t) {
-            return cmn(c ^ (b | (~d)), a, b, x, s, t);
-        }
-
-        function add(x, y) {
-            const lsw = (x & 0xFFFF) + (y & 0xFFFF);
-            const msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-            return (msw << 16) | (lsw & 0xFFFF);
-        }
-
-        function binl2hex(a) {
-            let str = '';
-            for (let i = 0; i < a.length * 4; i++) {
-                str += ('0' + ((a[i >> 2] >> ((i % 4) * 8)) & 0xFF).toString(16)).slice(-2);
+            currentSessionId = null;
+            if (sessionTimer) {
+                clearInterval(sessionTimer);
+                sessionTimer = null;
             }
-            return str;
-        }
 
-        const s = [7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
-            5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
-            4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
-            6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21];
-        
-        const len = s.length * 8;
-        const bin = [];
-        for (let i = 0; i < s.length; i++) {
-            bin[i >> 2] |= (s.charCodeAt(i) & 0xFF) << ((i % 4) * 8);
-        }
-
-        bin[len >> 5] |= 0x80 << (len % 32);
-        bin[(((len + 64) >> 9) << 4) + 14] = len;
-
-        let a = 0x67452301, b = 0xEFCDAB89, c = 0x98BADCFE, d = 0x10325476;
-
-        for (let i = 0; i < bin.length; i += 16) {
-            const olda = a, oldb = b, oldc = c, oldd = d;
-            const x = [];
-            for (let j = 0; j < 16; j++) {
-                x[j] = bin[i + j];
-            }
-            md5cycle([a, b, c, d], x);
-            a = add(a, olda);
-            b = add(b, oldb);
-            c = add(c, oldc);
-            d = add(d, oldd);
-        }
-
-        return binl2hex([a, b, c, d]);
-    }
-
-    // ============================================================
-    //  تسجيل الدخول (في الخلفية)
-    // ============================================================
-    async function loginToIChancy(username, password) {
-        const url = 'https://agents.ichancy.com/global/api/User/signIn';
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Origin': 'https://agents.ichancy.com',
-                'Referer': 'https://agents.ichancy.com/'
-            },
-            body: JSON.stringify({ username, password })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.status !== true) {
-            throw new Error(data.message || 'بيانات الدخول غير صحيحة');
-        }
-        
-        // استخراج الكوكيز
-        const cookies = response.headers.get('set-cookie') || '';
-        sessionCookies = cookies;
-        
-        return data;
-    }
-
-    // ============================================================
-    //  جلب الألعاب
-    // ============================================================
-    async function getGames() {
-        const url = 'https://agents.ichancy.com/global/api/Game/getGames';
-        
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Cookie': sessionCookies
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        return data.result || [];
-    }
-
-    // ============================================================
-    //  جلب الرصيد
-    // ============================================================
-    async function getBalance(playerId) {
-        const url = 'https://agents.ichancy.com/global/api/Player/getPlayerBalanceById';
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Cookie': sessionCookies
-            },
-            body: JSON.stringify({ playerId })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        const result = data.result || [];
-        if (result.length > 0) {
-            return result[0].balance || 0;
-        }
-        return 0;
-    }
-
-    // ============================================================
-    //  معالجة تسجيل الدخول
-    // ============================================================
-    async function handleLogin() {
-        hideError();
-        
-        const username = document.getElementById('usernameInput').value.trim();
-        const password = document.getElementById('passwordInput').value.trim();
-        const playerId = document.getElementById('playerIdInput').value.trim();
-        const remember = document.getElementById('rememberMe').checked;
-        
-        if (!username) {
-            showError('الرجاء إدخال اسم المستخدم');
-            document.getElementById('usernameInput').focus();
-            return;
-        }
-        
-        if (!password) {
-            showError('الرجاء إدخال كلمة المرور');
-            document.getElementById('passwordInput').focus();
-            return;
-        }
-        
-        if (!playerId) {
-            showError('الرجاء إدخال معرف اللاعب');
-            document.getElementById('playerIdInput').focus();
-            return;
-        }
-        
-        if (!/^\d+$/.test(playerId)) {
-            showError('معرف اللاعب يجب أن يكون أرقاماً فقط');
-            return;
-        }
-        
-        setLoading(true);
-        
-        try {
-            // 1. تسجيل الدخول في الخلفية
-            const loginResult = await loginToIChancy(username, password);
-            
-            // 2. جلب الرصيد
-            const balance = await getBalance(playerId);
-            
-            // 3. جلب الألعاب
-            const games = await getGames();
-            
-            // حفظ البيانات
-            userData = {
-                username,
-                player_id: playerId,
-                balance: balance
-            };
-            
-            gamesList = games;
-            isLoggedIn = true;
-            
-            // حفظ في localStorage
-            if (remember) {
-                localStorage.setItem('ichancy_user_data', JSON.stringify({
-                    username,
-                    password,
-                    player_id: playerId
-                }));
-            } else {
-                localStorage.removeItem('ichancy_user_data');
-            }
-            
+            dashboard.classList.remove('show');
+            loginScreen.classList.remove('hidden');
+            loginForm.reset();
+            hideError();
             setLoading(false);
-            showDashboard();
-            
-        } catch (error) {
-            setLoading(false);
-            showError(error.message || 'حدث خطأ أثناء تسجيل الدخول');
-            console.error('Login error:', error);
         }
-    }
 
-    function hideError() {
-        document.getElementById('errorBox').classList.remove('show');
-    }
+        // ================================================================
+        //  🔄  تحديث البيانات
+        // ================================================================
 
-    // ============================================================
-    //  عرض لوحة التحكم
-    // ============================================================
-    function showDashboard() {
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        
-        document.getElementById('displayName').textContent = userData.username || 'مستخدم';
-        document.getElementById('displayId').textContent = '🆔 ' + (userData.player_id || 'غير معروف');
-        document.getElementById('displayBalance').textContent = (userData.balance || 0).toFixed(2);
-        document.getElementById('userAvatar').textContent = (userData.username || 'U')[0].toUpperCase();
-        
-        renderGames(gamesList);
-    }
+        async function refreshData() {
+            if (!currentSessionId) return;
 
-    // ============================================================
-    //  عرض الألعاب
-    // ============================================================
-    function renderGames(games) {
-        const container = document.getElementById('gamesList');
-        
-        document.getElementById('statGames').textContent = games.length;
-        document.getElementById('gamesCount').textContent = games.length;
-        
-        const providers = new Set();
-        games.forEach(g => {
-            if (g.providerName || g.provider) {
-                providers.add(g.providerName || g.provider);
+            try {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+
+                const response = await fetch(`${API_URL}/refresh/${currentSessionId}`);
+                if (!response.ok) throw new Error('فشل التحديث');
+
+                const data = await response.json();
+                if (data.success && data.user) {
+                    // تحديث الرصيد فقط
+                    userBalance.textContent = (data.user.balance || 0).toFixed(2);
+                }
+            } catch (e) {
+                console.error('خطأ في التحديث:', e);
+                showError('فشل تحديث البيانات');
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<i class="fas fa-sync"></i> تحديث';
+            }
+        }
+
+        // ================================================================
+        //  🎯  معالج النموذج
+        // ================================================================
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!username || !password) {
+                showError('الرجاء إدخال اسم المستخدم وكلمة المرور');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const data = await performLogin(username, password);
+                currentSessionId = data.sessionId;
+                showDashboard(data.user);
+            } catch (err) {
+                setLoading(false);
+                showError(err.message || 'فشل تسجيل الدخول');
             }
         });
-        document.getElementById('statProviders').textContent = providers.size;
-        
-        const active = games.filter(g => g.isActive !== false).length;
-        document.getElementById('statActive').textContent = active;
-        
-        if (!games || games.length === 0) {
-            container.innerHTML = `
-                <div style="text-align:center; padding:30px; color:#8899aa;">
-                    <div style="font-size:48px; margin-bottom:12px;">📭</div>
-                    <p>لا توجد ألعاب متاحة حالياً</p>
-                    <button onclick="refreshGames()" style="margin-top:12px; padding:8px 24px; background:#00b894; color:#fff; border:none; border-radius:8px; cursor:pointer;">
-                        🔄 تحديث
-                    </button>
-                </div>
-            `;
-            return;
-        }
-        
-        let html = '';
-        
-        games.forEach((game, index) => {
-            const name = game.name || game.gameName || 'لعبة بدون اسم';
-            const provider = game.providerName || game.provider || game.vendor || '';
-            const gameId = game.id || game.gameId || index + 1;
-            const isActive = game.isActive !== false;
-            const externalId = game.externalGameId || '';
-            
-            html += `
-                <button class="btn-game" onclick="playGame('${gameId}', '${externalId}')" ${!isActive ? 'disabled style="opacity:0.4;"' : ''}>
-                    <span class="icon">${isActive ? '🎰' : '⏸️'}</span>
-                    <div class="info">
-                        <div class="name">${name}</div>
-                        ${provider ? `<div class="provider">${provider}</div>` : ''}
-                    </div>
-                    <span class="arrow">▶</span>
-                </button>
-            `;
-        });
-        
-        container.innerHTML = html;
-    }
 
-    // ============================================================
-    //  تشغيل اللعبة (مسجل دخول تلقائياً)
-    // ============================================================
-    function playGame(gameId, externalId) {
-        if (!userData || !userData.player_id) {
-            showError('الرجاء تسجيل الدخول أولاً');
-            return;
-        }
-        
-        // توليد توكن مؤقت
-        const timestamp = Date.now();
-        const tokenString = `${userData.player_id}_${gameId}_${timestamp}`;
-        const gameToken = md5(tokenString);
-        
-        // بناء رابط اللعبة مع التوكن
-        let url = `https://pg.ichancy200.com/launcher/launch?launchToken=${gameToken}&returnPath=%2F%3FpartnerId%3D18755655%26currency%3DNSP%26lan%3Dar%26gameId%3D${gameId}%26mode%3Dreal&mode=real&currency=NSP`;
-        
-        if (externalId) {
-            url += `&externalGameId=${externalId}`;
-        }
-        
-        // فتح اللعبة في نافذة جديدة
-        window.open(url, '_blank');
-    }
+        // ================================================================
+        //  🚪  أزرار التحكم
+        // ================================================================
 
-    // ============================================================
-    //  تحديث الألعاب
-    // ============================================================
-    function refreshGames() {
-        if (!isLoggedIn) {
-            showError('الرجاء تسجيل الدخول أولاً');
-            return;
-        }
-        
-        document.getElementById('gamesList').innerHTML = `
-            <div style="text-align:center; padding:20px; color:#8899aa;">
-                <div class="spinner"></div>
-                <p style="margin-top:12px;">جاري تحديث الألعاب...</p>
-            </div>
-        `;
-        
-        getGames()
-            .then(games => {
-                gamesList = games;
-                renderGames(games);
-            })
-            .catch(error => {
-                showError('فشل في تحديث الألعاب: ' + error.message);
+        logoutBtn.addEventListener('click', logout);
+        refreshBtn.addEventListener('click', refreshData);
+
+        // ================================================================
+        //  ⌨️  اختصار Enter
+        // ================================================================
+
+        document.querySelectorAll('.form-group input').forEach(input => {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    loginForm.dispatchEvent(new Event('submit'));
+                }
             });
-    }
+        });
 
-    // ============================================================
-    //  تسجيل الخروج
-    // ============================================================
-    function handleLogout() {
-        if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-            isLoggedIn = false;
-            userData = null;
-            gamesList = [];
-            sessionCookies = '';
-            
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        }
-    }
+        // ================================================================
+        //  📝  تعليمات التشغيل
+        // ================================================================
 
-    // ============================================================
-    //  دعم Enter key
-    // ============================================================
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !isLoggedIn) {
-            handleLogin();
-        }
-    });
-
-    console.log('🎮 IChancy Web App جاهز');
-</script>
+        console.log('🎮 منصة الألعاب - النسخة المتقدمة');
+        console.log('📌 تأكد من تشغيل الخادم أولاً:');
+        console.log('   npm install express puppeteer cors');
+        console.log('   node server.js');
+        console.log('   ثم افتح http://localhost:3000');
+    </script>
 
 </body>
 </html>

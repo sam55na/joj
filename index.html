@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js">
     </script>
     <style>
-        /* ===== إعادة ضبط ===== */
         * {
             margin: 0;
             padding: 0;
@@ -31,7 +30,6 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        /* خلفية ثابتة */
         .bg-image-fixed {
             position: fixed;
             top: 0;
@@ -58,7 +56,6 @@
             }
         }
 
-        /* ===== النص العلوي ===== */
         .banner-text {
             text-align: center;
             padding: 10px 12px;
@@ -83,132 +80,152 @@
             z-index: 1;
         }
 
-        /* ===== حالة المستخدم ===== */
         .user-status {
             display: none;
         }
 
-        /* ===== تأثير النيون والموجات المغناطيسية ===== */
-        .neon-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 460px;
-            aspect-ratio: 1/1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            z-index: 1;
-        }
-
-        /* إطار النيون الدوار */
-        .neon-frame {
-            position: absolute;
-            width: 95%;
-            height: 95%;
-            border-radius: 50%;
-            border: 3px solid transparent;
-            border-top-color: #FFD700;
-            border-bottom-color: #FFD700;
-            box-shadow: 0 0 15px #FFD700, inset 0 0 15px #FFD700;
-            animation: neonRotate 8s linear infinite;
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        .neon-frame::before {
-            content: '';
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            border-left-color: #FF8C00;
-            border-right-color: #FF8C00;
-            filter: blur(2px);
-            animation: neonRotate 12s linear infinite reverse;
-        }
-
-        @keyframes neonRotate {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* الموجات المغناطيسية */
-        .magnetic-waves {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .wave {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 80%;
-            height: 80%;
-            border: 1px solid rgba(255, 215, 0, 0.4);
-            border-radius: 50%;
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 0;
-            animation: magneticWaveEffect 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
-        }
-
-        .wave:nth-child(2) {
-            animation-delay: 1s;
-        }
-        .wave:nth-child(3) {
-            animation-delay: 2s;
-        }
-        .wave:nth-child(4) {
-            animation-delay: 3s;
-        }
-
-        @keyframes magneticWaveEffect {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.6;
-                border-width: 2px;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1.4);
-                opacity: 0;
-                border-width: 0.5px;
-                filter: blur(4px);
-            }
-        }
-
-        /* ===== العجلة ===== */
+        /* ===== العجلة مع إطار نيون ذهبي ===== */
         .wheel-wrapper {
             position: relative;
-            width: 88%;
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
             aspect-ratio: 1/1;
             display: none;
-            z-index: 3;
+            z-index: 1;
         }
         .wheel-wrapper.show {
             display: block;
             animation: fadeIn 0.5s ease;
         }
+
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            padding: 16px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== إطار نيون ذهبي لامع ===== */
+        .neon-frame-gold {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+            border: 4px solid #FFD700;
+            background: radial-gradient(circle at center, transparent 60%, rgba(255, 215, 0, 0.05) 70%, rgba(255, 215, 0, 0.15) 85%, rgba(255, 215, 0, 0.3) 100%);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1), inset 0 0 30px rgba(255, 215, 0, 0.1);
+            animation: goldNeonPulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes goldNeonPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1), inset 0 0 30px rgba(255, 215, 0, 0.1);
+                border-color: #FFD700;
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(255, 215, 0, 0.6), 0 0 100px rgba(255, 215, 0, 0.4), 0 0 150px rgba(255, 215, 0, 0.2), inset 0 0 50px rgba(255, 215, 0, 0.2);
+                border-color: #FFA500;
+            }
+        }
+
+        /* ===== حلقات نبضية ذهبية متلاشية ===== */
+        .wave-ring-gold {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255, 215, 0, 0.6);
+            animation: waveGoldExpand 4s ease-out infinite;
+        }
+
+        .wave-ring-gold:nth-child(3) {
+            width: 78%;
+            height: 78%;
+            animation-delay: 0s;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+        }
+
+        .wave-ring-gold:nth-child(4) {
+            width: 85%;
+            height: 85%;
+            animation-delay: 1.3s;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.1);
+        }
+
+        .wave-ring-gold:nth-child(5) {
+            width: 92%;
+            height: 92%;
+            animation-delay: 2.6s;
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.08);
+        }
+
+        @keyframes waveGoldExpand {
+            0% {
+                transform: translate(-50%, -50%) scale(0.92);
+                opacity: 0.9;
+                border-width: 4px;
+                border-color: rgba(255, 215, 0, 0.8);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0;
+                border-width: 1px;
+                border-color: rgba(255, 215, 0, 0);
+            }
+        }
+
+        /* ===== وهج ذهبي داخلي ===== */
+        .inner-glow-gold {
+            position: absolute;
+            top: 8%;
+            left: 8%;
+            width: 84%;
+            height: 84%;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.08), rgba(255, 215, 0, 0.02), transparent 70%);
+            animation: innerGoldPulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes innerGoldPulse {
+            0% {
+                opacity: 0.3;
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+
         .wheel-wrapper canvas {
             width: 100% !important;
             height: 100% !important;
             border-radius: 50%;
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.03), inset 0 0 60px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 215, 0, 0.1);
+            box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.3);
+            border: none;
             transition: filter 0.4s ease;
             display: block;
+            position: relative;
+            z-index: 3;
         }
         .wheel-wrapper canvas.spinning {
-            filter: brightness(1.1) drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
+            filter: brightness(1.15) drop-shadow(0 0 50px rgba(255, 215, 0, 0.12));
         }
 
         .pointer {
@@ -242,7 +259,6 @@
             }
         }
 
-        /* ===== لا توجد جوائز ===== */
         .no-prizes {
             display: none;
             text-align: center;
@@ -257,7 +273,6 @@
             z-index: 1;
         }
 
-        /* ===== الأزرار ===== */
         .actions {
             display: flex;
             flex-direction: column;
@@ -310,29 +325,6 @@
         .btn-spin.loading .spinner-small {
             display: inline-block;
         }
-
-        /* ===== زر البدء ===== */
-        .btn-start {
-            background: linear-gradient(135deg, #00FF88, #00CC6A);
-            color: #0a0a0a;
-            box-shadow: 0 4px 30px rgba(0, 255, 136, 0.2);
-            font-size: 18px;
-            animation: startPulse 2s ease-in-out infinite;
-        }
-        .btn-start:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 40px rgba(0, 255, 136, 0.3);
-        }
-        @keyframes startPulse {
-            0%,
-            100% {
-                box-shadow: 0 4px 30px rgba(0, 255, 136, 0.2);
-            }
-            50% {
-                box-shadow: 0 4px 40px rgba(0, 255, 136, 0.4);
-            }
-        }
-
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -342,7 +334,6 @@
             }
         }
 
-        /* ===== شرط الإيداع ===== */
         .deposit-notice {
             background: rgba(18, 18, 18, 0.85);
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -382,7 +373,6 @@
             color: #FF4444;
         }
 
-        /* ===== النتيجة ===== */
         .result-box {
             background: rgba(18, 18, 18, 0.85);
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -454,7 +444,9 @@
             }
         }
 
-        .result-box .prize-icon,
+        .result-box .prize-icon {
+            display: none;
+        }
         .result-box .prize-name {
             display: none;
         }
@@ -483,7 +475,6 @@
             }
         }
 
-        /* ===== رسائل الخطأ ===== */
         .error-msg {
             background: rgba(18, 18, 18, 0.85);
             border: 1px solid rgba(255, 0, 0, 0.06);
@@ -507,7 +498,6 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* ===== شاشة اللودينغ ===== */
         .loading-screen {
             display: none;
             position: fixed;
@@ -521,6 +511,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            margin: 0;
         }
         .loading-screen.active {
             display: flex;
@@ -576,7 +567,6 @@
             letter-spacing: 1px;
         }
 
-        /* ===== إعدادات الصوت ===== */
         .sound-settings {
             display: flex;
             justify-content: center;
@@ -613,7 +603,6 @@
             font-size: 14px;
         }
 
-        /* ===== لوحة الإدارة ===== */
         .admin-panel {
             display: none;
             background: rgba(18, 18, 18, 0.85);
@@ -924,7 +913,6 @@
             color: #00FF88;
         }
 
-        /* ===== خطأ أولي ===== */
         .error-container {
             display: none;
             text-align: center;
@@ -976,7 +964,6 @@
             box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
         }
 
-        /* ===== إشعار منبثق ===== */
         .notification-bar {
             display: none;
             position: fixed;
@@ -1009,7 +996,6 @@
             }
         }
 
-        /* ===== تجاوب ===== */
         @media (max-width: 480px) {
             .banner-text {
                 font-size: 17px;
@@ -1048,6 +1034,7 @@
                 min-width: auto;
             }
             .loading-screen .loading-image {
+                width: 60vw;
                 max-width: 220px;
             }
             .admin-panel .add-prize-form input {
@@ -1063,9 +1050,6 @@
             .sound-settings {
                 gap: 12px;
                 padding: 4px 12px;
-            }
-            .neon-wrapper {
-                max-width: 380px;
             }
         }
 
@@ -1092,23 +1076,18 @@
 </head>
 <body>
 
-    <!-- ===== خلفية ===== -->
     <div class="bg-image-fixed">
         <img id="bgImage" src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80" alt="Background">
     </div>
 
-    <!-- ===== إشعار ===== -->
     <div class="notification-bar" id="notificationBar">
         🎉 مبروك! لقد فزت بـ <span id="notifPrizeName">جائزة</span>!
     </div>
 
-    <!-- ===== النص العلوي ===== -->
     <div class="banner-text" id="bannerText">🎡 IChancy · عجلة الحظ</div>
 
-    <!-- ===== حالة المستخدم ===== -->
     <div class="user-status" id="userStatus"></div>
 
-    <!-- ===== خطأ ===== -->
     <div class="error-container" id="errorContainer">
         <div class="error-icon">⚠️</div>
         <div class="error-title">يجب الدخول من البوت</div>
@@ -1119,7 +1098,6 @@
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
 
-    <!-- ===== شاشة لودينغ ===== -->
     <div class="loading-screen" id="loadingScreen">
         <img class="loading-image" id="loadingImage" src="https://via.placeholder.com/200/1a1a2e/FFD700?text=🎡" alt="Loading">
         <div class="progress-container">
@@ -1128,37 +1106,35 @@
             </div>
             <div class="progress-text" id="loaderStatusText">0%</div>
         </div>
-        <button class="btn btn-start" id="startBtn" style="display: none; margin-top: 30px; max-width: 300px;">
-            🎵 اضغط للبدء
-        </button>
     </div>
 
-    <!-- ===== حاوية النيون والعجلة ===== -->
-    <div class="neon-wrapper" id="neonWrapper" style="display: none;">
-        <!-- الموجات المغناطيسية -->
-        <div class="magnetic-waves">
-            <div class="wave"></div>
-            <div class="wave"></div>
-            <div class="wave"></div>
-            <div class="wave"></div>
-        </div>
-        <!-- إطار النيون -->
-        <div class="neon-frame"></div>
+    <!-- ===== العجلة مع إطار نيون ذهبي ===== -->
+    <div class="wheel-wrapper" id="wheelWrapper">
+        <div class="wheel-container">
+            <!-- حلقات نبضية ذهبية متلاشية -->
+            <div class="wave-ring-gold"></div>
+            <div class="wave-ring-gold"></div>
+            <div class="wave-ring-gold"></div>
 
-        <!-- العجلة -->
-        <div class="wheel-wrapper" id="wheelWrapper">
+            <!-- الوهج الداخلي -->
+            <div class="inner-glow-gold"></div>
+
+            <!-- الإطار النيون الذهبي -->
+            <div class="neon-frame-gold"></div>
+
+            <!-- السهم -->
             <div class="pointer" id="pointer">🔽</div>
+
+            <!-- اللوحة -->
             <canvas id="wheelCanvas" width="500" height="500"></canvas>
         </div>
     </div>
 
-    <!-- ===== لا توجد جوائز ===== -->
     <div class="no-prizes" id="noPrizes">
         <div style="font-size:28px;">⚠️</div>
         <div style="margin-top:6px;">لا توجد جوائز متاحة</div>
     </div>
 
-    <!-- ===== أزرار ===== -->
     <div class="actions">
         <button class="btn btn-spin" id="spinBtn" disabled>
             <span class="spinner-small"></span>
@@ -1166,7 +1142,6 @@
         </button>
     </div>
 
-    <!-- ===== شرط الإيداع ===== -->
     <div class="deposit-notice" id="depositNotice">
         <div class="notice-text">
             💰 مطلوب إيداع <span class="amount" id="depositMinAmount">0</span> SYP
@@ -1177,7 +1152,6 @@
         </div>
     </div>
 
-    <!-- ===== النتيجة ===== -->
     <div class="result-box" id="resultBox">
         <div class="confetti-container" id="confettiContainer"></div>
         <div class="prize-icon" id="prizeIcon">🎁</div>
@@ -1185,21 +1159,18 @@
         <div class="prize-desc" id="prizeDesc"></div>
     </div>
 
-    <!-- ===== إعدادات الصوت ===== -->
     <div class="sound-settings">
         <label>
             <span class="sound-indicator">🔊</span>
             <input type="checkbox" id="soundToggle" checked> مؤثرات
         </label>
-        <label>
-            <span class="sound-indicator">🎵</span>
-            <input type="checkbox" id="musicToggle" checked> موسيقى
-        </label>
     </div>
 
-    <!-- ===== لوحة الإدارة ===== -->
     <div class="admin-panel" id="adminPanel">
-        <div class="panel-title">⚙️ لوحة الإدارة <span class="badge">ADMIN</span></div>
+        <div class="panel-title">
+            ⚙️ لوحة الإدارة
+            <span class="badge">ADMIN</span>
+        </div>
         <div id="prizesList"></div>
 
         <div class="add-prize-form">
@@ -1218,22 +1189,66 @@
         </div>
 
         <div class="settings-section">
-            <div class="setting-row"><label>النص العلوي</label><input type="text" id="editBannerText"><button class="btn-save" data-setting="banner_text" data-field="editBannerText">💾 حفظ</button></div>
-            <div class="setting-row"><label>صورة الخلفية</label><input type="text" id="editBgImage"><button class="btn-save" data-setting="bg_image_url" data-field="editBgImage">💾 حفظ</button></div>
-            <div class="setting-row"><label>صورة اللودينغ</label><input type="text" id="editLoadingImage"><button class="btn-save" data-setting="loading_image_url" data-field="editLoadingImage">💾 حفظ</button></div>
-            <div class="setting-row"><label>مركز العجلة</label><input type="text" id="editCenterIcon" style="max-width:80px;"><button class="btn-save" data-setting="center_icon" data-field="editCenterIcon">💾 حفظ</button></div>
-            <div class="setting-row"><label>مدة التدوير</label><input type="number" id="editSpinDuration" style="max-width:80px;"><span style="color:#555;font-size:11px;">مللي ثانية</span><button class="btn-save" data-setting="spin_duration" data-field="editSpinDuration">💾 حفظ</button></div>
-            <div class="setting-row"><label>فترة التبريد</label><input type="number" id="editIntervalHours" style="max-width:60px;"><span style="color:#555;font-size:11px;">ساعة</span><button class="btn-save" data-setting="spin_interval_hours" data-field="editIntervalHours">💾 حفظ</button></div>
-            <div class="toggle-row"><label>تفعيل العجلة</label><input type="checkbox" id="editIsActive"><button class="btn-save" data-setting="is_active" data-field="editIsActive" data-type="checkbox">💾 حفظ</button></div>
-            <div class="toggle-row"><label>تفعيل شرط الإيداع</label><input type="checkbox" id="editDepositRequired"><button class="btn-save" data-setting="deposit_required" data-field="editDepositRequired" data-type="checkbox">💾 حفظ</button></div>
-            <div class="setting-row"><label>الحد الأدنى للإيداع</label><input type="number" id="editDepositMin" style="max-width:80px;"><span style="color:#555;font-size:11px;">SYP</span><button class="btn-save" data-setting="deposit_min_amount" data-field="editDepositMin">💾 حفظ</button></div>
-            <div class="setting-row"><label>مدة صلاحية الإيداع</label><input type="number" id="editDepositHours" style="max-width:60px;"><span style="color:#555;font-size:11px;">ساعة</span><button class="btn-save" data-setting="deposit_check_hours" data-field="editDepositHours">💾 حفظ</button></div>
-            <div class="setting-row"><label>رابط الصوت الترحيبي</label><input type="text" id="editStartAudioUrl" placeholder="https://..."><button class="btn-save" data-setting="start_audio_url" data-field="editStartAudioUrl">💾 حفظ</button></div>
+            <div class="setting-row">
+                <label>النص العلوي</label>
+                <input type="text" id="editBannerText" placeholder="النص الذي يظهر في الأعلى">
+                <button class="btn-save" data-setting="banner_text" data-field="editBannerText">💾 حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>صورة الخلفية</label>
+                <input type="text" id="editBgImage" placeholder="رابط الصورة">
+                <button class="btn-save" data-setting="bg_image_url" data-field="editBgImage">💾 حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>صورة اللودينغ</label>
+                <input type="text" id="editLoadingImage" placeholder="رابط صورة اللودينغ">
+                <button class="btn-save" data-setting="loading_image_url" data-field="editLoadingImage">💾 حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>مركز العجلة</label>
+                <input type="text" id="editCenterIcon" placeholder="🎯" style="max-width:80px;">
+                <button class="btn-save" data-setting="center_icon" data-field="editCenterIcon">💾 حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>مدة التدوير</label>
+                <input type="number" id="editSpinDuration" placeholder="3500" style="max-width:80px;">
+                <span style="color:#555;font-size:11px;">مللي ثانية</span>
+                <button class="btn-save" data-setting="spin_duration" data-field="editSpinDuration">💾 حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>فترة التبريد</label>
+                <input type="number" id="editIntervalHours" placeholder="24" style="max-width:60px;">
+                <span style="color:#555;font-size:11px;">ساعة</span>
+                <button class="btn-save" data-setting="spin_interval_hours" data-field="editIntervalHours">💾 حفظ</button>
+            </div>
+            <div class="toggle-row">
+                <label>تفعيل العجلة</label>
+                <input type="checkbox" id="editIsActive">
+                <button class="btn-save" data-setting="is_active" data-field="editIsActive" data-type="checkbox">💾 حفظ</button>
+            </div>
+            <div class="toggle-row">
+                <label>تفعيل شرط الإيداع</label>
+                <input type="checkbox" id="editDepositRequired">
+                <button class="btn-save" data-setting="deposit_required" data-field="editDepositRequired" data-type="checkbox">💾 حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>الحد الأدنى للإيداع</label>
+                <input type="number" id="editDepositMin" placeholder="1000" style="max-width:80px;">
+                <span style="color:#555;font-size:11px;">SYP</span>
+                <button class="btn-save" data-setting="deposit_min_amount" data-field="editDepositMin">💾 حفظ</button>
+            </div>
+            <div class="setting-row">
+                <label>مدة صلاحية الإيداع</label>
+                <input type="number" id="editDepositHours" placeholder="24" style="max-width:60px;">
+                <span style="color:#555;font-size:11px;">ساعة</span>
+                <button class="btn-save" data-setting="deposit_check_hours" data-field="editDepositHours">💾 حفظ</button>
+            </div>
         </div>
     </div>
 
-    <!-- ===== خطأ ===== -->
-    <div class="error-msg" id="errorMsg"><span id="errorText"></span></div>
+    <div class="error-msg" id="errorMsg">
+        <span id="errorText"></span>
+    </div>
 
     <script>
         // ================================================================
@@ -1246,20 +1261,18 @@
         let prizesCache = [];
         let currentRotation = 0;
         let soundEnabled = true;
-        let musicEnabled = true;
         let settingsCache = {};
         let spinDuration = 3500;
-        let startAudioUrl = '';
 
         // ================================================================
-        //                      نظام الصوت المحسّن
+        //                      نظام الصوت المتطور
         // ================================================================
-        class EnhancedSoundManager {
+        class AdvancedSoundManager {
             constructor() {
                 this.initialized = false;
                 this.audioContext = null;
-                this.bgInterval = null;
                 this.isPlaying = false;
+                this.spinSoundInterval = null;
             }
 
             init() {
@@ -1273,188 +1286,211 @@
             }
 
             stopAll() {
+                this.stopSpinSound();
                 if (this.audioContext) {
                     try {
                         this.audioContext.close();
                         this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
                     } catch (e) {}
                 }
-                this.stopBackgroundMusic();
                 this.isPlaying = false;
             }
 
+            // ===== صوت تدوير مميز =====
             playSpinSound() {
                 if (!soundEnabled || !this.initialized) return;
+                this.stopSpinSound();
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
-                    for (let i = 0; i < 8; i++) {
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        const startFreq = 200 + i * 80;
-                        const endFreq = 600 + i * 150;
-                        osc.frequency.setValueAtTime(startFreq, now + i * 0.05);
-                        osc.frequency.exponentialRampToValueAtTime(endFreq, now + i * 0.05 + 0.15);
-                        osc.type = i % 2 === 0 ? 'sine' : 'triangle';
-                        gain.gain.setValueAtTime(0.08, now + i * 0.05);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.15);
-                        osc.start(now + i * 0.05);
-                        osc.stop(now + i * 0.05 + 0.15);
-                    }
+                    let count = 0;
+
+                    this.spinSoundInterval = setInterval(() => {
+                        if (!soundEnabled || !this.initialized) {
+                            this.stopSpinSound();
+                            return;
+                        }
+                        try {
+                            const t = ctx.currentTime;
+                            // نغمة تدوير سريعة تشبه صوت العجلة
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+
+                            // تردد متغير يعطي احساس بالدوران
+                            const freq = 120 + (count % 5) * 30 + Math.sin(count * 0.5) * 20;
+                            osc.frequency.setValueAtTime(freq, t);
+                            osc.type = 'square';
+
+                            gain.gain.setValueAtTime(0.04, t);
+                            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+
+                            osc.start(t);
+                            osc.stop(t + 0.08);
+
+                            count++;
+                        } catch (e) {
+                            console.warn('Spin sound tick error:', e);
+                        }
+                    }, 100);
+
+                    setTimeout(() => this.stopSpinSound(), 6000);
                 } catch (e) {
                     console.warn('Spin sound error:', e);
                 }
             }
 
+            stopSpinSound() {
+                if (this.spinSoundInterval) {
+                    clearInterval(this.spinSoundInterval);
+                    this.spinSoundInterval = null;
+                }
+            }
+
+            // ===== صوت ربح مميز =====
             playWinSound() {
                 if (!soundEnabled || !this.initialized) return;
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
-                    const winMelody = [
-                        { freq: 523, dur: 0.15 },
-                        { freq: 659, dur: 0.15 },
-                        { freq: 784, dur: 0.15 },
-                        { freq: 1047, dur: 0.3 },
-                        { freq: 1319, dur: 0.3 },
-                        { freq: 1568, dur: 0.5 }
+
+                    // لحن ربح سعيد ومميز
+                    const notes = [
+                        [523, 0.15, 0.08],
+                        [659, 0.15, 0.08],
+                        [784, 0.15, 0.08],
+                        [1047, 0.25, 0.1],
+                        [784, 0.15, 0.08],
+                        [1047, 0.15, 0.08],
+                        [1175, 0.15, 0.08],
+                        [1319, 0.3, 0.12],
+                        [1175, 0.15, 0.08],
+                        [1047, 0.15, 0.08],
+                        [1175, 0.15, 0.08],
+                        [1568, 0.35, 0.15]
                     ];
-                    let totalTime = 0;
-                    winMelody.forEach(({ freq, dur }, i) => {
+
+                    notes.forEach(([freq, dur, vol], i) => {
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, now + totalTime);
-                        osc.type = 'sine';
-                        gain.gain.setValueAtTime(0.15, now + totalTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + totalTime + dur);
-                        osc.start(now + totalTime);
-                        osc.stop(now + totalTime + dur);
-                        totalTime += dur + 0.05;
+
+                        osc.frequency.setValueAtTime(freq, now + i * 0.07);
+                        osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+
+                        gain.gain.setValueAtTime(vol || 0.08, now + i * 0.07);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + dur);
+
+                        osc.start(now + i * 0.07);
+                        osc.stop(now + i * 0.07 + dur);
                     });
+
+                    // نغمات مرافقة
                     setTimeout(() => {
-                        if (!this.initialized) return;
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(2093, now + totalTime);
-                        osc.type = 'sine';
-                        gain.gain.setValueAtTime(0.1, now + totalTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + totalTime + 0.3);
-                        osc.start(now + totalTime);
-                        osc.stop(now + totalTime + 0.3);
-                    }, 100);
+                        const t = ctx.currentTime;
+                        [523, 659, 784, 1047].forEach((freq, i) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.frequency.setValueAtTime(freq, t + i * 0.06);
+                            osc.type = 'sine';
+                            gain.gain.setValueAtTime(0.04, t + i * 0.06);
+                            gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.06 + 0.2);
+                            osc.start(t + i * 0.06);
+                            osc.stop(t + i * 0.06 + 0.2);
+                        });
+                    }, notes.length * 0.07 + 0.1);
+
+                    setTimeout(() => { this.isPlaying = false; }, 3000);
                 } catch (e) {
                     console.warn('Win sound error:', e);
+                    this.isPlaying = false;
                 }
             }
 
+            // ===== صوت خسارة مميز =====
             playLoseSound() {
                 if (!soundEnabled || !this.initialized) return;
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
-                    const loseMelody = [
-                        { freq: 349, dur: 0.2 },
-                        { freq: 330, dur: 0.2 },
-                        { freq: 294, dur: 0.2 },
-                        { freq: 262, dur: 0.4 }
+
+                    // نغمات خسارة حزينة ومميزة
+                    const notes = [
+                        [440, 0.3, 0.06],
+                        [349, 0.3, 0.06],
+                        [294, 0.4, 0.07],
+                        [220, 0.5, 0.08]
                     ];
-                    let totalTime = 0;
-                    loseMelody.forEach(({ freq, dur }, i) => {
+
+                    notes.forEach(([freq, dur, vol], i) => {
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, now + totalTime);
-                        osc.type = 'sine';
-                        gain.gain.setValueAtTime(0.12, now + totalTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + totalTime + dur);
-                        osc.start(now + totalTime);
-                        osc.stop(now + totalTime + dur);
-                        totalTime += dur + 0.05;
+
+                        osc.frequency.setValueAtTime(freq, now + i * 0.25);
+                        osc.type = 'sawtooth';
+
+                        gain.gain.setValueAtTime(vol || 0.05, now + i * 0.25);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.25 + dur);
+
+                        osc.start(now + i * 0.25);
+                        osc.stop(now + i * 0.25 + dur);
                     });
+
+                    // تأثير إضافي
+                    setTimeout(() => {
+                        const t = ctx.currentTime;
+                        const osc2 = ctx.createOscillator();
+                        const gain2 = ctx.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(ctx.destination);
+                        osc2.frequency.setValueAtTime(180, t);
+                        osc2.frequency.exponentialRampToValueAtTime(80, t + 0.6);
+                        osc2.type = 'sawtooth';
+                        gain2.gain.setValueAtTime(0.03, t);
+                        gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+                        osc2.start(t);
+                        osc2.stop(t + 0.6);
+                    }, notes.length * 0.25 + 0.1);
+
+                    setTimeout(() => { this.isPlaying = false; }, 2000);
                 } catch (e) {
                     console.warn('Lose sound error:', e);
+                    this.isPlaying = false;
                 }
             }
 
-            playBackgroundMusic() {
-                if (!musicEnabled || !this.initialized) return;
-                if (this.bgInterval) return;
+            // ===== صوت البداية =====
+            playStartSound() {
+                if (!soundEnabled || !this.initialized) return;
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
-                    const playNote = (freq, time, dur, vol, type = 'sine') => {
+
+                    [523, 659, 784].forEach((freq, i) => {
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, time);
-                        osc.type = type;
-                        gain.gain.setValueAtTime(vol || 0.025, time);
-                        gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
-                        osc.start(time);
-                        osc.stop(time + dur);
-                    };
-                    const pattern = [
-                        [262, 0.25, 0.02],
-                        [330, 0.25, 0.02],
-                        [392, 0.25, 0.02],
-                        [523, 0.35, 0.025],
-                        [330, 0.25, 0.02],
-                        [392, 0.25, 0.02],
-                        [523, 0.25, 0.02],
-                        [659, 0.35, 0.025],
-                        [392, 0.25, 0.02],
-                        [523, 0.25, 0.02],
-                        [659, 0.25, 0.02],
-                        [784, 0.35, 0.025]
-                    ];
-                    pattern.forEach(([freq, dur, vol], i) => {
-                        const time = now + i * 0.3;
-                        playNote(freq, time, dur, vol, i % 2 === 0 ? 'sine' : 'triangle');
+                        osc.frequency.setValueAtTime(freq, now + i * 0.08);
+                        osc.type = 'sine';
+                        gain.gain.setValueAtTime(0.03, now + i * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.1);
+                        osc.start(now + i * 0.08);
+                        osc.stop(now + i * 0.08 + 0.1);
                     });
-                    this.bgInterval = setInterval(() => {
-                        if (!musicEnabled || !this.initialized) {
-                            this.stopBackgroundMusic();
-                            return;
-                        }
-                        const t = ctx.currentTime;
-                        const bassNotes = [131, 165, 196, 262, 196, 165];
-                        bassNotes.forEach((freq, i) => {
-                            playNote(freq, t + i * 0.25, 0.2, 0.015, 'square');
-                        });
-                    }, 1500);
                 } catch (e) {
-                    console.warn('Music error:', e);
-                }
-            }
-
-            stopBackgroundMusic() {
-                if (this.bgInterval) {
-                    clearInterval(this.bgInterval);
-                    this.bgInterval = null;
-                }
-            }
-
-            playStartAudio(audioUrl) {
-                if (!soundEnabled || !audioUrl) return;
-                try {
-                    const audio = new Audio(audioUrl);
-                    audio.volume = 0.7;
-                    audio.play().catch(e => console.warn('Start audio error:', e));
-                } catch (e) {
-                    console.warn('Audio playback error:', e);
+                    console.warn('Start sound error:', e);
                 }
             }
         }
 
-        const soundManager = new EnhancedSoundManager();
+        const soundManager = new AdvancedSoundManager();
 
         // ================================================================
         //                      جلب USER_ID
@@ -1498,17 +1534,14 @@
             const r = Math.min(w, h) / 2 - 12;
             const noPrizes = document.getElementById('noPrizes');
             const wrapper = document.getElementById('wheelWrapper');
-            const neonWrapper = document.getElementById('neonWrapper');
 
             if (!prizes || prizes.length === 0) {
                 noPrizes.style.display = 'block';
                 wrapper.classList.remove('show');
-                neonWrapper.style.display = 'none';
                 return;
             }
 
             noPrizes.style.display = 'none';
-            neonWrapper.style.display = 'flex';
             wrapper.classList.add('show');
             ctx.clearRect(0, 0, w, h);
 
@@ -1528,6 +1561,7 @@
                 const color1 = p.color || '#1a1a2e';
                 const color2 = p.color2 || '#16213e';
                 const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+
                 if (isHighlight) {
                     grad.addColorStop(0, '#FFD700');
                     grad.addColorStop(0.5, '#FF8C00');
@@ -1546,7 +1580,8 @@
                     ctx.shadowColor = 'transparent';
                     ctx.shadowBlur = 0;
                 }
-                ctx.strokeStyle = isHighlight ? '#FFD700' : 'rgba(255,215,0,0.1)';
+
+                ctx.strokeStyle = isHighlight ? '#FFD700' : 'rgba(255,215,0,0.05)';
                 ctx.lineWidth = isHighlight ? 2.5 : 0.5;
                 ctx.stroke();
                 ctx.shadowBlur = 0;
@@ -1559,6 +1594,7 @@
                 ctx.save();
                 ctx.translate(x, y);
                 ctx.rotate(mid + (mid > Math.PI / 2 ? Math.PI : 0));
+
                 ctx.fillStyle = isHighlight ? '#0a0a0a' : '#fff';
                 ctx.font = isHighlight ? 'bold 19px sans-serif' : '17px sans-serif';
                 ctx.textAlign = 'center';
@@ -1572,28 +1608,35 @@
 
             const centerR = r * 0.16;
             const centerIcon = settingsCache.center_icon || '⭐';
-            const gradC = ctx.createRadialGradient(cx - 4, cy - 4, 0, cx, cy, centerR);
-            gradC.addColorStop(0, '#FFD700');
-            gradC.addColorStop(0.3, '#FFA500');
-            gradC.addColorStop(0.7, '#FF8C00');
-            gradC.addColorStop(1, '#B8860B');
+
+            const grad = ctx.createRadialGradient(cx - 4, cy - 4, 0, cx, cy, centerR);
+            grad.addColorStop(0, '#FFD700');
+            grad.addColorStop(0.3, '#FFA500');
+            grad.addColorStop(0.7, '#FF8C00');
+            grad.addColorStop(1, '#B8860B');
+
             ctx.beginPath();
             ctx.arc(cx, cy, centerR, 0, 2 * Math.PI);
-            ctx.fillStyle = gradC;
+            ctx.fillStyle = grad;
             ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
             ctx.shadowBlur = 40;
             ctx.fill();
             ctx.shadowBlur = 0;
+
             ctx.beginPath();
             ctx.arc(cx, cy, centerR + 5, 0, 2 * Math.PI);
             ctx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
             ctx.lineWidth = 2;
             ctx.stroke();
+
             ctx.fillStyle = '#0a0a0a';
             ctx.font = '32px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 10;
             ctx.fillText(centerIcon, cx, cy + 1);
+            ctx.shadowBlur = 0;
         }
 
         // ================================================================
@@ -1602,6 +1645,7 @@
         function animateSpin(targetRotation, duration, callback) {
             const canvas = document.getElementById('wheelCanvas');
             canvas.classList.add('spinning');
+
             const startRotation = currentRotation;
             const startTime = performance.now();
 
@@ -1609,9 +1653,13 @@
                 const elapsed = time - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-                const currentAngle = startRotation + (targetRotation - startRotation) * easeOutCubic;
+                const easedProgress = easeOutCubic;
+
+                const currentAngle = startRotation + (targetRotation - startRotation) * easedProgress;
                 currentRotation = currentAngle;
+
                 drawWheel(prizesCache, -1, currentAngle);
+
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
@@ -1620,6 +1668,7 @@
                     if (callback) callback();
                 }
             }
+
             requestAnimationFrame(animate);
         }
 
@@ -1632,13 +1681,18 @@
                 const data = await res.json();
                 if (data.success) {
                     settingsCache = data.settings;
-                    if (settingsCache.banner_text) document.getElementById('bannerText').textContent = settingsCache
-                        .banner_text;
-                    if (settingsCache.bg_image_url) document.getElementById('bgImage').src = settingsCache.bg_image_url;
-                    if (settingsCache.loading_image_url) document.getElementById('loadingImage').src = settingsCache
-                        .loading_image_url;
-                    spinDuration = parseInt(settingsCache.spin_duration) || 3500;
-                    startAudioUrl = settingsCache.start_audio_url || '';
+                    if (settingsCache.banner_text) {
+                        document.getElementById('bannerText').textContent = settingsCache.banner_text;
+                    }
+                    if (settingsCache.bg_image_url) {
+                        document.getElementById('bgImage').src = settingsCache.bg_image_url;
+                    }
+                    if (settingsCache.loading_image_url) {
+                        document.getElementById('loadingImage').src = settingsCache.loading_image_url;
+                    }
+                    if (settingsCache.spin_duration) {
+                        spinDuration = parseInt(settingsCache.spin_duration) || 3500;
+                    }
                     document.getElementById('editBannerText').value = settingsCache.banner_text || '';
                     document.getElementById('editBgImage').value = settingsCache.bg_image_url || '';
                     document.getElementById('editLoadingImage').value = settingsCache.loading_image_url || '';
@@ -1649,160 +1703,442 @@
                     document.getElementById('editDepositRequired').checked = settingsCache.deposit_required === 'true';
                     document.getElementById('editDepositMin').value = settingsCache.deposit_min_amount || 1000;
                     document.getElementById('editDepositHours').value = settingsCache.deposit_check_hours || 24;
-                    document.getElementById('editStartAudioUrl').value = settingsCache.start_audio_url || '';
                     return data.settings;
                 }
-            } catch (e) {}
-            return {};
+                return {};
+            } catch (e) {
+                console.error('Error loading settings:', e);
+                return {};
+            }
         }
 
         async function saveSetting(key, value) {
             try {
+                let finalValue = value;
+                if (typeof value === 'boolean') {
+                    finalValue = value ? 'true' : 'false';
+                }
                 const response = await fetch(`${API_BASE}/api/admin/setting`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ admin_id: ADMIN_ID, key: key, value: String(value) })
+                    body: JSON.stringify({
+                        admin_id: ADMIN_ID,
+                        key: key,
+                        value: String(finalValue)
+                    })
                 });
-                return response.ok;
-            } catch (e) { return false; }
-        }
-
-        async function loadPrizes() {
-            try {
-                const response = await fetch(`${API_BASE}/api/wheel/prizes`);
                 const data = await response.json();
-                if (data.success) { prizesCache = data.prizes; return data.prizes; }
-            } catch (e) {}
-            return [];
-        }
-
-        async function loadUserStatus() {
-            if (!USER_ID) return;
-            try {
-                const response = await fetch(`${API_BASE}/api/wheel/status?user_id=${USER_ID}`);
-                const data = await response.json();
-                const spinBtn = document.getElementById('spinBtn');
-                const spinBtnText = document.getElementById('spinBtnText');
-                const depositNotice = document.getElementById('depositNotice');
-
-                if (data.success) {
-                    if (data.can_spin) {
-                        spinBtn.disabled = false;
-                        spinBtnText.textContent = '🎰 تدوير العجلة';
-                    } else {
-                        spinBtn.disabled = true;
-                        spinBtnText.textContent = `⏳ ${data.remaining_hours}h ${data.remaining_minutes}m`;
-                    }
-                    if (data.deposit_required) {
-                        depositNotice.classList.add('show');
-                        document.getElementById('depositMinAmount').textContent = data.deposit_min_amount;
-                        document.getElementById('depositCheckHours').textContent = data.deposit_check_hours;
-                        const statusEl = document.getElementById('depositStatus');
-                        if (data.deposit_met) {
-                            statusEl.innerHTML = 'الحالة: <span class="met">✅ مكتمل</span>';
-                        } else {
-                            statusEl.innerHTML = 'الحالة: <span class="not-met">❌ غير مكتمل</span>';
-                            spinBtn.disabled = true;
-                        }
-                    } else { depositNotice.classList.remove('show'); }
+                if (!response.ok) {
+                    throw new Error(data.error || 'فشل الحفظ');
                 }
-            } catch (e) {}
+                return data.success === true;
+            } catch (e) {
+                console.error('Error saving setting:', e);
+                showError('فشل حفظ الإعداد: ' + e.message);
+                return false;
+            }
+        }
+
+        async function loadAdminPrizes() {
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/prizes?admin_id=${ADMIN_ID}`);
+                const data = await res.json();
+                if (data.success) {
+                    return data.prizes || [];
+                }
+                return [];
+            } catch (e) {
+                console.error('Error loading admin prizes:', e);
+                return [];
+            }
+        }
+
+        async function loadPublicPrizes() {
+            try {
+                const res = await fetch(`${API_BASE}/api/prizes`);
+                const data = await res.json();
+                if (data.success) {
+                    return data.prizes || [];
+                }
+                return [];
+            } catch (e) {
+                console.error('Error loading public prizes:', e);
+                return [];
+            }
+        }
+
+        async function updatePrize(prizeId, data) {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ admin_id: ADMIN_ID, ...data })
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || 'فشل التحديث');
+                }
+                return result.success === true;
+            } catch (e) {
+                console.error('Error updating prize:', e);
+                showError('❌ فشل تحديث الجائزة: ' + e.message);
+                return false;
+            }
+        }
+
+        async function deletePrize(prizeId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ admin_id: ADMIN_ID })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'فشل الحذف');
+                }
+                return data.success === true;
+            } catch (e) {
+                console.error('Error deleting prize:', e);
+                showError('❌ فشل حذف الجائزة: ' + e.message);
+                return false;
+            }
         }
 
         async function addPrize(name, icon, description, probability, color, color2) {
             try {
-                const response = await fetch(`${API_BASE}/api/admin/prize`, {
+                const response = await fetch(`${API_BASE}/api/admin/prizes`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ admin_id: ADMIN_ID, name, icon, description, probability, color, color2 })
+                    body: JSON.stringify({
+                        admin_id: ADMIN_ID,
+                        name: name,
+                        icon: icon || '🎁',
+                        description: description || '',
+                        probability: parseFloat(probability) || 10,
+                        color: color || '#1a1a2e',
+                        color2: color2 || '#16213e'
+                    })
                 });
-                return response.ok;
-            } catch (e) { return false; }
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'فشل الإضافة');
+                }
+                return data.success === true;
+            } catch (e) {
+                console.error('Error adding prize:', e);
+                showError('❌ فشل إضافة الجائزة: ' + e.message);
+                return false;
+            }
         }
 
         async function resetPrizes() {
             try {
-                const response = await fetch(`${API_BASE}/api/admin/prizes/reset`, {
+                const res = await fetch(`${API_BASE}/api/admin/seed-prizes`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ admin_id: ADMIN_ID })
                 });
-                return response.ok;
-            } catch (e) { return false; }
+                const data = await res.json();
+                return data.success;
+            } catch (e) {
+                console.error('Error resetting prizes:', e);
+                return false;
+            }
         }
 
+        // ================================================================
+        //                      عرض لوحة الإدارة
+        // ================================================================
+        async function renderAdminPanel() {
+            const panel = document.getElementById('adminPanel');
+            const list = document.getElementById('prizesList');
+
+            if (USER_ID !== ADMIN_ID) {
+                panel.classList.remove('show');
+                return;
+            }
+
+            panel.classList.add('show');
+
+            const prizes = await loadAdminPrizes();
+            if (!prizes || prizes.length === 0) {
+                list.innerHTML = `
+                            <div style="color:#555;font-size:13px;text-align:center;padding:20px;">
+                                <div style="font-size:30px;margin-bottom:10px;">📭</div>
+                                لا توجد جوائز<br>
+                                <span style="font-size:11px;color:#444;">أضف جائزة جديدة باستخدام النموذج أدناه</span>
+                            </div>
+                        `;
+                return;
+            }
+
+            list.innerHTML = prizes.map((p, index) => `
+                        <div class="prize-item" data-id="${p.id}" data-index="${index}">
+                            <div class="prize-icon-small">${p.icon || '🎁'}</div>
+                            <div class="prize-info">
+                                <div class="name">
+                                    <input type="text" class="name-input" value="${p.name}" placeholder="اسم الجائزة">
+                                </div>
+                                <div class="desc">
+                                    <input type="text" class="desc-input" value="${p.description || ''}" placeholder="الوصف (يظهر للجمهور)">
+                                </div>
+                            </div>
+                            <div class="prize-prob">
+                                <input type="number" class="prob-input" value="${p.probability}" min="0" max="100" step="0.1">
+                                <span class="prob-label">%</span>
+                                <button class="btn-save-prob" data-id="${p.id}">💾</button>
+                            </div>
+                            <div class="prize-colors">
+                                <input type="color" class="color-input" value="${p.color || '#1a1a2e'}" data-field="color" data-id="${p.id}">
+                                <input type="color" class="color-input" value="${p.color2 || '#16213e'}" data-field="color2" data-id="${p.id}">
+                            </div>
+                            <button class="btn-delete" data-id="${p.id}">✕</button>
+                        </div>
+                    `).join('');
+
+            list.querySelectorAll('.name-input').forEach(input => {
+                input.addEventListener('change', async function() {
+                    const item = this.closest('.prize-item');
+                    const id = parseInt(item.dataset.id);
+                    const value = this.value.trim();
+                    if (!value) {
+                        showError('⚠️ الاسم مطلوب');
+                        this.value = item.querySelector('.name-input').dataset.oldValue || '';
+                        return;
+                    }
+                    const success = await updatePrize(id, { name: value });
+                    if (success) {
+                        await refreshAll();
+                        showNotification('✅ تم تحديث الاسم');
+                    } else {
+                        showError('❌ فشل تحديث الاسم');
+                        await refreshAll();
+                    }
+                });
+                input.addEventListener('focus', function() {
+                    this.dataset.oldValue = this.value;
+                });
+            });
+
+            list.querySelectorAll('.desc-input').forEach(input => {
+                input.addEventListener('change', async function() {
+                    const item = this.closest('.prize-item');
+                    const id = parseInt(item.dataset.id);
+                    const value = this.value.trim();
+                    const success = await updatePrize(id, { description: value });
+                    if (success) {
+                        await refreshAll();
+                        showNotification('✅ تم تحديث الوصف');
+                    } else {
+                        showError('❌ فشل تحديث الوصف');
+                        await refreshAll();
+                    }
+                });
+            });
+
+            list.querySelectorAll('.prob-input').forEach(input => {
+                input.addEventListener('change', async function() {
+                    const item = this.closest('.prize-item');
+                    const id = parseInt(item.dataset.id);
+                    const val = parseFloat(this.value);
+                    if (isNaN(val) || val < 0) { this.value = 0; return; }
+                    if (val > 100) { this.value = 100; }
+                    const success = await updatePrize(id, { probability: parseFloat(this.value) });
+                    if (success) {
+                        await refreshAll();
+                        showNotification('✅ تم تحديث النسبة');
+                    } else {
+                        showError('❌ فشل تحديث النسبة');
+                        await refreshAll();
+                    }
+                });
+            });
+
+            list.querySelectorAll('.btn-save-prob').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const item = this.closest('.prize-item');
+                    const id = parseInt(item.dataset.id);
+                    const input = item.querySelector('.prob-input');
+                    const val = parseFloat(input.value);
+                    if (isNaN(val) || val < 0) { input.value = 0; return; }
+                    if (val > 100) { input.value = 100; }
+                    const success = await updatePrize(id, { probability: parseFloat(input.value) });
+                    if (success) {
+                        await refreshAll();
+                        showNotification('✅ تم حفظ النسبة');
+                    } else {
+                        showError('❌ فشل حفظ النسبة');
+                        await refreshAll();
+                    }
+                });
+            });
+
+            list.querySelectorAll('.color-input').forEach(input => {
+                input.addEventListener('change', async function() {
+                    const id = parseInt(this.dataset.id);
+                    const field = this.dataset.field;
+                    const value = this.value;
+                    const updateData = {};
+                    updateData[field] = value;
+                    const success = await updatePrize(id, updateData);
+                    if (success) {
+                        await refreshAll();
+                        showNotification(`✅ تم تحديث اللون`);
+                    } else {
+                        showError('❌ فشل تحديث اللون');
+                        await refreshAll();
+                    }
+                });
+            });
+
+            list.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const id = parseInt(this.dataset.id);
+                    const item = this.closest('.prize-item');
+                    const name = item.querySelector('.name-input').value || 'هذه الجائزة';
+                    if (confirm(`⚠️ هل أنت متأكد من حذف "${name}"؟`)) {
+                        const success = await deletePrize(id);
+                        if (success) {
+                            await refreshAll();
+                            showNotification(`✅ تم حذف "${name}"`);
+                        } else {
+                            showError('❌ فشل حذف الجائزة');
+                        }
+                    }
+                });
+            });
+        }
+
+        // ================================================================
+        //                      تحميل الجوائز
+        // ================================================================
+        async function loadPrizes() {
+            try {
+                const res = await fetch(`${API_BASE}/api/prizes`);
+                const data = await res.json();
+                if (data.success && data.prizes && data.prizes.length > 0) {
+                    prizesCache = data.prizes;
+                    return data.prizes;
+                }
+                return [];
+            } catch (e) {
+                console.error('Error loading prizes:', e);
+                return [];
+            }
+        }
+
+        // ================================================================
+        //                      تحميل حالة المستخدم
+        // ================================================================
+        async function loadUserStatus() {
+            if (!USER_ID) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/wheel/history/${USER_ID}`);
+                const data = await res.json();
+                if (data.success) {
+                    const depositNotice = document.getElementById('depositNotice');
+                    const depositStatus = document.getElementById('depositStatus');
+
+                    if (data.deposit_requirement?.required) {
+                        const minAmount = data.deposit_requirement.min_amount || 0;
+                        const checkHours = data.deposit_requirement.check_hours || 24;
+                        const currentDeposits = data.deposit_requirement.current_deposits || 0;
+                        const isMet = data.deposit_requirement.is_met || false;
+
+                        document.getElementById('depositMinAmount').textContent = minAmount;
+                        document.getElementById('depositCheckHours').textContent = checkHours;
+
+                        depositNotice.classList.add('show');
+                        if (isMet) {
+                            depositStatus.innerHTML =
+                                `الحالة: <span class="met">✅ مكتمل (${currentDeposits} SYP)</span>`;
+                        } else {
+                            depositStatus.innerHTML =
+                                `الحالة: <span class="not-met">❌ غير مكتمل (${currentDeposits}/${minAmount} SYP)</span>`;
+                        }
+                    } else {
+                        depositNotice.classList.remove('show');
+                    }
+
+                    const spinBtn = document.getElementById('spinBtn');
+                    const canSpin = data.spin_status?.can_spin !== false &&
+                        (!data.deposit_requirement?.required || data.deposit_requirement?.is_met);
+
+                    if (canSpin && prizesCache.length > 0) {
+                        spinBtn.disabled = false;
+                        document.getElementById('spinBtnText').textContent = '🎰 تدوير العجلة';
+                    } else if (!data.spin_status?.can_spin) {
+                        spinBtn.disabled = true;
+                        const h = data.spin_status?.remaining_hours || 0;
+                        const m = data.spin_status?.remaining_minutes || 0;
+                        document.getElementById('spinBtnText').textContent = `⏳ ${h}h ${m}m`;
+                        soundManager.stopAll();
+                    } else if (data.deposit_requirement?.required && !data.deposit_requirement?.is_met) {
+                        spinBtn.disabled = true;
+                        document.getElementById('spinBtnText').textContent = '💰 إيداع مطلوب';
+                        soundManager.stopAll();
+                    } else {
+                        spinBtn.disabled = true;
+                        document.getElementById('spinBtnText').textContent = '⏳ جاري التحميل...';
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading user status:', e);
+            }
+        }
+
+        // ================================================================
+        //                      تحديث كل شيء
+        // ================================================================
         async function refreshAll() {
             await loadSettings();
             const prizes = await loadPrizes();
             drawWheel(prizes, -1, currentRotation);
             await loadUserStatus();
-            if (USER_ID === ADMIN_ID) renderAdminPanel();
-        }
-
-        function renderAdminPanel() {
-            if (USER_ID !== ADMIN_ID) return;
-            const panel = document.getElementById('adminPanel');
-            panel.classList.add('show');
-            const list = document.getElementById('prizesList');
-            list.innerHTML = '';
-            prizesCache.forEach(p => {
-                const item = document.createElement('div');
-                item.className = 'prize-item';
-                item.innerHTML = `
-                        <div class="prize-icon-small">${p.icon}</div>
-                        <div class="prize-info">
-                            <input type="text" class="name-input" value="${p.name}" onchange="updatePrizeField(${p.id}, 'name', this.value)">
-                            <input type="text" class="desc-input" value="${p.description || ''}" onchange="updatePrizeField(${p.id}, 'description', this.value)">
-                        </div>
-                        <div class="prize-prob">
-                            <input type="number" class="prob-input" value="${p.probability}" onchange="updatePrizeField(${p.id}, 'probability', this.value)">
-                            <span class="prob-label">%</span>
-                        </div>
-                        <button class="btn-delete" onclick="deletePrize(${p.id})">🗑️</button>
-                    `;
-                list.appendChild(item);
-            });
-        }
-
-        async function updatePrizeField(id, field, value) {
-            try {
-                await fetch(`${API_BASE}/api/admin/prize`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ admin_id: ADMIN_ID, prize_id: id, [field]: value })
-                });
-                await refreshAll();
-            } catch (e) {}
-        }
-
-        async function deletePrize(id) {
-            if (!confirm('حذف الجائزة؟')) return;
-            try {
-                await fetch(`${API_BASE}/api/admin/prize?admin_id=${ADMIN_ID}&prize_id=${id}`, { method: 'DELETE' });
-                await refreshAll();
-            } catch (e) {}
+            await renderAdminPanel();
         }
 
         // ================================================================
         //                      تأثيرات الاحتفال
         // ================================================================
-        function createWinEffects(text) {
+        function createConfetti(count = 60) {
             const container = document.getElementById('confettiContainer');
             container.innerHTML = '';
-            for (let i = 0; i < 40; i++) {
-                const c = document.createElement('div');
-                c.className = 'confetti';
-                c.style.left = Math.random() * 100 + '%';
-                c.style.backgroundColor = ['#FFD700', '#FF8C00', '#FFFFFF', '#FFD700'][Math.floor(Math.random() * 4)];
-                c.style.animationDelay = Math.random() * 2 + 's';
-                container.appendChild(c);
+            const colors = ['#FFD700', '#FF6B00', '#FF0000', '#00FF00', '#00BFFF', '#FF00FF', '#FF69B4', '#FF4500',
+                '#7CFC00'
+            ];
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti';
+                const size = 6 + Math.random() * 14;
+                el.style.width = size + 'px';
+                el.style.height = size + 'px';
+                el.style.background = colors[Math.floor(Math.random() * colors.length)];
+                el.style.left = Math.random() * 100 + '%';
+                el.style.top = Math.random() * 40 + '%';
+                el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                el.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+                el.style.animationDelay = Math.random() * 0.8 + 's';
+                container.appendChild(el);
             }
-            showNotification(`🎉 مبروك! لقد فزت بـ ${text}!`);
+            setTimeout(() => { container.innerHTML = ''; }, 3500);
+        }
+
+        function createWinEffects(prizeName) {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.classList.add('winner');
+            const name = document.getElementById('prizeName');
+            name.classList.add('win-text');
+            createConfetti(60);
+            showNotification(`🎉 مبروك! لقد فزت بـ ${prizeName}!`);
         }
 
         function clearWinEffects() {
-            document.getElementById('confettiContainer').innerHTML = '';
-            document.getElementById('resultBox').classList.remove('winner');
+            const resultBox = document.getElementById('resultBox');
+            resultBox.classList.remove('winner');
+            const name = document.getElementById('prizeName');
+            name.classList.remove('win-text');
         }
 
         function showNotification(message) {
@@ -1810,43 +2146,71 @@
             document.getElementById('notifPrizeName').textContent = message.replace('🎉 مبروك! لقد فزت بـ ', '').replace('!',
             '');
             bar.classList.add('show');
-            setTimeout(() => bar.classList.remove('show'), 4000);
+            setTimeout(() => { bar.classList.remove('show'); }, 4000);
         }
 
+        // ================================================================
+        //                      شاشة اللودينغ
+        // ================================================================
         function updateLoading(progress) {
-            document.getElementById('loaderProgressBar').style.width = progress + '%';
-            document.getElementById('loaderStatusText').textContent = progress + '%';
+            const bar = document.getElementById('loaderProgressBar');
+            const text = document.getElementById('loaderStatusText');
+            bar.style.width = progress + '%';
+            text.textContent = progress + '%';
         }
 
         function showLoading(show) {
             const screen = document.getElementById('loadingScreen');
-            const neonWrapper = document.getElementById('neonWrapper');
-            if (show) { screen.classList.add('active');
-                neonWrapper.style.display = 'none'; } else { screen.classList.remove('active');
-                neonWrapper.style.display = 'flex'; }
+            const wrapper = document.getElementById('wheelWrapper');
+            if (show) {
+                screen.classList.add('active');
+                wrapper.classList.remove('show');
+            } else {
+                screen.classList.remove('active');
+                wrapper.classList.add('show');
+            }
         }
 
+        // ================================================================
+        //                      التحقق من الاتصال
+        // ================================================================
         async function checkConnection() {
             try {
-                const res = await fetch(`${API_BASE}/api/status`);
-                return res.ok;
-            } catch (e) { return false; }
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                const response = await fetch(`${API_BASE}/api/status`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return true;
+            } catch (e) {
+                console.error('Connection failed:', e);
+                return false;
+            }
         }
 
         // ================================================================
         //                      تدوير العجلة
         // ================================================================
         async function spinWheel() {
-            if (isSpinning || !USER_ID || document.getElementById('spinBtn').disabled) return;
+            if (isSpinning || !USER_ID) return;
+            if (document.getElementById('spinBtn').disabled) return;
+            if (prizesCache.length === 0) {
+                showError('لا توجد جوائز متاحة');
+                return;
+            }
+
             isSpinning = true;
             const spinBtn = document.getElementById('spinBtn');
             spinBtn.disabled = true;
             spinBtn.classList.add('loading');
             document.getElementById('spinBtnText').textContent = 'جاري التدوير...';
+
             document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('errorMsg').classList.remove('show');
             clearWinEffects();
 
             soundManager.init();
+            soundManager.playStartSound();
             soundManager.playSpinSound();
 
             try {
@@ -1855,51 +2219,84 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: USER_ID })
                 });
+
                 const data = await response.json();
                 spinBtn.classList.remove('loading');
+
                 if (data.success) {
                     const prize = data.spin.prize;
+                    const step = (2 * Math.PI) / prizesCache.length;
+
                     const prizeIndex = prizesCache.findIndex(p => p.id === prize.id);
                     const isWin = !prize.name.includes('حظ سعيد');
-                    const targetIdx = prizeIndex === -1 ? Math.floor(Math.random() * prizesCache.length) : prizeIndex;
-                    const step = (2 * Math.PI) / prizesCache.length;
-                    const targetAngle = (targetIdx / prizesCache.length) * 2 * Math.PI;
-                    const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step / 2));
-                    animateSpin(totalRotation, spinDuration, () => {
-                        drawWheel(prizesCache, targetIdx, totalRotation);
-                        showResult(prizeIndex === -1 ? prizesCache[targetIdx] : prize, isWin);
-                    });
+
+                    if (prizeIndex === -1) {
+                        const randomIndex = Math.floor(Math.random() * prizesCache.length);
+                        const targetAngle = (randomIndex / prizesCache.length) * 2 * Math.PI;
+                        const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step /
+                            2));
+
+                        animateSpin(totalRotation, spinDuration, () => {
+                            drawWheel(prizesCache, randomIndex, totalRotation);
+                            showResult(prizesCache[randomIndex], isWin);
+                        });
+                    } else {
+                        const targetAngle = (prizeIndex / prizesCache.length) * 2 * Math.PI;
+                        const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step /
+                            2));
+
+                        animateSpin(totalRotation, spinDuration, () => {
+                            drawWheel(prizesCache, prizeIndex, totalRotation);
+                            showResult(prize, isWin);
+                        });
+                    }
+
                 } else {
                     showError(data.error || 'حدث خطأ');
                     if (data.remaining_hours !== undefined) {
-                        spinBtn.disabled = true;
+                        const btn = document.getElementById('spinBtn');
+                        btn.disabled = true;
                         document.getElementById('spinBtnText').textContent = `⏳ ${data.remaining_hours}h ${data.remaining_minutes}m`;
                         soundManager.stopAll();
                     }
                     drawWheel(prizesCache, -1, currentRotation);
                 }
+
             } catch (e) {
                 spinBtn.classList.remove('loading');
                 showError('خطأ في الاتصال: ' + e.message);
                 drawWheel(prizesCache, -1, currentRotation);
                 soundManager.stopAll();
             }
+
             isSpinning = false;
+            if (!document.getElementById('spinBtn').disabled) {
+                document.getElementById('spinBtnText').textContent = '🎰 تدوير العجلة';
+            }
         }
 
+        // ================================================================
+        //                      عرض النتيجة
+        // ================================================================
         function showResult(prize, isWin) {
             document.getElementById('prizeDesc').textContent = prize.description || prize.name || 'جائزة!';
             document.getElementById('resultBox').classList.add('show');
+
+            soundManager.stopAll();
+
             if (isWin) {
-                document.getElementById('resultBox').classList.add('winner');
                 createWinEffects(prize.description || prize.name);
                 soundManager.playWinSound();
             } else {
                 soundManager.playLoseSound();
             }
+
             loadUserStatus();
         }
 
+        // ================================================================
+        //                      عرض الخطأ
+        // ================================================================
         function showError(msg) {
             const el = document.getElementById('errorMsg');
             document.getElementById('errorText').textContent = '❌ ' + msg;
@@ -1908,120 +2305,185 @@
         }
 
         // ================================================================
-        //                      زر البدء مع الصوت الترحيبي
+        //                      أحداث الإدارة
         // ================================================================
-        function setupStartButton() {
-            const startBtn = document.getElementById('startBtn');
-            startBtn.onclick = () => {
+        document.querySelectorAll('.btn-save').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const key = this.dataset.setting;
+                const fieldId = this.dataset.field;
+                const type = this.dataset.type || 'text';
+                let value = '';
+                if (type === 'checkbox') {
+                    value = document.getElementById(fieldId).checked;
+                } else {
+                    value = document.getElementById(fieldId).value;
+                }
+                const originalText = this.textContent;
+                this.textContent = '⏳ جاري...';
+                this.disabled = true;
+                const success = await saveSetting(key, value);
+                if (success) {
+                    this.textContent = '✅ تم الحفظ';
+                    this.classList.add('saved');
+                    await refreshAll();
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.classList.remove('saved');
+                        this.disabled = false;
+                    }, 2000);
+                } else {
+                    this.textContent = '❌ فشل';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.disabled = false;
+                    }, 2000);
+                }
+            });
+        });
+
+        document.getElementById('addPrizeBtn').addEventListener('click', async function() {
+            const nameInput = document.getElementById('newPrizeName');
+            const iconInput = document.getElementById('newPrizeIcon');
+            const descInput = document.getElementById('newPrizeDesc');
+            const probInput = document.getElementById('newPrizeProb');
+            const colorInput = document.getElementById('newPrizeColor');
+            const color2Input = document.getElementById('newPrizeColor2');
+
+            const name = nameInput.value.trim();
+            const icon = iconInput.value.trim() || '🎁';
+            const description = descInput.value.trim() || '';
+            const prob = parseFloat(probInput.value) || 10;
+            const color = colorInput.value || '#1a1a2e';
+            const color2 = color2Input.value || '#16213e';
+
+            if (!name) {
+                showError('⚠️ الرجاء إدخال اسم الجائزة');
+                nameInput.focus();
+                return;
+            }
+            if (prob < 0 || prob > 100) {
+                showError('⚠️ النسبة يجب أن تكون بين 0 و 100');
+                probInput.focus();
+                return;
+            }
+
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = '⏳';
+
+            const success = await addPrize(name, icon, description, prob, color, color2);
+            if (success) {
+                nameInput.value = '';
+                iconInput.value = '';
+                descInput.value = '';
+                probInput.value = '';
+                await refreshAll();
+                showNotification(`✅ تم إضافة "${name}" بنجاح`);
+            } else {
+                showError('❌ فشل إضافة الجائزة');
+            }
+            btn.disabled = false;
+            btn.textContent = '➕';
+        });
+
+        document.getElementById('refreshPrizesBtn').addEventListener('click', async function() {
+            await refreshAll();
+            showNotification('🔄 تم تحديث الكل');
+        });
+
+        document.getElementById('resetPrizesBtn').addEventListener('click', async function() {
+            if (confirm('⚠️ هل أنت متأكد من إعادة تعيين جميع الجوائز إلى الإعدادات الافتراضية؟')) {
+                const success = await resetPrizes();
+                if (success) {
+                    await refreshAll();
+                    showNotification('✅ تم إعادة تعيين الجوائز');
+                } else {
+                    showError('❌ فشل إعادة التعيين');
+                }
+            }
+        });
+
+        document.getElementById('soundToggle').addEventListener('change', function() {
+            soundEnabled = this.checked;
+            if (!soundEnabled) {
+                soundManager.stopAll();
+            } else {
                 soundManager.init();
-                soundManager.playStartAudio(startAudioUrl);
-                soundManager.playBackgroundMusic();
-                startBtn.style.display = 'none';
-                showLoading(false);
-            };
-        }
+            }
+        });
 
         // ================================================================
         //                      التهيئة
         // ================================================================
         async function init() {
             USER_ID = getUserId();
-            if (!USER_ID) { document.getElementById('errorContainer').classList.add('show'); return; }
+
+            if (!USER_ID) {
+                document.getElementById('errorContainer').classList.add('show');
+                document.getElementById('userStatus').style.display = 'none';
+                return;
+            }
 
             showLoading(true);
             updateLoading(0);
 
-            const isConnected = await checkConnection();
-            if (!isConnected) { showLoading(false);
-                showError('⚠️ فشل الاتصال بالخادم'); return; }
+            try {
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 12;
+                    if (progress > 85) progress = 85;
+                    updateLoading(Math.round(progress));
+                }, 150);
 
-            updateLoading(30);
-            await loadSettings();
-            updateLoading(50);
-            const prizes = await loadPrizes();
-            updateLoading(70);
-            drawWheel(prizes, -1, 0);
-            updateLoading(85);
-            await loadUserStatus();
-            updateLoading(100);
-
-            setTimeout(() => {
-                const startBtn = document.getElementById('startBtn');
-                if (startAudioUrl) {
-                    startBtn.style.display = 'block';
-                } else {
+                const isConnected = await checkConnection();
+                if (!isConnected) {
+                    clearInterval(interval);
+                    updateLoading(100);
+                    await new Promise(r => setTimeout(r, 400));
                     showLoading(false);
-                    if (USER_ID === ADMIN_ID) renderAdminPanel();
-                    soundManager.init();
-                    soundManager.playBackgroundMusic();
+                    showError('⚠️ لا يمكن الاتصال بالخادم. تأكد من اتصالك بالإنترنت.');
+                    return;
                 }
-            }, 500);
+
+                updateLoading(30);
+                await new Promise(r => setTimeout(r, 300));
+
+                await loadSettings();
+                updateLoading(50);
+                await new Promise(r => setTimeout(r, 300));
+
+                const prizes = await loadPrizes();
+                drawWheel(prizes, -1, 0);
+                updateLoading(70);
+                await new Promise(r => setTimeout(r, 300));
+
+                await loadUserStatus();
+                updateLoading(85);
+                await new Promise(r => setTimeout(r, 300));
+
+                await renderAdminPanel();
+                updateLoading(95);
+                await new Promise(r => setTimeout(r, 300));
+
+                clearInterval(interval);
+                updateLoading(100);
+                await new Promise(r => setTimeout(r, 500));
+
+                soundManager.init();
+
+            } catch (e) {
+                console.error('Init error:', e);
+                updateLoading(100);
+                await new Promise(r => setTimeout(r, 600));
+                showError('⚠️ فشل تحميل البيانات: ' + e.message);
+            }
+
+            showLoading(false);
+            document.getElementById('spinBtn').onclick = spinWheel;
         }
 
-        // ================================================================
-        //                      أحداث
-        // ================================================================
-        document.getElementById('spinBtn').onclick = spinWheel;
-
-        document.getElementById('soundToggle').onchange = (e) => {
-            soundEnabled = e.target.checked;
-            if (!soundEnabled) soundManager.stopAll();
-            else { soundManager.init();
-                soundManager.playBackgroundMusic(); }
-        };
-
-        document.getElementById('musicToggle').onchange = (e) => {
-            musicEnabled = e.target.checked;
-            if (!musicEnabled) soundManager.stopBackgroundMusic();
-            else { soundManager.init();
-                soundManager.playBackgroundMusic(); }
-        };
-
-        document.querySelectorAll('.btn-save').forEach(btn => {
-            btn.onclick = async function() {
-                const key = this.dataset.setting;
-                const fieldId = this.dataset.field;
-                const val = this.dataset.type === 'checkbox' ? document.getElementById(fieldId).checked :
-                    document.getElementById(fieldId).value;
-                const oldText = this.textContent;
-                this.textContent = '⏳';
-                if (await saveSetting(key, val)) {
-                    this.textContent = '✅';
-                    await refreshAll();
-                    setTimeout(() => this.textContent = oldText, 2000);
-                } else {
-                    this.textContent = '❌';
-                    setTimeout(() => this.textContent = oldText, 2000);
-                }
-            };
-        });
-
-        document.getElementById('addPrizeBtn').onclick = async function() {
-            const name = document.getElementById('newPrizeName').value;
-            if (!name) return;
-            if (await addPrize(
-                    name,
-                    document.getElementById('newPrizeIcon').value,
-                    document.getElementById('newPrizeDesc').value,
-                    document.getElementById('newPrizeProb').value,
-                    document.getElementById('newPrizeColor').value,
-                    document.getElementById('newPrizeColor2').value
-                )) {
-                await refreshAll();
-                showNotification('✅ تم الإضافة');
-            }
-        };
-
-        document.getElementById('refreshPrizesBtn').onclick = () => refreshAll();
-        document.getElementById('resetPrizesBtn').onclick = async () => {
-            if (confirm('إعادة تعيين؟')) {
-                await resetPrizes();
-                await refreshAll();
-            }
-        };
-
-        setupStartButton();
         document.addEventListener('DOMContentLoaded', init);
     </script>
+
 </body>
 </html>

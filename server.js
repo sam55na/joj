@@ -753,7 +753,7 @@ app.post('/api/wheel/spin', async (req, res) => {
             });
         }
 
-        // 2. التحقق من شرط الإيداع - استخدام external_deposits بدلاً من wheel_deposits
+        // 2. التحقق من شرط الإيداع
         const depositRequired = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['deposit_required']
@@ -777,7 +777,6 @@ app.post('/api/wheel/spin', async (req, res) => {
 
             console.log(`💰 Min amount: ${minAmountValue}, Check hours: ${checkHoursValue}`);
 
-            // ✅ استخدام external_deposits بدلاً من wheel_deposits
             const userDeposits = await pool.query(`
                 SELECT COALESCE(SUM(final_amount), 0) as total
                 FROM external_deposits
@@ -788,7 +787,7 @@ app.post('/api/wheel/spin', async (req, res) => {
 
             const totalDeposits = parseFloat(userDeposits.rows[0]?.total || 0);
 
-            console.log(`💰 User ${user_id} deposits from external_deposits: ${totalDeposits}`);
+            console.log(`💰 User ${user_id} deposits: ${totalDeposits}`);
 
             if (totalDeposits < minAmountValue) {
                 releaseLock(user_id);
@@ -863,10 +862,10 @@ app.post('/api/wheel/spin', async (req, res) => {
             random -= parseFloat(prize.probability);
         }
 
-        // 5. تسجيل التدوير
+        // 5. تسجيل التدوير في قاعدة البيانات
         const result = await pool.query(`
-            INSERT INTO wheel_spins (user_id, prize_id, prize_name)
-            VALUES ($1, $2, $3)
+            INSERT INTO wheel_spins (user_id, prize_id, prize_name, is_claimed)
+            VALUES ($1, $2, $3, FALSE)
             RETURNING id, spin_date
         `, [user_id, selectedPrize.id, selectedPrize.name]);
 
@@ -878,6 +877,8 @@ app.post('/api/wheel/spin', async (req, res) => {
             FROM wheel_spins 
             WHERE user_id = $1
         `, [user_id]);
+
+        console.log(`✅ Spin recorded: User ${user_id} won ${selectedPrize.name} (Spin ID: ${result.rows[0].id})`);
 
         res.json({
             success: true,
@@ -893,7 +894,7 @@ app.post('/api/wheel/spin', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Spin error:', error);
+        console.error('❌ Spin error:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -947,7 +948,6 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             const minAmountValue = parseFloat(minAmount.rows[0]?.setting_value || 1000);
             const checkHoursValue = parseInt(checkHours.rows[0]?.setting_value || 24);
 
-            // ✅ استخدام external_deposits بدلاً من wheel_deposits
             const userDeposits = await pool.query(`
                 SELECT COALESCE(SUM(final_amount), 0) as total
                 FROM external_deposits
@@ -1018,7 +1018,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
     }
 });
 
-// -------------------- تسجيل إيداع (اختياري - قد لا تحتاجه) --------------------
+// -------------------- تسجيل إيداع --------------------
 app.post('/api/wheel/deposit', async (req, res) => {
     const { user_id, amount, source } = req.body;
 
@@ -1037,13 +1037,12 @@ app.post('/api/wheel/deposit', async (req, res) => {
     }
 
     try {
-        // ✅ استخدام external_deposits بدلاً من wheel_deposits
         await pool.query(`
             INSERT INTO external_deposits (user_id, amount_sent, final_amount, method_name, status, notes)
             VALUES ($1, $2, $3, 'يدوي', 'completed', $4)
         `, [user_id, amount, amount, source || 'wheel_deposit']);
 
-        console.log(`💰 Deposit recorded in external_deposits: ${user_id} - ${amount} SYP`);
+        console.log(`💰 Deposit recorded: ${user_id} - ${amount} SYP`);
 
         res.json({
             success: true,

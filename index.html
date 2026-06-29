@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>🎡 عجلة الحظ</title>
-    <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js">
     </script>
     <style>
-        /* ===== إعادة ضبط ===== */
         * {
             margin: 0;
             padding: 0;
@@ -32,7 +30,6 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        /* خلفية ثابتة */
         .bg-image-fixed {
             position: fixed;
             top: 0;
@@ -59,7 +56,6 @@
             }
         }
 
-        /* ===== النص العلوي ===== */
         .banner-text {
             text-align: center;
             padding: 10px 12px;
@@ -84,12 +80,10 @@
             z-index: 1;
         }
 
-        /* ===== حالة المستخدم (مخفية) ===== */
         .user-status {
             display: none;
         }
 
-        /* ===== العجلة ===== */
         .wheel-wrapper {
             position: relative;
             width: 100%;
@@ -104,7 +98,6 @@
             animation: fadeIn 0.5s ease;
         }
 
-        /* ===== العجلة الرئيسية ===== */
         #wheelCanvas {
             width: 100% !important;
             height: 100% !important;
@@ -120,13 +113,12 @@
             filter: brightness(1.15) drop-shadow(0 0 50px rgba(255, 215, 0, 0.12));
         }
 
-        /* ===== طبقة النيون ===== */
         .neon-layer {
             position: absolute;
-            top: -10px;
-            left: -10px;
-            width: calc(100% + 20px);
-            height: calc(100% + 20px);
+            top: -14px;
+            left: -14px;
+            width: calc(100% + 28px);
+            height: calc(100% + 28px);
             border-radius: 50%;
             z-index: 2;
             pointer-events: none;
@@ -142,13 +134,12 @@
             left: 0;
         }
 
-        /* ===== طبقة الأمواج النيونية ===== */
         .wave-layer {
             position: absolute;
-            top: -30px;
-            left: -30px;
-            width: calc(100% + 60px);
-            height: calc(100% + 60px);
+            top: -40px;
+            left: -40px;
+            width: calc(100% + 80px);
+            height: calc(100% + 80px);
             border-radius: 50%;
             z-index: 1;
             pointer-events: none;
@@ -195,7 +186,6 @@
             }
         }
 
-        /* ===== لا توجد جوائز ===== */
         .no-prizes {
             display: none;
             text-align: center;
@@ -210,7 +200,6 @@
             z-index: 1;
         }
 
-        /* ===== الأزرار ===== */
         .actions {
             display: flex;
             flex-direction: column;
@@ -272,7 +261,6 @@
             }
         }
 
-        /* ===== شرط الإيداع ===== */
         .deposit-notice {
             background: rgba(18, 18, 18, 0.85);
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -312,7 +300,6 @@
             color: #FF4444;
         }
 
-        /* ===== النتيجة ===== */
         .result-box {
             background: rgba(18, 18, 18, 0.85);
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -415,7 +402,6 @@
             }
         }
 
-        /* ===== رسائل الخطأ ===== */
         .error-msg {
             background: rgba(18, 18, 18, 0.85);
             border: 1px solid rgba(255, 0, 0, 0.06);
@@ -439,7 +425,6 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* ===== شاشة اللودينغ ===== */
         .loading-screen {
             display: none;
             position: fixed;
@@ -509,7 +494,6 @@
             letter-spacing: 1px;
         }
 
-        /* ===== إعدادات الصوت ===== */
         .sound-settings {
             display: flex;
             justify-content: center;
@@ -546,7 +530,6 @@
             font-size: 14px;
         }
 
-        /* ===== لوحة الإدارة ===== */
         .admin-panel {
             display: none;
             background: rgba(18, 18, 18, 0.85);
@@ -857,7 +840,6 @@
             color: #00FF88;
         }
 
-        /* ===== خطأ أولي ===== */
         .error-container {
             display: none;
             text-align: center;
@@ -909,7 +891,6 @@
             box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
         }
 
-        /* ===== إشعار منبثق ===== */
         .notification-bar {
             display: none;
             position: fixed;
@@ -942,7 +923,6 @@
             }
         }
 
-        /* ===== تجاوب ===== */
         @media (max-width: 480px) {
             .banner-text {
                 font-size: 17px;
@@ -1023,23 +1003,18 @@
 </head>
 <body>
 
-    <!-- ===== خلفية ===== -->
     <div class="bg-image-fixed">
         <img id="bgImage" src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80" alt="Background">
     </div>
 
-    <!-- ===== إشعار ===== -->
     <div class="notification-bar" id="notificationBar">
         🎉 مبروك! لقد فزت بـ <span id="notifPrizeName">جائزة</span>!
     </div>
 
-    <!-- ===== النص العلوي ===== -->
     <div class="banner-text" id="bannerText">🎡 IChancy · عجلة الحظ</div>
 
-    <!-- ===== حالة المستخدم ===== -->
     <div class="user-status" id="userStatus"></div>
 
-    <!-- ===== خطأ ===== -->
     <div class="error-container" id="errorContainer">
         <div class="error-icon">⚠️</div>
         <div class="error-title">يجب الدخول من البوت</div>
@@ -1050,7 +1025,6 @@
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
 
-    <!-- ===== شاشة لودينغ ===== -->
     <div class="loading-screen" id="loadingScreen">
         <img class="loading-image" id="loadingImage" src="https://via.placeholder.com/200/1a1a2e/FFD700?text=🎡" alt="Loading">
         <div class="progress-container">
@@ -1061,28 +1035,22 @@
         </div>
     </div>
 
-    <!-- ===== العجلة ===== -->
     <div class="wheel-wrapper" id="wheelWrapper">
-        <!-- طبقة الأمواج النيونية -->
         <div class="wave-layer" id="waveLayer">
             <canvas id="waveCanvas" width="500" height="500"></canvas>
         </div>
-        <!-- طبقة النيون -->
         <div class="neon-layer" id="neonLayer">
             <canvas id="neonCanvas" width="500" height="500"></canvas>
         </div>
-        <!-- العجلة الرئيسية -->
         <canvas id="wheelCanvas" width="500" height="500"></canvas>
         <div class="pointer" id="pointer">🔽</div>
     </div>
 
-    <!-- ===== لا توجد جوائز ===== -->
     <div class="no-prizes" id="noPrizes">
         <div style="font-size:28px;">⚠️</div>
         <div style="margin-top:6px;">لا توجد جوائز متاحة</div>
     </div>
 
-    <!-- ===== أزرار ===== -->
     <div class="actions">
         <button class="btn btn-spin" id="spinBtn" disabled>
             <span class="spinner-small"></span>
@@ -1090,7 +1058,6 @@
         </button>
     </div>
 
-    <!-- ===== شرط الإيداع ===== -->
     <div class="deposit-notice" id="depositNotice">
         <div class="notice-text">
             💰 مطلوب إيداع <span class="amount" id="depositMinAmount">0</span> SYP
@@ -1101,7 +1068,6 @@
         </div>
     </div>
 
-    <!-- ===== النتيجة ===== -->
     <div class="result-box" id="resultBox">
         <div class="confetti-container" id="confettiContainer"></div>
         <div class="prize-icon" id="prizeIcon">🎁</div>
@@ -1109,7 +1075,6 @@
         <div class="prize-desc" id="prizeDesc"></div>
     </div>
 
-    <!-- ===== إعدادات الصوت ===== -->
     <div class="sound-settings">
         <label>
             <span class="sound-indicator">🔊</span>
@@ -1117,7 +1082,6 @@
         </label>
     </div>
 
-    <!-- ===== لوحة الإدارة ===== -->
     <div class="admin-panel" id="adminPanel">
         <div class="panel-title">
             ⚙️ لوحة الإدارة
@@ -1198,15 +1162,11 @@
         </div>
     </div>
 
-    <!-- ===== خطأ ===== -->
     <div class="error-msg" id="errorMsg">
         <span id="errorText"></span>
     </div>
 
     <script>
-        // ================================================================
-        //                      الإعدادات الأساسية
-        // ================================================================
         const API_BASE = 'https://joj-d0kl.onrender.com';
         const ADMIN_ID = 7011476249;
         let USER_ID = null;
@@ -1218,7 +1178,7 @@
         let spinDuration = 3500;
 
         // ================================================================
-        //                      نظام الصوت (بدون موسيقى خلفية)
+        //                      نظام الصوت
         // ================================================================
         class SoundManager {
             constructor() {
@@ -1402,13 +1362,13 @@
         }
 
         // ================================================================
-        //                      رسم شريط النيون والأمواج
+        //                      رسم شريط النيون العريض والأمواج
         // ================================================================
 
         let neonAngle = 0;
         let waveAngle = 0;
 
-        // ---- شريط النيون الدائري ----
+        // ---- شريط النيون العريض ----
         function drawNeon() {
             const canvas = document.getElementById('neonCanvas');
             if (!canvas) return;
@@ -1423,101 +1383,102 @@
 
             neonAngle -= 0.002;
 
-            // الشريط الرئيسي - خط نيون سميك
-            const grad1 = ctx.createRadialGradient(cx - r * 0.1, cy - r * 0.1, 0, cx, cy, r + 8);
-            grad1.addColorStop(0, 'rgba(255, 215, 0, 0.03)');
-            grad1.addColorStop(0.3, 'rgba(255, 215, 0, 0.08)');
-            grad1.addColorStop(0.7, 'rgba(255, 215, 0, 0.15)');
-            grad1.addColorStop(0.85, 'rgba(255, 215, 0, 0.3)');
-            grad1.addColorStop(0.92, 'rgba(255, 215, 0, 0.6)');
-            grad1.addColorStop(0.97, 'rgba(255, 215, 0, 0.8)');
+            // الشريط الرئيسي العريض
+            const grad1 = ctx.createRadialGradient(cx - r * 0.1, cy - r * 0.1, 0, cx, cy, r + 10);
+            grad1.addColorStop(0, 'rgba(255, 215, 0, 0.02)');
+            grad1.addColorStop(0.2, 'rgba(255, 215, 0, 0.05)');
+            grad1.addColorStop(0.5, 'rgba(255, 215, 0, 0.12)');
+            grad1.addColorStop(0.7, 'rgba(255, 215, 0, 0.25)');
+            grad1.addColorStop(0.85, 'rgba(255, 215, 0, 0.5)');
+            grad1.addColorStop(0.93, 'rgba(255, 215, 0, 0.8)');
+            grad1.addColorStop(0.97, 'rgba(255, 215, 0, 0.9)');
             grad1.addColorStop(1, 'rgba(255, 215, 0, 0)');
 
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, 2 * Math.PI);
             ctx.strokeStyle = grad1;
-            ctx.lineWidth = 6;
+            ctx.lineWidth = 10;
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.4)';
+            ctx.shadowBlur = 40;
+            ctx.stroke();
+
+            // شريط داخلي أرق
+            ctx.beginPath();
+            ctx.arc(cx, cy, r - 3, 0, 2 * Math.PI);
+            ctx.strokeStyle = `rgba(255, 255, 220, ${0.2 + Math.sin(neonAngle * 2) * 0.08})`;
+            ctx.lineWidth = 2;
             ctx.shadowColor = 'rgba(255, 215, 0, 0.3)';
+            ctx.shadowBlur = 20;
+            ctx.stroke();
+
+            // شريط خارجي
+            ctx.beginPath();
+            ctx.arc(cx, cy, r + 4, 0, 2 * Math.PI);
+            ctx.strokeStyle = `rgba(255, 215, 0, ${0.1 + Math.sin(neonAngle * 1.5 + 1) * 0.06})`;
+            ctx.lineWidth = 1.5;
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.2)';
             ctx.shadowBlur = 30;
             ctx.stroke();
 
-            // الشريط الداخلي - أرق
+            // شريط توهج خارجي
             ctx.beginPath();
-            ctx.arc(cx, cy, r - 2, 0, 2 * Math.PI);
-            ctx.strokeStyle = `rgba(255, 255, 200, ${0.15 + Math.sin(neonAngle * 2) * 0.05})`;
-            ctx.lineWidth = 1.5;
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.2)';
-            ctx.shadowBlur = 15;
+            ctx.arc(cx, cy, r + 8, 0, 2 * Math.PI);
+            ctx.strokeStyle = `rgba(255, 215, 0, ${0.04 + Math.sin(neonAngle * 0.7) * 0.02})`;
+            ctx.lineWidth = 4;
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.1)';
+            ctx.shadowBlur = 60;
             ctx.stroke();
+            ctx.shadowBlur = 0;
 
-            // الشريط الخارجي - أرق مع توهج
-            ctx.beginPath();
-            ctx.arc(cx, cy, r + 3, 0, 2 * Math.PI);
-            ctx.strokeStyle = `rgba(255, 215, 0, ${0.08 + Math.sin(neonAngle * 1.5 + 1) * 0.04})`;
-            ctx.lineWidth = 1;
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.15)';
-            ctx.shadowBlur = 25;
-            ctx.stroke();
-
-            // خطوط متقطعة نيونية على الشريط (تأثير نبض)
-            const numDash = 12;
+            // خطوط متقطعة على الشريط
+            const numDash = 16;
             for (let i = 0; i < numDash; i++) {
-                const angle = (i / numDash) * 2 * Math.PI + neonAngle * 0.5;
-                const len = 12 + Math.sin(angle * 3 + neonAngle * 2) * 5;
-                const startR = r - 2;
-                const endR = r + 2;
+                const angle = (i / numDash) * 2 * Math.PI + neonAngle * 0.6;
+                const len = 14 + Math.sin(angle * 3 + neonAngle * 2) * 6;
+                const startR = r - 3;
+                const endR = r + 3;
 
                 const x1 = cx + Math.cos(angle) * startR;
                 const y1 = cy + Math.sin(angle) * startR;
                 const x2 = cx + Math.cos(angle) * endR;
                 const y2 = cy + Math.sin(angle) * endR;
 
-                const alpha = 0.15 + Math.sin(angle * 2 + neonAngle * 1.5) * 0.1 + 0.1;
+                const alpha = 0.2 + Math.sin(angle * 2 + neonAngle * 1.5) * 0.15 + 0.15;
 
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
                 ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`;
-                ctx.lineWidth = 1.2;
-                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.3})`;
-                ctx.shadowBlur = 10;
+                ctx.lineWidth = 1.5;
+                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.4})`;
+                ctx.shadowBlur = 12;
                 ctx.stroke();
                 ctx.shadowBlur = 0;
             }
 
-            // نقاط ضوئية صغيرة على الشريط
-            const numDots = 20;
+            // نقاط ضوئية متحركة على الشريط
+            const numDots = 24;
             for (let i = 0; i < numDots; i++) {
-                const angle = (i / numDots) * 2 * Math.PI + neonAngle * 0.8;
-                const dotR = r + Math.sin(angle * 2 + neonAngle * 1.2) * 1.5;
+                const angle = (i / numDots) * 2 * Math.PI + neonAngle * 0.9;
+                const dotR = r + Math.sin(angle * 2 + neonAngle * 1.2) * 2;
                 const x = cx + Math.cos(angle) * dotR;
                 const y = cy + Math.sin(angle) * dotR;
-                const size = 1.5 + Math.sin(angle * 3 + neonAngle * 2) * 0.8 + 0.8;
-                const alpha = 0.2 + Math.sin(angle * 2 + neonAngle * 1.5) * 0.15 + 0.15;
+                const size = 2 + Math.sin(angle * 3 + neonAngle * 2) * 1 + 1;
+                const alpha = 0.25 + Math.sin(angle * 2 + neonAngle * 1.5) * 0.2 + 0.2;
 
                 ctx.beginPath();
                 ctx.arc(x, y, size, 0, 2 * Math.PI);
-                ctx.fillStyle = `rgba(255, 255, 220, ${alpha})`;
-                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.4})`;
-                ctx.shadowBlur = 15;
+                ctx.fillStyle = `rgba(255, 255, 230, ${alpha})`;
+                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.5})`;
+                ctx.shadowBlur = 20;
                 ctx.fill();
                 ctx.shadowBlur = 0;
             }
 
-            // شريط توهج خارجي خفيف جداً
-            ctx.beginPath();
-            ctx.arc(cx, cy, r + 6, 0, 2 * Math.PI);
-            ctx.strokeStyle = `rgba(255, 215, 0, ${0.03 + Math.sin(neonAngle * 0.8) * 0.015})`;
-            ctx.lineWidth = 3;
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.1)';
-            ctx.shadowBlur = 50;
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-
             requestAnimationFrame(drawNeon);
         }
 
-        // ---- الأمواج النيونية (خطوط رفيعة تخرج من الشريط) ----
+        // ---- الأمواج كخيوط رفيعة تظهر وتتلاشى ----
         function drawWaves() {
             const canvas = document.getElementById('waveCanvas');
             if (!canvas) return;
@@ -1530,24 +1491,30 @@
 
             ctx.clearRect(0, 0, w, h);
 
-            waveAngle += 0.003;
+            waveAngle += 0.002;
 
-            // 3 طبقات من الأمواج
+            // 4 طبقات من الخيوط الرفيعة
             const layers = [
-                { count: 40, speed: 1.2, amplitude: 10, width: 1.5, alpha: 0.15, offset: 0 },
-                { count: 30, speed: 0.8, amplitude: 18, width: 1, alpha: 0.1, offset: 1.5 },
-                { count: 20, speed: 0.5, amplitude: 28, width: 0.7, alpha: 0.06, offset: 3 }
+                { count: 50, speed: 1.0, maxLen: 22, width: 0.8, alpha: 0.2, offset: 0, fadeSpeed: 0.6 },
+                { count: 40, speed: 0.7, maxLen: 35, width: 0.6, alpha: 0.15, offset: 1.8, fadeSpeed: 0.5 },
+                { count: 30, speed: 0.45, maxLen: 50, width: 0.5, alpha: 0.1, offset: 3.2, fadeSpeed: 0.4 },
+                { count: 20, speed: 0.3, maxLen: 70, width: 0.4, alpha: 0.07, offset: 4.5, fadeSpeed: 0.3 }
             ];
 
             layers.forEach((layer) => {
                 const numLines = layer.count;
                 for (let i = 0; i < numLines; i++) {
-                    const angle = (i / numLines) * 2 * Math.PI + waveAngle * layer.speed + layer.offset;
-                    // تموج في الطول والاتجاه
-                    const wavePulse = Math.sin(angle * 3 + waveAngle * layer.speed * 1.2 + layer.offset) * 0.5 + 0.5;
-                    const length = layer.amplitude * (0.3 + wavePulse * 0.7);
+                    const baseAngle = (i / numLines) * 2 * Math.PI;
+                    // كل خيط له زاوية خاصة به مع تموج بسيط
+                    const angle = baseAngle + waveAngle * layer.speed + layer.offset +
+                        Math.sin(baseAngle * 2 + waveAngle * 0.5) * 0.08;
 
-                    const startR = baseR + 4 + Math.sin(angle * 2 + waveAngle * 0.5) * 2;
+                    // حساب الطول الحالي للخيط (يتغير مع الزمن ليظهر ويختفي)
+                    const timeFactor = Math.sin(baseAngle * 1.5 + waveAngle * layer.fadeSpeed + layer.offset) * 0.5 + 0.5;
+                    const length = layer.maxLen * (0.05 + timeFactor * 0.95);
+
+                    // نقطة البداية على الشريط
+                    const startR = baseR + 4 + Math.sin(baseAngle * 2 + waveAngle * 0.4) * 2;
                     const endR = startR + length;
 
                     const x1 = cx + Math.cos(angle) * startR;
@@ -1555,34 +1522,39 @@
                     const x2 = cx + Math.cos(angle) * endR;
                     const y2 = cy + Math.sin(angle) * endR;
 
-                    // شفافية متغيرة مع الزمن والزاوية
-                    const alpha = layer.alpha * (0.3 + Math.sin(angle * 2 + waveAngle * layer.speed * 0.7) * 0.3 + 0.4);
+                    // شفافية الخيط (تتلاشى مع الطول)
+                    const fadeOut = 1 - (length / layer.maxLen) * 0.6;
+                    const alphaPulse = Math.sin(baseAngle * 1.2 + waveAngle * layer.fadeSpeed + layer.offset) * 0.3 + 0.7;
+                    const alpha = layer.alpha * fadeOut * (0.3 + alphaPulse * 0.7);
 
-                    // توهج نيوني
+                    // تدرج نيوني على طول الخيط
                     const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-                    grad.addColorStop(0, `rgba(255, 215, 0, ${alpha * 0.8})`);
+                    grad.addColorStop(0, `rgba(255, 215, 0, ${alpha * 0.9})`);
                     grad.addColorStop(0.3, `rgba(255, 215, 0, ${alpha})`);
-                    grad.addColorStop(0.7, `rgba(255, 200, 50, ${alpha * 0.7})`);
-                    grad.addColorStop(1, `rgba(255, 200, 50, 0)`);
+                    grad.addColorStop(0.6, `rgba(255, 200, 50, ${alpha * 0.6})`);
+                    grad.addColorStop(0.85, `rgba(255, 180, 0, ${alpha * 0.3})`);
+                    grad.addColorStop(1, `rgba(255, 180, 0, 0)`);
 
                     ctx.beginPath();
                     ctx.moveTo(x1, y1);
                     ctx.lineTo(x2, y2);
                     ctx.strokeStyle = grad;
-                    ctx.lineWidth = layer.width + Math.sin(angle * 2 + waveAngle * 1.5) * 0.3;
-                    ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.3})`;
-                    ctx.shadowBlur = 8 + layer.width * 2;
+                    ctx.lineWidth = layer.width + Math.sin(baseAngle * 2 + waveAngle * 1.2) * 0.2;
+                    ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.4})`;
+                    ctx.shadowBlur = 10 + layer.width * 3;
                     ctx.stroke();
                     ctx.shadowBlur = 0;
                 }
             });
 
-            // أمواج عشوائية إضافية (تأثير ارتداد)
-            for (let i = 0; i < 12; i++) {
-                const angle = (i / 12) * 2 * Math.PI + waveAngle * 0.7 + Math.sin(waveAngle * 0.3) * 0.5;
-                const pulse = Math.sin(waveAngle * 0.8 + i * 1.2) * 0.5 + 0.5;
-                const length = 15 + pulse * 20;
-                const startR = baseR + 2 + Math.sin(angle * 3 + waveAngle * 0.6) * 3;
+            // خيوط إضافية عشوائية (تأثير ارتداد)
+            for (let i = 0; i < 15; i++) {
+                const baseAngle = Math.random() * 2 * Math.PI;
+                const angle = baseAngle + waveAngle * 0.5 + Math.sin(waveAngle * 0.3 + i) * 0.3;
+                const pulse = Math.sin(waveAngle * 0.6 + i * 1.3) * 0.5 + 0.5;
+                const length = 10 + pulse * 50;
+
+                const startR = baseR + 2 + Math.sin(baseAngle * 2 + waveAngle * 0.5) * 3;
                 const endR = startR + length;
 
                 const x1 = cx + Math.cos(angle) * startR;
@@ -1590,15 +1562,15 @@
                 const x2 = cx + Math.cos(angle) * endR;
                 const y2 = cy + Math.sin(angle) * endR;
 
-                const alpha = 0.04 + pulse * 0.06;
+                const alpha = 0.02 + pulse * 0.06;
 
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
                 ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`;
-                ctx.lineWidth = 0.5 + pulse * 1;
-                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.2})`;
-                ctx.shadowBlur = 12;
+                ctx.lineWidth = 0.5 + pulse * 0.8;
+                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.3})`;
+                ctx.shadowBlur = 15;
                 ctx.stroke();
                 ctx.shadowBlur = 0;
             }
@@ -1616,7 +1588,7 @@
                 h = canvas.height;
             const cx = w / 2,
                 cy = h / 2;
-            const r = Math.min(w, h) / 2 - 14;
+            const r = Math.min(w, h) / 2 - 16;
             const noPrizes = document.getElementById('noPrizes');
             const wrapper = document.getElementById('wheelWrapper');
 
@@ -1758,7 +1730,7 @@
         }
 
         // ================================================================
-        //                      دوال الإدارة (مختصرة)
+        //                      دوال الإدارة
         // ================================================================
         async function loadSettings() {
             try {
@@ -2535,7 +2507,6 @@
 
                 soundManager.init();
 
-                // بدء تشغيل النيون والأمواج
                 drawNeon();
                 drawWaves();
 

@@ -120,19 +120,19 @@
             filter: brightness(1.15) drop-shadow(0 0 50px rgba(255, 215, 0, 0.12));
         }
 
-        /* ===== الإطار المشع - دائرة كاملة ===== */
-        .glow-layer {
+        /* ===== طبقة النيون ===== */
+        .neon-layer {
             position: absolute;
-            top: -12px;
-            left: -12px;
-            width: calc(100% + 24px);
-            height: calc(100% + 24px);
+            top: -10px;
+            left: -10px;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
             border-radius: 50%;
             z-index: 2;
             pointer-events: none;
             overflow: visible;
         }
-        .glow-layer canvas {
+        .neon-layer canvas {
             width: 100% !important;
             height: 100% !important;
             border-radius: 50%;
@@ -142,7 +142,7 @@
             left: 0;
         }
 
-        /* ===== طبقة الأمواج الارتدادية ===== */
+        /* ===== طبقة الأمواج النيونية ===== */
         .wave-layer {
             position: absolute;
             top: -30px;
@@ -1063,13 +1063,13 @@
 
     <!-- ===== العجلة ===== -->
     <div class="wheel-wrapper" id="wheelWrapper">
-        <!-- طبقة الأمواج الارتدادية -->
+        <!-- طبقة الأمواج النيونية -->
         <div class="wave-layer" id="waveLayer">
             <canvas id="waveCanvas" width="500" height="500"></canvas>
         </div>
-        <!-- طبقة الإطار المشع -->
-        <div class="glow-layer" id="glowLayer">
-            <canvas id="glowCanvas" width="500" height="500"></canvas>
+        <!-- طبقة النيون -->
+        <div class="neon-layer" id="neonLayer">
+            <canvas id="neonCanvas" width="500" height="500"></canvas>
         </div>
         <!-- العجلة الرئيسية -->
         <canvas id="wheelCanvas" width="500" height="500"></canvas>
@@ -1402,15 +1402,15 @@
         }
 
         // ================================================================
-        //                      رسم الإطار المشع والأمواج
+        //                      رسم شريط النيون والأمواج
         // ================================================================
 
-        let glowAngle = 0;
+        let neonAngle = 0;
         let waveAngle = 0;
 
-        // ---- الإطار المشع الدائري ----
-        function drawGlow() {
-            const canvas = document.getElementById('glowCanvas');
+        // ---- شريط النيون الدائري ----
+        function drawNeon() {
+            const canvas = document.getElementById('neonCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             const w = canvas.width,
@@ -1421,95 +1421,103 @@
 
             ctx.clearRect(0, 0, w, h);
 
-            // تحديث زاوية الدوران (عكس اتجاه العجلة)
-            glowAngle -= 0.003;
+            neonAngle -= 0.002;
 
-            // ----- الحلقة الخارجية المشعة الرئيسية -----
-            const numDots = 80;
-            const angleStep = (2 * Math.PI) / numDots;
+            // الشريط الرئيسي - خط نيون سميك
+            const grad1 = ctx.createRadialGradient(cx - r * 0.1, cy - r * 0.1, 0, cx, cy, r + 8);
+            grad1.addColorStop(0, 'rgba(255, 215, 0, 0.03)');
+            grad1.addColorStop(0.3, 'rgba(255, 215, 0, 0.08)');
+            grad1.addColorStop(0.7, 'rgba(255, 215, 0, 0.15)');
+            grad1.addColorStop(0.85, 'rgba(255, 215, 0, 0.3)');
+            grad1.addColorStop(0.92, 'rgba(255, 215, 0, 0.6)');
+            grad1.addColorStop(0.97, 'rgba(255, 215, 0, 0.8)');
+            grad1.addColorStop(1, 'rgba(255, 215, 0, 0)');
 
-            for (let i = 0; i < numDots; i++) {
-                const angle = i * angleStep + glowAngle;
-                const dotR = r + Math.sin(angle * 4 + glowAngle * 2) * 4;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+            ctx.strokeStyle = grad1;
+            ctx.lineWidth = 6;
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.3)';
+            ctx.shadowBlur = 30;
+            ctx.stroke();
 
-                const x = cx + Math.cos(angle) * dotR;
-                const y = cy + Math.sin(angle) * dotR;
+            // الشريط الداخلي - أرق
+            ctx.beginPath();
+            ctx.arc(cx, cy, r - 2, 0, 2 * Math.PI);
+            ctx.strokeStyle = `rgba(255, 255, 200, ${0.15 + Math.sin(neonAngle * 2) * 0.05})`;
+            ctx.lineWidth = 1.5;
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.2)';
+            ctx.shadowBlur = 15;
+            ctx.stroke();
 
-                const pulse = 0.6 + Math.sin(angle * 3 + glowAngle * 2.5) * 0.4;
-                const size = 2 + pulse * 4;
-                const alpha = 0.3 + pulse * 0.5;
+            // الشريط الخارجي - أرق مع توهج
+            ctx.beginPath();
+            ctx.arc(cx, cy, r + 3, 0, 2 * Math.PI);
+            ctx.strokeStyle = `rgba(255, 215, 0, ${0.08 + Math.sin(neonAngle * 1.5 + 1) * 0.04})`;
+            ctx.lineWidth = 1;
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.15)';
+            ctx.shadowBlur = 25;
+            ctx.stroke();
 
-                // توهج ذهبي
-                const grad = ctx.createRadialGradient(x, y, 0, x, y, size * 2);
-                grad.addColorStop(0, `rgba(255, 215, 0, ${alpha})`);
-                grad.addColorStop(0.3, `rgba(255, 200, 50, ${alpha * 0.7})`);
-                grad.addColorStop(1, `rgba(255, 180, 0, 0)`);
-
-                ctx.beginPath();
-                ctx.arc(x, y, size * 2, 0, 2 * Math.PI);
-                ctx.fillStyle = grad;
-                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.5})`;
-                ctx.shadowBlur = 30 + size * 5;
-                ctx.fill();
-
-                // النقطة الأساسية
-                ctx.beginPath();
-                ctx.arc(x, y, size * 0.6, 0, 2 * Math.PI);
-                ctx.fillStyle = `rgba(255, 255, 200, ${alpha * 0.9})`;
-                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.8})`;
-                ctx.shadowBlur = 20;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-
-            // ----- حلقة ذهبية متوهجة -----
-            for (let j = 0; j < 2; j++) {
-                const ringR = r + j * 3 + Math.sin(glowAngle * 0.5 + j) * 2;
-                const alphaRing = 0.15 - j * 0.05 + Math.sin(glowAngle * 0.7 + j * 1.2) * 0.05;
-
-                ctx.beginPath();
-                ctx.arc(cx, cy, ringR, 0, 2 * Math.PI);
-                ctx.strokeStyle = `rgba(255, 215, 0, ${alphaRing})`;
-                ctx.lineWidth = 2 - j * 0.5;
-                ctx.shadowColor = `rgba(255, 215, 0, ${alphaRing * 0.4})`;
-                ctx.shadowBlur = 40 - j * 10;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-            }
-
-            // ----- أشعة ضوئية خفيفة -----
-            for (let k = 0; k < 30; k++) {
-                const angle = (k / 30) * 2 * Math.PI + glowAngle * 0.3;
-                const startR = r * 0.85;
-                const endR = r + 10 + Math.sin(angle * 2 + glowAngle * 1.5) * 4;
+            // خطوط متقطعة نيونية على الشريط (تأثير نبض)
+            const numDash = 12;
+            for (let i = 0; i < numDash; i++) {
+                const angle = (i / numDash) * 2 * Math.PI + neonAngle * 0.5;
+                const len = 12 + Math.sin(angle * 3 + neonAngle * 2) * 5;
+                const startR = r - 2;
+                const endR = r + 2;
 
                 const x1 = cx + Math.cos(angle) * startR;
                 const y1 = cy + Math.sin(angle) * startR;
                 const x2 = cx + Math.cos(angle) * endR;
                 const y2 = cy + Math.sin(angle) * endR;
 
-                const alphaLine = 0.05 + Math.sin(angle * 3 + glowAngle * 2) * 0.03 + 0.03;
-
-                const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-                grad.addColorStop(0, `rgba(255, 215, 0, ${alphaLine * 0.3})`);
-                grad.addColorStop(0.5, `rgba(255, 215, 0, ${alphaLine})`);
-                grad.addColorStop(1, `rgba(255, 215, 0, 0)`);
+                const alpha = 0.15 + Math.sin(angle * 2 + neonAngle * 1.5) * 0.1 + 0.1;
 
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
-                ctx.strokeStyle = grad;
-                ctx.lineWidth = 1 + Math.sin(angle + glowAngle) * 0.5;
-                ctx.shadowColor = `rgba(255, 215, 0, ${alphaLine * 0.2})`;
+                ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`;
+                ctx.lineWidth = 1.2;
+                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.3})`;
                 ctx.shadowBlur = 10;
                 ctx.stroke();
                 ctx.shadowBlur = 0;
             }
 
-            requestAnimationFrame(drawGlow);
+            // نقاط ضوئية صغيرة على الشريط
+            const numDots = 20;
+            for (let i = 0; i < numDots; i++) {
+                const angle = (i / numDots) * 2 * Math.PI + neonAngle * 0.8;
+                const dotR = r + Math.sin(angle * 2 + neonAngle * 1.2) * 1.5;
+                const x = cx + Math.cos(angle) * dotR;
+                const y = cy + Math.sin(angle) * dotR;
+                const size = 1.5 + Math.sin(angle * 3 + neonAngle * 2) * 0.8 + 0.8;
+                const alpha = 0.2 + Math.sin(angle * 2 + neonAngle * 1.5) * 0.15 + 0.15;
+
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, 2 * Math.PI);
+                ctx.fillStyle = `rgba(255, 255, 220, ${alpha})`;
+                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.4})`;
+                ctx.shadowBlur = 15;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            // شريط توهج خارجي خفيف جداً
+            ctx.beginPath();
+            ctx.arc(cx, cy, r + 6, 0, 2 * Math.PI);
+            ctx.strokeStyle = `rgba(255, 215, 0, ${0.03 + Math.sin(neonAngle * 0.8) * 0.015})`;
+            ctx.lineWidth = 3;
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.1)';
+            ctx.shadowBlur = 50;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            requestAnimationFrame(drawNeon);
         }
 
-        // ---- الأمواج الارتدادية ----
+        // ---- الأمواج النيونية (خطوط رفيعة تخرج من الشريط) ----
         function drawWaves() {
             const canvas = document.getElementById('waveCanvas');
             if (!canvas) return;
@@ -1518,80 +1526,82 @@
                 h = canvas.height;
             const cx = w / 2,
                 cy = h / 2;
-            const maxR = Math.min(w, h) / 2 + 6;
+            const baseR = Math.min(w, h) / 2;
 
             ctx.clearRect(0, 0, w, h);
 
-            waveAngle += 0.004;
+            waveAngle += 0.003;
 
-            // 4 موجات متداخلة بسرعات مختلفة
-            const waves = [
-                { offset: 0, speed: 0.8, amplitude: 8, width: 3, alpha: 0.12 },
-                { offset: 1.5, speed: 0.6, amplitude: 14, width: 2.2, alpha: 0.08 },
-                { offset: 3.0, speed: 0.4, amplitude: 20, width: 1.6, alpha: 0.05 },
-                { offset: 0.8, speed: 1.0, amplitude: 5, width: 1, alpha: 0.15 }
+            // 3 طبقات من الأمواج
+            const layers = [
+                { count: 40, speed: 1.2, amplitude: 10, width: 1.5, alpha: 0.15, offset: 0 },
+                { count: 30, speed: 0.8, amplitude: 18, width: 1, alpha: 0.1, offset: 1.5 },
+                { count: 20, speed: 0.5, amplitude: 28, width: 0.7, alpha: 0.06, offset: 3 }
             ];
 
-            waves.forEach((wave, idx) => {
-                const baseR = maxR + wave.offset * 2;
+            layers.forEach((layer) => {
+                const numLines = layer.count;
+                for (let i = 0; i < numLines; i++) {
+                    const angle = (i / numLines) * 2 * Math.PI + waveAngle * layer.speed + layer.offset;
+                    // تموج في الطول والاتجاه
+                    const wavePulse = Math.sin(angle * 3 + waveAngle * layer.speed * 1.2 + layer.offset) * 0.5 + 0.5;
+                    const length = layer.amplitude * (0.3 + wavePulse * 0.7);
 
-                ctx.beginPath();
-                // رسم الموجة كنمط متموج
-                const points = 300;
-                for (let i = 0; i <= points; i++) {
-                    const angle = (i / points) * 2 * Math.PI;
-                    // تموج نصف القطر - تأثير ارتدادي
-                    const wave1 = Math.sin(angle * 3 + waveAngle * wave.speed + wave.offset) * wave.amplitude;
-                    const wave2 = Math.sin(angle * 5 + waveAngle * wave.speed * 1.3 + wave.offset * 0.7) * wave.amplitude *
-                        0.4;
-                    const wave3 = Math.sin(angle * 2 + waveAngle * wave.speed * 0.5 + wave.offset * 1.3) * wave.amplitude *
-                        0.3;
+                    const startR = baseR + 4 + Math.sin(angle * 2 + waveAngle * 0.5) * 2;
+                    const endR = startR + length;
 
-                    const rOffset = wave1 + wave2 + wave3;
-                    const r = baseR + rOffset;
+                    const x1 = cx + Math.cos(angle) * startR;
+                    const y1 = cy + Math.sin(angle) * startR;
+                    const x2 = cx + Math.cos(angle) * endR;
+                    const y2 = cy + Math.sin(angle) * endR;
 
-                    const x = cx + Math.cos(angle) * r;
-                    const y = cy + Math.sin(angle) * r;
+                    // شفافية متغيرة مع الزمن والزاوية
+                    const alpha = layer.alpha * (0.3 + Math.sin(angle * 2 + waveAngle * layer.speed * 0.7) * 0.3 + 0.4);
 
-                    if (i === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
-                }
-                ctx.closePath();
+                    // توهج نيوني
+                    const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+                    grad.addColorStop(0, `rgba(255, 215, 0, ${alpha * 0.8})`);
+                    grad.addColorStop(0.3, `rgba(255, 215, 0, ${alpha})`);
+                    grad.addColorStop(0.7, `rgba(255, 200, 50, ${alpha * 0.7})`);
+                    grad.addColorStop(1, `rgba(255, 200, 50, 0)`);
 
-                // تدرج شعاعي للأمواج
-                const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR + 30);
-                const pulseAlpha = wave.alpha + Math.sin(waveAngle * 0.4 + idx * 1.2) * 0.03;
-
-                // توهج ذهبي متدرج
-                gradient.addColorStop(0, `rgba(255, 215, 0, ${pulseAlpha * 0.2})`);
-                gradient.addColorStop(0.3, `rgba(255, 215, 0, ${pulseAlpha * 0.5})`);
-                gradient.addColorStop(0.6, `rgba(255, 200, 50, ${pulseAlpha * 0.8})`);
-                gradient.addColorStop(0.8, `rgba(255, 180, 0, ${pulseAlpha * 0.4})`);
-                gradient.addColorStop(1, `rgba(255, 150, 0, 0)`);
-
-                ctx.strokeStyle = gradient;
-                ctx.lineWidth = wave.width + Math.sin(waveAngle * 0.6 + idx * 1.8) * 0.8;
-                ctx.shadowColor = `rgba(255, 215, 0, ${pulseAlpha * 0.3})`;
-                ctx.shadowBlur = 40 + wave.amplitude * 2;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-
-                // موجات داخلية لتعزيز العمق
-                if (idx === 0) {
-                    const innerR = maxR + 4 + Math.sin(waveAngle * 0.7) * 3;
                     ctx.beginPath();
-                    ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
-                    ctx.strokeStyle = `rgba(255, 215, 0, ${0.03 + Math.sin(waveAngle * 0.5) * 0.015})`;
-                    ctx.lineWidth = 1.2;
-                    ctx.shadowColor = `rgba(255, 215, 0, 0.05)`;
-                    ctx.shadowBlur = 20;
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = layer.width + Math.sin(angle * 2 + waveAngle * 1.5) * 0.3;
+                    ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.3})`;
+                    ctx.shadowBlur = 8 + layer.width * 2;
                     ctx.stroke();
                     ctx.shadowBlur = 0;
                 }
             });
+
+            // أمواج عشوائية إضافية (تأثير ارتداد)
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * 2 * Math.PI + waveAngle * 0.7 + Math.sin(waveAngle * 0.3) * 0.5;
+                const pulse = Math.sin(waveAngle * 0.8 + i * 1.2) * 0.5 + 0.5;
+                const length = 15 + pulse * 20;
+                const startR = baseR + 2 + Math.sin(angle * 3 + waveAngle * 0.6) * 3;
+                const endR = startR + length;
+
+                const x1 = cx + Math.cos(angle) * startR;
+                const y1 = cy + Math.sin(angle) * startR;
+                const x2 = cx + Math.cos(angle) * endR;
+                const y2 = cy + Math.sin(angle) * endR;
+
+                const alpha = 0.04 + pulse * 0.06;
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`;
+                ctx.lineWidth = 0.5 + pulse * 1;
+                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.2})`;
+                ctx.shadowBlur = 12;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
 
             requestAnimationFrame(drawWaves);
         }
@@ -1606,7 +1616,7 @@
                 h = canvas.height;
             const cx = w / 2,
                 cy = h / 2;
-            const r = Math.min(w, h) / 2 - 12;
+            const r = Math.min(w, h) / 2 - 14;
             const noPrizes = document.getElementById('noPrizes');
             const wrapper = document.getElementById('wheelWrapper');
 
@@ -1748,7 +1758,7 @@
         }
 
         // ================================================================
-        //                      دوال الإدارة
+        //                      دوال الإدارة (مختصرة)
         // ================================================================
         async function loadSettings() {
             try {
@@ -1824,20 +1834,6 @@
                 return [];
             } catch (e) {
                 console.error('Error loading admin prizes:', e);
-                return [];
-            }
-        }
-
-        async function loadPublicPrizes() {
-            try {
-                const res = await fetch(`${API_BASE}/api/prizes`);
-                const data = await res.json();
-                if (data.success) {
-                    return data.prizes || [];
-                }
-                return [];
-            } catch (e) {
-                console.error('Error loading public prizes:', e);
                 return [];
             }
         }
@@ -2203,8 +2199,6 @@
         function createWinEffects(prizeName) {
             const resultBox = document.getElementById('resultBox');
             resultBox.classList.add('winner');
-            const name = document.getElementById('prizeName');
-            name.classList.add('win-text');
             createConfetti(60);
             showNotification(`🎉 مبروك! لقد فزت بـ ${prizeName}!`);
         }
@@ -2212,14 +2206,12 @@
         function clearWinEffects() {
             const resultBox = document.getElementById('resultBox');
             resultBox.classList.remove('winner');
-            const name = document.getElementById('prizeName');
-            name.classList.remove('win-text');
         }
 
         function showNotification(message) {
             const bar = document.getElementById('notificationBar');
             document.getElementById('notifPrizeName').textContent = message.replace('🎉 مبروك! لقد فزت بـ ', '').replace('!',
-            '');
+                '');
             bar.classList.add('show');
             setTimeout(() => { bar.classList.remove('show'); }, 4000);
         }
@@ -2308,7 +2300,7 @@
                         const randomIndex = Math.floor(Math.random() * prizesCache.length);
                         const targetAngle = (randomIndex / prizesCache.length) * 2 * Math.PI;
                         const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step /
-                        2));
+                            2));
 
                         animateSpin(totalRotation, spinDuration, () => {
                             drawWheel(prizesCache, randomIndex, totalRotation);
@@ -2317,7 +2309,7 @@
                     } else {
                         const targetAngle = (prizeIndex / prizesCache.length) * 2 * Math.PI;
                         const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step /
-                        2));
+                            2));
 
                         animateSpin(totalRotation, spinDuration, () => {
                             drawWheel(prizesCache, prizeIndex, totalRotation);
@@ -2543,8 +2535,8 @@
 
                 soundManager.init();
 
-                // بدء تشغيل الإطار المشع والأمواج
-                drawGlow();
+                // بدء تشغيل النيون والأمواج
+                drawNeon();
                 drawWaves();
 
             } catch (e) {

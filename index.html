@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>🎡 عجلة الحظ</title>
+    <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js">
     </script>
     <style>
+        /* ===== إعادة ضبط ===== */
         * {
             margin: 0;
             padding: 0;
@@ -30,6 +32,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
+        /* خلفية ثابتة */
         .bg-image-fixed {
             position: fixed;
             top: 0;
@@ -56,6 +59,7 @@
             }
         }
 
+        /* ===== النص العلوي ===== */
         .banner-text {
             text-align: center;
             padding: 10px 12px;
@@ -80,10 +84,12 @@
             z-index: 1;
         }
 
+        /* ===== حالة المستخدم (مخفية) ===== */
         .user-status {
             display: none;
         }
 
+        /* ===== العجلة - مع إطار نيون ونبضات ===== */
         .wheel-wrapper {
             position: relative;
             width: 100%;
@@ -97,64 +103,95 @@
             display: block;
             animation: fadeIn 0.5s ease;
         }
+        /* الحاوية الداخلية للعجلة مع تأثير الإطار النيون والموجات */
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            padding: 12px;
+            /* مساحة للإطار والموجات */
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* طبقة الإطار النيون والنبضات */
+        .wheel-neon-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+            /* نيون خارجي */
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), 0 0 60px rgba(0, 255, 255, 0.2), 0 0 90px rgba(0, 255, 255, 0.1);
+            border: 3px solid rgba(0, 255, 255, 0.6);
+            animation: neonPulse 3s ease-in-out infinite;
+            /* الموجات */
+            background: radial-gradient(circle at center, transparent 60%, rgba(0, 255, 255, 0.05) 75%, rgba(0, 255, 255, 0.15) 85%, transparent 100%);
+        }
+        @keyframes neonPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 255, 255, 0.15), 0 0 90px rgba(0, 255, 255, 0.05);
+                border-color: rgba(0, 255, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(0, 255, 255, 0.6), 0 0 100px rgba(0, 255, 255, 0.3), 0 0 150px rgba(0, 255, 255, 0.15);
+                border-color: rgba(0, 255, 255, 0.9);
+            }
+        }
+        /* طبقة الموجات المتوسعة (نبضات) */
+        .wave-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            border: 2px solid rgba(0, 255, 255, 0);
+            animation: waveExpand 4s ease-out infinite;
+        }
+        .wave-ring:nth-child(2) {
+            animation-delay: 1.3s;
+        }
+        .wave-ring:nth-child(3) {
+            animation-delay: 2.6s;
+        }
+        @keyframes waveExpand {
+            0% {
+                transform: scale(0.92);
+                border-color: rgba(0, 255, 255, 0.6);
+                opacity: 0.8;
+                border-width: 3px;
+            }
+            100% {
+                transform: scale(1.15);
+                border-color: rgba(0, 255, 255, 0);
+                opacity: 0;
+                border-width: 1px;
+            }
+        }
 
-        #wheelCanvas {
+        .wheel-wrapper canvas {
             width: 100% !important;
             height: 100% !important;
             border-radius: 50%;
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.03), inset 0 0 60px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 215, 0, 0.05);
+            box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.3);
+            border: none;
             transition: filter 0.4s ease;
             display: block;
             position: relative;
             z-index: 3;
+            /* فوق الإطار والموجات */
         }
-        #wheelCanvas.spinning {
+        .wheel-wrapper canvas.spinning {
             filter: brightness(1.15) drop-shadow(0 0 50px rgba(255, 215, 0, 0.12));
-        }
-
-        /* طبقة الخيوط النيونية (فوق العجلة) */
-        .wave-layer {
-            position: absolute;
-            top: -40px;
-            left: -40px;
-            width: calc(100% + 80px);
-            height: calc(100% + 80px);
-            border-radius: 50%;
-            z-index: 4;
-            pointer-events: none;
-            overflow: visible;
-        }
-        .wave-layer canvas {
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50%;
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        /* طبقة الشريط النيوني (فوق العجلة) */
-        .neon-layer {
-            position: absolute;
-            top: -16px;
-            left: -16px;
-            width: calc(100% + 32px);
-            height: calc(100% + 32px);
-            border-radius: 50%;
-            z-index: 5;
-            pointer-events: none;
-            overflow: visible;
-        }
-        .neon-layer canvas {
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50%;
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
         }
 
         .pointer {
@@ -188,6 +225,7 @@
             }
         }
 
+        /* ===== لا توجد جوائز ===== */
         .no-prizes {
             display: none;
             text-align: center;
@@ -202,6 +240,7 @@
             z-index: 1;
         }
 
+        /* ===== الأزرار ===== */
         .actions {
             display: flex;
             flex-direction: column;
@@ -263,6 +302,7 @@
             }
         }
 
+        /* ===== شرط الإيداع ===== */
         .deposit-notice {
             background: rgba(18, 18, 18, 0.85);
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -302,6 +342,7 @@
             color: #FF4444;
         }
 
+        /* ===== النتيجة (يظهر فيها الوصف فقط) ===== */
         .result-box {
             background: rgba(18, 18, 18, 0.85);
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -373,6 +414,7 @@
             }
         }
 
+        /* إخفاء الأيقونة والاسم، نعرض الوصف فقط */
         .result-box .prize-icon {
             display: none;
         }
@@ -404,6 +446,7 @@
             }
         }
 
+        /* ===== رسائل الخطأ ===== */
         .error-msg {
             background: rgba(18, 18, 18, 0.85);
             border: 1px solid rgba(255, 0, 0, 0.06);
@@ -427,6 +470,7 @@
             animation: fadeIn 0.3s ease;
         }
 
+        /* ===== شاشة اللودينغ ===== */
         .loading-screen {
             display: none;
             position: fixed;
@@ -496,6 +540,7 @@
             letter-spacing: 1px;
         }
 
+        /* ===== إعدادات الصوت ===== */
         .sound-settings {
             display: flex;
             justify-content: center;
@@ -532,6 +577,7 @@
             font-size: 14px;
         }
 
+        /* ===== لوحة الإدارة ===== */
         .admin-panel {
             display: none;
             background: rgba(18, 18, 18, 0.85);
@@ -842,6 +888,7 @@
             color: #00FF88;
         }
 
+        /* ===== خطأ أولي ===== */
         .error-container {
             display: none;
             text-align: center;
@@ -893,6 +940,7 @@
             box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
         }
 
+        /* ===== إشعار منبثق ===== */
         .notification-bar {
             display: none;
             position: fixed;
@@ -925,6 +973,7 @@
             }
         }
 
+        /* ===== تجاوب ===== */
         @media (max-width: 480px) {
             .banner-text {
                 font-size: 17px;
@@ -1005,18 +1054,23 @@
 </head>
 <body>
 
+    <!-- ===== خلفية ===== -->
     <div class="bg-image-fixed">
         <img id="bgImage" src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80" alt="Background">
     </div>
 
+    <!-- ===== إشعار ===== -->
     <div class="notification-bar" id="notificationBar">
         🎉 مبروك! لقد فزت بـ <span id="notifPrizeName">جائزة</span>!
     </div>
 
+    <!-- ===== النص العلوي ===== -->
     <div class="banner-text" id="bannerText">🎡 IChancy · عجلة الحظ</div>
 
+    <!-- ===== حالة المستخدم (مخفي) ===== -->
     <div class="user-status" id="userStatus"></div>
 
+    <!-- ===== خطأ ===== -->
     <div class="error-container" id="errorContainer">
         <div class="error-icon">⚠️</div>
         <div class="error-title">يجب الدخول من البوت</div>
@@ -1027,6 +1081,7 @@
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
 
+    <!-- ===== شاشة لودينغ ===== -->
     <div class="loading-screen" id="loadingScreen">
         <img class="loading-image" id="loadingImage" src="https://via.placeholder.com/200/1a1a2e/FFD700?text=🎡" alt="Loading">
         <div class="progress-container">
@@ -1037,25 +1092,29 @@
         </div>
     </div>
 
+    <!-- ===== العجلة مع إطار نيون ونبضات ===== -->
     <div class="wheel-wrapper" id="wheelWrapper">
-        <!-- طبقة الخيوط النيونية (فوق العجلة) -->
-        <div class="wave-layer" id="waveLayer">
-            <canvas id="waveCanvas" width="500" height="500"></canvas>
+        <div class="wheel-container">
+            <!-- طبقات الموجات (نبضات) -->
+            <div class="wave-ring"></div>
+            <div class="wave-ring"></div>
+            <div class="wave-ring"></div>
+            <!-- الإطار النيون -->
+            <div class="wheel-neon-frame"></div>
+            <!-- السهم -->
+            <div class="pointer" id="pointer">🔽</div>
+            <!-- اللوحة -->
+            <canvas id="wheelCanvas" width="500" height="500"></canvas>
         </div>
-        <!-- طبقة الشريط النيوني (فوق العجلة) -->
-        <div class="neon-layer" id="neonLayer">
-            <canvas id="neonCanvas" width="500" height="500"></canvas>
-        </div>
-        <!-- العجلة الرئيسية -->
-        <canvas id="wheelCanvas" width="500" height="500"></canvas>
-        <div class="pointer" id="pointer">🔽</div>
     </div>
 
+    <!-- ===== لا توجد جوائز ===== -->
     <div class="no-prizes" id="noPrizes">
         <div style="font-size:28px;">⚠️</div>
         <div style="margin-top:6px;">لا توجد جوائز متاحة</div>
     </div>
 
+    <!-- ===== أزرار ===== -->
     <div class="actions">
         <button class="btn btn-spin" id="spinBtn" disabled>
             <span class="spinner-small"></span>
@@ -1063,6 +1122,7 @@
         </button>
     </div>
 
+    <!-- ===== شرط الإيداع ===== -->
     <div class="deposit-notice" id="depositNotice">
         <div class="notice-text">
             💰 مطلوب إيداع <span class="amount" id="depositMinAmount">0</span> SYP
@@ -1073,6 +1133,7 @@
         </div>
     </div>
 
+    <!-- ===== النتيجة (يظهر الوصف فقط) ===== -->
     <div class="result-box" id="resultBox">
         <div class="confetti-container" id="confettiContainer"></div>
         <div class="prize-icon" id="prizeIcon">🎁</div>
@@ -1080,13 +1141,19 @@
         <div class="prize-desc" id="prizeDesc"></div>
     </div>
 
+    <!-- ===== إعدادات الصوت ===== -->
     <div class="sound-settings">
         <label>
             <span class="sound-indicator">🔊</span>
             <input type="checkbox" id="soundToggle" checked> مؤثرات
         </label>
+        <label>
+            <span class="sound-indicator">🎵</span>
+            <input type="checkbox" id="musicToggle" checked> موسيقى
+        </label>
     </div>
 
+    <!-- ===== لوحة الإدارة ===== -->
     <div class="admin-panel" id="adminPanel">
         <div class="panel-title">
             ⚙️ لوحة الإدارة
@@ -1167,11 +1234,15 @@
         </div>
     </div>
 
+    <!-- ===== خطأ ===== -->
     <div class="error-msg" id="errorMsg">
         <span id="errorText"></span>
     </div>
 
     <script>
+        // ================================================================
+        //                      الإعدادات الأساسية
+        // ================================================================
         const API_BASE = 'https://joj-d0kl.onrender.com';
         const ADMIN_ID = 7011476249;
         let USER_ID = null;
@@ -1179,6 +1250,7 @@
         let prizesCache = [];
         let currentRotation = 0;
         let soundEnabled = true;
+        let musicEnabled = true;
         let settingsCache = {};
         let spinDuration = 3500;
 
@@ -1189,6 +1261,8 @@
             constructor() {
                 this.initialized = false;
                 this.audioContext = null;
+                this.bgInterval = null;
+                this.isPlaying = false;
             }
 
             init() {
@@ -1208,6 +1282,8 @@
                         this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
                     } catch (e) {}
                 }
+                this.stopBackgroundMusic();
+                this.isPlaying = false;
             }
 
             playWinSound() {
@@ -1260,8 +1336,10 @@
                             osc.stop(now + 1.8 + i * 0.05);
                         });
                     }, 800);
+                    setTimeout(() => { this.isPlaying = false; }, 3000);
                 } catch (e) {
                     console.warn('Sound error:', e);
+                    this.isPlaying = false;
                 }
             }
 
@@ -1294,43 +1372,69 @@
                         osc2.start(now + 0.3);
                         osc2.stop(now + 0.6);
                     }, 200);
+                    setTimeout(() => { this.isPlaying = false; }, 1000);
                 } catch (e) {
                     console.warn('Sound error:', e);
+                    this.isPlaying = false;
                 }
             }
 
-            playSpinSound() {
-                if (!soundEnabled || !this.initialized) return;
+            playBackgroundMusic() {
+                if (!musicEnabled || !this.initialized) return;
+                if (this.bgInterval) return;
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
-                    for (let i = 0; i < 12; i++) {
+                    const playNote = (freq, time, dur, vol, type = 'sine') => {
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(200 + i * 30, now + i * 0.06);
-                        osc.type = 'square';
-                        gain.gain.setValueAtTime(0.02, now + i * 0.06);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.04);
-                        osc.start(now + i * 0.06);
-                        osc.stop(now + i * 0.06 + 0.04);
-                    }
-                    setTimeout(() => {
-                        const oscEnd = ctx.createOscillator();
-                        const gainEnd = ctx.createGain();
-                        oscEnd.connect(gainEnd);
-                        gainEnd.connect(ctx.destination);
-                        oscEnd.frequency.setValueAtTime(800, now + 0.8);
-                        oscEnd.frequency.exponentialRampToValueAtTime(400, now + 1.0);
-                        oscEnd.type = 'sine';
-                        gainEnd.gain.setValueAtTime(0.05, now + 0.8);
-                        gainEnd.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
-                        oscEnd.start(now + 0.8);
-                        oscEnd.stop(now + 1.0);
-                    }, 700);
+                        osc.frequency.setValueAtTime(freq, time);
+                        osc.type = type;
+                        gain.gain.setValueAtTime(vol || 0.025, time);
+                        gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+                        osc.start(time);
+                        osc.stop(time + dur);
+                    };
+                    const pattern = [
+                        [262, 0.25, 0.02],
+                        [330, 0.25, 0.02],
+                        [392, 0.25, 0.02],
+                        [523, 0.35, 0.025],
+                        [330, 0.25, 0.02],
+                        [392, 0.25, 0.02],
+                        [523, 0.25, 0.02],
+                        [659, 0.35, 0.025],
+                        [392, 0.25, 0.02],
+                        [523, 0.25, 0.02],
+                        [659, 0.25, 0.02],
+                        [784, 0.35, 0.025]
+                    ];
+                    pattern.forEach(([freq, dur, vol], i) => {
+                        const time = now + i * 0.3;
+                        playNote(freq, time, dur, vol, i % 2 === 0 ? 'sine' : 'triangle');
+                    });
+                    this.bgInterval = setInterval(() => {
+                        if (!musicEnabled || !this.initialized) {
+                            this.stopBackgroundMusic();
+                            return;
+                        }
+                        const t = ctx.currentTime;
+                        const bassNotes = [131, 165, 196, 262, 196, 165];
+                        bassNotes.forEach((freq, i) => {
+                            playNote(freq, t + i * 0.25, 0.2, 0.015, 'square');
+                        });
+                    }, 1500);
                 } catch (e) {
-                    console.warn('Sound error:', e);
+                    console.warn('Music error:', e);
+                }
+            }
+
+            stopBackgroundMusic() {
+                if (this.bgInterval) {
+                    clearInterval(this.bgInterval);
+                    this.bgInterval = null;
                 }
             }
         }
@@ -1367,226 +1471,7 @@
         }
 
         // ================================================================
-        //                      رسم الشريط النيوني العريض والخيوط
-        // ================================================================
-
-        let neonAngle = 0;
-        let waveAngle = 0;
-
-        // ---- شريط النيون العريض ----
-        function drawNeon() {
-            const canvas = document.getElementById('neonCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width,
-                h = canvas.height;
-            const cx = w / 2,
-                cy = h / 2;
-            // نصف القطر الخارجي للشريط (أكبر بقليل من العجلة)
-            const r = Math.min(w, h) / 2 - 2;
-
-            ctx.clearRect(0, 0, w, h);
-
-            neonAngle -= 0.002;
-
-            // === الشريط الرئيسي العريض (عرض 12 بكسل) ===
-            const grad1 = ctx.createRadialGradient(cx - r * 0.1, cy - r * 0.1, r - 8, cx, cy, r + 8);
-            grad1.addColorStop(0, 'rgba(255, 215, 0, 0.01)');
-            grad1.addColorStop(0.1, 'rgba(255, 215, 0, 0.03)');
-            grad1.addColorStop(0.3, 'rgba(255, 215, 0, 0.08)');
-            grad1.addColorStop(0.5, 'rgba(255, 215, 0, 0.2)');
-            grad1.addColorStop(0.7, 'rgba(255, 215, 0, 0.5)');
-            grad1.addColorStop(0.85, 'rgba(255, 215, 0, 0.85)');
-            grad1.addColorStop(0.94, 'rgba(255, 215, 0, 0.95)');
-            grad1.addColorStop(0.98, 'rgba(255, 215, 0, 0.9)');
-            grad1.addColorStop(1, 'rgba(255, 215, 0, 0)');
-
-            ctx.beginPath();
-            ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-            ctx.strokeStyle = grad1;
-            ctx.lineWidth = 12;
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
-            ctx.shadowBlur = 50;
-            ctx.stroke();
-
-            // === شريط داخلي مضيء ===
-            ctx.beginPath();
-            ctx.arc(cx, cy, r - 4, 0, 2 * Math.PI);
-            ctx.strokeStyle = `rgba(255, 255, 230, ${0.25 + Math.sin(neonAngle * 2) * 0.1})`;
-            ctx.lineWidth = 2.5;
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.4)';
-            ctx.shadowBlur = 30;
-            ctx.stroke();
-
-            // === شريط خارجي متوهج ===
-            ctx.beginPath();
-            ctx.arc(cx, cy, r + 5, 0, 2 * Math.PI);
-            ctx.strokeStyle = `rgba(255, 215, 0, ${0.12 + Math.sin(neonAngle * 1.5 + 1) * 0.08})`;
-            ctx.lineWidth = 2;
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.3)';
-            ctx.shadowBlur = 40;
-            ctx.stroke();
-
-            // === شريط توهج خارجي واسع ===
-            ctx.beginPath();
-            ctx.arc(cx, cy, r + 10, 0, 2 * Math.PI);
-            ctx.strokeStyle = `rgba(255, 215, 0, ${0.05 + Math.sin(neonAngle * 0.7) * 0.025})`;
-            ctx.lineWidth = 6;
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.15)';
-            ctx.shadowBlur = 70;
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-
-            // === خطوط متقطعة على الشريط (تأثير نبض) ===
-            const numDash = 20;
-            for (let i = 0; i < numDash; i++) {
-                const angle = (i / numDash) * 2 * Math.PI + neonAngle * 0.7;
-                const len = 16 + Math.sin(angle * 3 + neonAngle * 2) * 7;
-                const startR = r - 4;
-                const endR = r + 4;
-
-                const x1 = cx + Math.cos(angle) * startR;
-                const y1 = cy + Math.sin(angle) * startR;
-                const x2 = cx + Math.cos(angle) * endR;
-                const y2 = cy + Math.sin(angle) * endR;
-
-                const alpha = 0.25 + Math.sin(angle * 2 + neonAngle * 1.5) * 0.2 + 0.15;
-
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.strokeStyle = `rgba(255, 255, 220, ${alpha})`;
-                ctx.lineWidth = 2;
-                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.5})`;
-                ctx.shadowBlur = 15;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-            }
-
-            // === نقاط ضوئية متحركة ===
-            const numDots = 30;
-            for (let i = 0; i < numDots; i++) {
-                const angle = (i / numDots) * 2 * Math.PI + neonAngle * 1.0;
-                const dotR = r + Math.sin(angle * 2 + neonAngle * 1.2) * 3;
-                const x = cx + Math.cos(angle) * dotR;
-                const y = cy + Math.sin(angle) * dotR;
-                const size = 2.5 + Math.sin(angle * 3 + neonAngle * 2) * 1.5 + 1.5;
-                const alpha = 0.3 + Math.sin(angle * 2 + neonAngle * 1.5) * 0.25 + 0.2;
-
-                ctx.beginPath();
-                ctx.arc(x, y, size, 0, 2 * Math.PI);
-                ctx.fillStyle = `rgba(255, 255, 240, ${alpha})`;
-                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.6})`;
-                ctx.shadowBlur = 25;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-
-            requestAnimationFrame(drawNeon);
-        }
-
-        // ---- الخيوط النيونية الرقيقة (تظهر وتتلاشى) ----
-        function drawWaves() {
-            const canvas = document.getElementById('waveCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width,
-                h = canvas.height;
-            const cx = w / 2,
-                cy = h / 2;
-            const baseR = Math.min(w, h) / 2;
-
-            ctx.clearRect(0, 0, w, h);
-
-            waveAngle += 0.002;
-
-            // 4 طبقات من الخيوط
-            const layers = [
-                { count: 60, speed: 1.2, maxLen: 25, width: 1.0, alpha: 0.2, offset: 0, fadeSpeed: 0.7 },
-                { count: 45, speed: 0.8, maxLen: 40, width: 0.8, alpha: 0.15, offset: 1.5, fadeSpeed: 0.55 },
-                { count: 30, speed: 0.5, maxLen: 55, width: 0.6, alpha: 0.1, offset: 3.0, fadeSpeed: 0.4 },
-                { count: 18, speed: 0.3, maxLen: 75, width: 0.5, alpha: 0.07, offset: 4.5, fadeSpeed: 0.3 }
-            ];
-
-            layers.forEach((layer) => {
-                const numLines = layer.count;
-                for (let i = 0; i < numLines; i++) {
-                    const baseAngle = (i / numLines) * 2 * Math.PI;
-                    // تموج خفيف في الزاوية
-                    const angle = baseAngle + waveAngle * layer.speed + layer.offset +
-                        Math.sin(baseAngle * 2 + waveAngle * 0.5) * 0.1;
-
-                    // طول الخيط يتغير مع الزمن (يظهر ويختفي)
-                    const timeFactor = Math.sin(baseAngle * 1.3 + waveAngle * layer.fadeSpeed + layer.offset) * 0.5 + 0.5;
-                    const length = layer.maxLen * (0.05 + timeFactor * 0.95);
-
-                    // نقطة البداية على الشريط
-                    const startR = baseR + 6 + Math.sin(baseAngle * 2 + waveAngle * 0.4) * 2;
-                    const endR = startR + length;
-
-                    const x1 = cx + Math.cos(angle) * startR;
-                    const y1 = cy + Math.sin(angle) * startR;
-                    const x2 = cx + Math.cos(angle) * endR;
-                    const y2 = cy + Math.sin(angle) * endR;
-
-                    // تلاشي تدريجي مع الطول
-                    const fadeOut = 1 - (length / layer.maxLen) * 0.7;
-                    const alphaPulse = Math.sin(baseAngle * 1.2 + waveAngle * layer.fadeSpeed + layer.offset) * 0.3 + 0.7;
-                    const alpha = layer.alpha * fadeOut * (0.2 + alphaPulse * 0.8);
-
-                    // تدرج نيوني
-                    const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-                    grad.addColorStop(0, `rgba(255, 215, 0, ${alpha * 0.95})`);
-                    grad.addColorStop(0.3, `rgba(255, 215, 0, ${alpha})`);
-                    grad.addColorStop(0.6, `rgba(255, 200, 50, ${alpha * 0.6})`);
-                    grad.addColorStop(0.85, `rgba(255, 180, 0, ${alpha * 0.3})`);
-                    grad.addColorStop(1, `rgba(255, 180, 0, 0)`);
-
-                    ctx.beginPath();
-                    ctx.moveTo(x1, y1);
-                    ctx.lineTo(x2, y2);
-                    ctx.strokeStyle = grad;
-                    ctx.lineWidth = layer.width + Math.sin(baseAngle * 2 + waveAngle * 1.2) * 0.25;
-                    ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.5})`;
-                    ctx.shadowBlur = 12 + layer.width * 4;
-                    ctx.stroke();
-                    ctx.shadowBlur = 0;
-                }
-            });
-
-            // خيوط عشوائية إضافية (تأثير ارتداد)
-            for (let i = 0; i < 20; i++) {
-                const baseAngle = Math.random() * 2 * Math.PI;
-                const angle = baseAngle + waveAngle * 0.4 + Math.sin(waveAngle * 0.3 + i * 1.2) * 0.4;
-                const pulse = Math.sin(waveAngle * 0.6 + i * 1.4) * 0.5 + 0.5;
-                const length = 8 + pulse * 55;
-
-                const startR = baseR + 4 + Math.sin(baseAngle * 2 + waveAngle * 0.5) * 3;
-                const endR = startR + length;
-
-                const x1 = cx + Math.cos(angle) * startR;
-                const y1 = cy + Math.sin(angle) * startR;
-                const x2 = cx + Math.cos(angle) * endR;
-                const y2 = cy + Math.sin(angle) * endR;
-
-                const alpha = 0.02 + pulse * 0.07;
-
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`;
-                ctx.lineWidth = 0.5 + pulse * 0.9;
-                ctx.shadowColor = `rgba(255, 215, 0, ${alpha * 0.4})`;
-                ctx.shadowBlur = 18;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-            }
-
-            requestAnimationFrame(drawWaves);
-        }
-
-        // ================================================================
-        //                      رسم العجلة
+        //                      رسم العجلة (نص مصغر /2)
         // ================================================================
         function drawWheel(prizes, highlightIndex = -1, rotation = 0) {
             const canvas = document.getElementById('wheelCanvas');
@@ -1595,7 +1480,7 @@
                 h = canvas.height;
             const cx = w / 2,
                 cy = h / 2;
-            const r = Math.min(w, h) / 2 - 18;
+            const r = Math.min(w, h) / 2 - 12;
             const noPrizes = document.getElementById('noPrizes');
             const wrapper = document.getElementById('wheelWrapper');
 
@@ -1650,6 +1535,7 @@
                 ctx.stroke();
                 ctx.shadowBlur = 0;
 
+                // عرض الإيموجي فقط (بدون اسم) - حجم الإيموجي المصغر /2
                 const mid = start + step / 2;
                 const tr = r * 0.62;
                 const x = cx + Math.cos(mid) * tr;
@@ -1670,6 +1556,7 @@
                 ctx.restore();
             });
 
+            // مركز العجلة
             const centerR = r * 0.16;
             const centerIcon = settingsCache.center_icon || '⭐';
 
@@ -1737,7 +1624,7 @@
         }
 
         // ================================================================
-        //                      دوال الإدارة (مختصرة)
+        //                      دوال الإدارة
         // ================================================================
         async function loadSettings() {
             try {
@@ -1813,6 +1700,20 @@
                 return [];
             } catch (e) {
                 console.error('Error loading admin prizes:', e);
+                return [];
+            }
+        }
+
+        async function loadPublicPrizes() {
+            try {
+                const res = await fetch(`${API_BASE}/api/prizes`);
+                const data = await res.json();
+                if (data.success) {
+                    return data.prizes || [];
+                }
+                return [];
+            } catch (e) {
+                console.error('Error loading public prizes:', e);
                 return [];
             }
         }
@@ -2178,6 +2079,8 @@
         function createWinEffects(prizeName) {
             const resultBox = document.getElementById('resultBox');
             resultBox.classList.add('winner');
+            const name = document.getElementById('prizeName');
+            name.classList.add('win-text');
             createConfetti(60);
             showNotification(`🎉 مبروك! لقد فزت بـ ${prizeName}!`);
         }
@@ -2185,12 +2088,14 @@
         function clearWinEffects() {
             const resultBox = document.getElementById('resultBox');
             resultBox.classList.remove('winner');
+            const name = document.getElementById('prizeName');
+            name.classList.remove('win-text');
         }
 
         function showNotification(message) {
             const bar = document.getElementById('notificationBar');
             document.getElementById('notifPrizeName').textContent = message.replace('🎉 مبروك! لقد فزت بـ ', '').replace('!',
-                '');
+            '');
             bar.classList.add('show');
             setTimeout(() => { bar.classList.remove('show'); }, 4000);
         }
@@ -2256,7 +2161,7 @@
             clearWinEffects();
 
             soundManager.init();
-            soundManager.playSpinSound();
+            soundManager.playBackgroundMusic();
 
             try {
                 const response = await fetch(`${API_BASE}/api/wheel/spin`, {
@@ -2279,7 +2184,7 @@
                         const randomIndex = Math.floor(Math.random() * prizesCache.length);
                         const targetAngle = (randomIndex / prizesCache.length) * 2 * Math.PI;
                         const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step /
-                            2));
+                        2));
 
                         animateSpin(totalRotation, spinDuration, () => {
                             drawWheel(prizesCache, randomIndex, totalRotation);
@@ -2288,7 +2193,7 @@
                     } else {
                         const targetAngle = (prizeIndex / prizesCache.length) * 2 * Math.PI;
                         const totalRotation = currentRotation + (4 * 2 * Math.PI) + (2 * Math.PI - targetAngle - (step /
-                            2));
+                        2));
 
                         animateSpin(totalRotation, spinDuration, () => {
                             drawWheel(prizesCache, prizeIndex, totalRotation);
@@ -2321,7 +2226,7 @@
         }
 
         // ================================================================
-        //                      عرض النتيجة
+        //                      عرض النتيجة (يظهر الوصف فقط)
         // ================================================================
         function showResult(prize, isWin) {
             document.getElementById('prizeDesc').textContent = prize.description || prize.name || 'جائزة!';
@@ -2452,6 +2357,19 @@
             soundEnabled = this.checked;
             if (!soundEnabled) {
                 soundManager.stopAll();
+            } else {
+                soundManager.init();
+                soundManager.playBackgroundMusic();
+            }
+        });
+
+        document.getElementById('musicToggle').addEventListener('change', function() {
+            musicEnabled = this.checked;
+            if (!musicEnabled) {
+                soundManager.stopBackgroundMusic();
+            } else {
+                soundManager.init();
+                soundManager.playBackgroundMusic();
             }
         });
 
@@ -2513,9 +2431,7 @@
                 await new Promise(r => setTimeout(r, 500));
 
                 soundManager.init();
-
-                drawNeon();
-                drawWaves();
+                soundManager.playBackgroundMusic();
 
             } catch (e) {
                 console.error('Init error:', e);

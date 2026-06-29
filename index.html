@@ -88,7 +88,7 @@
         .neon-wrapper {
             position: relative;
             width: 100%;
-            max-width: 460px; /* أكبر قليلاً من العجلة لاستيعاب الإطار */
+            max-width: 460px;
             aspect-ratio: 1/1;
             display: flex;
             align-items: center;
@@ -282,6 +282,24 @@
         .btn-spin.loading .spinner-small {
             display: inline-block;
         }
+
+        /* ===== زر البدء ===== */
+        .btn-start {
+            background: linear-gradient(135deg, #00FF88, #00CC6A);
+            color: #0a0a0a;
+            box-shadow: 0 4px 30px rgba(0, 255, 136, 0.2);
+            font-size: 18px;
+            animation: startPulse 2s ease-in-out infinite;
+        }
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(0, 255, 136, 0.3);
+        }
+        @keyframes startPulse {
+            0%, 100% { box-shadow: 0 4px 30px rgba(0, 255, 136, 0.2); }
+            50% { box-shadow: 0 4px 40px rgba(0, 255, 136, 0.4); }
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -630,6 +648,10 @@
             </div>
             <div class="progress-text" id="loaderStatusText">0%</div>
         </div>
+        <!-- زر البدء - يظهر بعد اكتمال التحميل -->
+        <button class="btn btn-start" id="startBtn" style="display: none; margin-top: 30px; max-width: 300px;">
+            🎵 اضغط للبدء
+        </button>
     </div>
 
     <!-- ===== حاوية النيون والعجلة ===== -->
@@ -690,10 +712,6 @@
             <span class="sound-indicator">🔊</span>
             <input type="checkbox" id="soundToggle" checked> مؤثرات
         </label>
-        <label>
-            <span class="sound-indicator">🎵</span>
-            <input type="checkbox" id="musicToggle" checked> موسيقى
-        </label>
     </div>
 
     <!-- ===== لوحة الإدارة ===== -->
@@ -727,6 +745,7 @@
             <div class="toggle-row"><label>تفعيل شرط الإيداع</label><input type="checkbox" id="editDepositRequired"><button class="btn-save" data-setting="deposit_required" data-field="editDepositRequired" data-type="checkbox">💾 حفظ</button></div>
             <div class="setting-row"><label>الحد الأدنى للإيداع</label><input type="number" id="editDepositMin" style="max-width:80px;"><span style="color:#555;font-size:11px;">SYP</span><button class="btn-save" data-setting="deposit_min_amount" data-field="editDepositMin">💾 حفظ</button></div>
             <div class="setting-row"><label>مدة صلاحية الإيداع</label><input type="number" id="editDepositHours" style="max-width:60px;"><span style="color:#555;font-size:11px;">ساعة</span><button class="btn-save" data-setting="deposit_check_hours" data-field="editDepositHours">💾 حفظ</button></div>
+            <div class="setting-row"><label>رابط الصوت الترحيبي</label><input type="text" id="editStartAudioUrl" placeholder="https://..."><button class="btn-save" data-setting="start_audio_url" data-field="editStartAudioUrl">💾 حفظ</button></div>
         </div>
     </div>
 
@@ -741,61 +760,181 @@
         let prizesCache = [];
         let currentRotation = 0;
         let soundEnabled = true;
-        let musicEnabled = true;
         let settingsCache = {};
         let spinDuration = 3500;
+        let startAudioUrl = ''; // رابط الصوت الترحيبي
 
-        class SoundManager {
-            constructor() { this.initialized = false; this.audioContext = null; this.bgInterval = null; this.isPlaying = false; }
-            init() { if (this.initialized) return; try { this.audioContext = new(window.AudioContext || window.webkitAudioContext)(); this.initialized = true; } catch (e) { console.warn('Web Audio not supported'); } }
-            stopAll() { if (this.audioContext) { try { this.audioContext.close(); this.audioContext = new(window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } this.stopBackgroundMusic(); this.isPlaying = false; }
+        // ================================================================
+        //                      نظام الصوت المحسّن
+        // ================================================================
+        class EnhancedSoundManager {
+            constructor() {
+                this.initialized = false;
+                this.audioContext = null;
+                this.isPlaying = false;
+            }
+
+            init() {
+                if (this.initialized) return;
+                try {
+                    this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
+                    this.initialized = true;
+                } catch (e) {
+                    console.warn('Web Audio not supported');
+                }
+            }
+
+            stopAll() {
+                if (this.audioContext) {
+                    try {
+                        this.audioContext.close();
+                        this.audioContext = new(window.AudioContext || window.webkitAudioContext)();
+                    } catch (e) {}
+                }
+                this.isPlaying = false;
+            }
+
+            // صوت الدوران - تأثير ديناميكي جميل
+            playSpinSound() {
+                if (!soundEnabled || !this.initialized) return;
+                try {
+                    const ctx = this.audioContext;
+                    const now = ctx.currentTime;
+                    
+                    // تأثير صعود سريع للتردد
+                    for (let i = 0; i < 8; i++) {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        
+                        const startFreq = 200 + i * 80;
+                        const endFreq = 600 + i * 150;
+                        
+                        osc.frequency.setValueAtTime(startFreq, now + i * 0.05);
+                        osc.frequency.exponentialRampToValueAtTime(endFreq, now + i * 0.05 + 0.15);
+                        osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+                        
+                        gain.gain.setValueAtTime(0.08, now + i * 0.05);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.15);
+                        
+                        osc.start(now + i * 0.05);
+                        osc.stop(now + i * 0.05 + 0.15);
+                    }
+                } catch (e) {
+                    console.warn('Spin sound error:', e);
+                }
+            }
+
+            // صوت الربح - نغمات عالية وفرحة
             playWinSound() {
                 if (!soundEnabled || !this.initialized) return;
                 try {
-                    const ctx = this.audioContext; const now = ctx.currentTime;
-                    const melody = [[523, 0.1], [587, 0.1], [659, 0.1], [784, 0.15], [659, 0.1], [880, 0.1], [988, 0.1], [1175, 0.2], [1047, 0.1], [1175, 0.1], [1319, 0.1], [1568, 0.25], [1319, 0.1], [1175, 0.1], [1047, 0.1], [880, 0.3]];
-                    melody.forEach(([freq, dur], i) => {
-                        const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                        osc.connect(gain); gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, now + i * 0.08); osc.type = i % 3 === 0 ? 'sine' : 'triangle';
-                        gain.gain.setValueAtTime(0.1, now + i * 0.08); gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + dur);
-                        osc.start(now + i * 0.08); osc.stop(now + i * 0.08 + dur);
+                    const ctx = this.audioContext;
+                    const now = ctx.currentTime;
+                    
+                    // نغمات الربح - تصعيد تدريجي
+                    const winMelody = [
+                        { freq: 523, dur: 0.15 },   // C5
+                        { freq: 659, dur: 0.15 },   // E5
+                        { freq: 784, dur: 0.15 },   // G5
+                        { freq: 1047, dur: 0.3 },   // C6 - نغمة عالية
+                        { freq: 1319, dur: 0.3 },   // E6 - أعلى
+                        { freq: 1568, dur: 0.5 }    // G6 - الأعلى
+                    ];
+                    
+                    let totalTime = 0;
+                    winMelody.forEach(({ freq, dur }, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        
+                        osc.frequency.setValueAtTime(freq, now + totalTime);
+                        osc.type = 'sine';
+                        
+                        gain.gain.setValueAtTime(0.15, now + totalTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + totalTime + dur);
+                        
+                        osc.start(now + totalTime);
+                        osc.stop(now + totalTime + dur);
+                        
+                        totalTime += dur + 0.05;
                     });
-                } catch (e) {}
+                    
+                    // تأثير إضافي - جرس عالي
+                    setTimeout(() => {
+                        if (!this.initialized) return;
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        
+                        osc.frequency.setValueAtTime(2093, now + totalTime);
+                        osc.type = 'sine';
+                        gain.gain.setValueAtTime(0.1, now + totalTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + totalTime + 0.3);
+                        
+                        osc.start(now + totalTime);
+                        osc.stop(now + totalTime + 0.3);
+                    }, 100);
+                } catch (e) {
+                    console.warn('Win sound error:', e);
+                }
             }
+
+            // صوت الخسارة - نغمات منخفضة حزينة
             playLoseSound() {
                 if (!soundEnabled || !this.initialized) return;
                 try {
-                    const ctx = this.audioContext; const now = ctx.currentTime;
-                    const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                    osc.connect(gain); gain.connect(ctx.destination);
-                    osc.frequency.setValueAtTime(500, now); osc.frequency.exponentialRampToValueAtTime(120, now + 0.5);
-                    osc.type = 'sawtooth'; gain.gain.setValueAtTime(0.06, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                    osc.start(now); osc.stop(now + 0.5);
-                } catch (e) {}
-            }
-            playBackgroundMusic() {
-                if (!musicEnabled || !this.initialized || this.bgInterval) return;
-                try {
                     const ctx = this.audioContext;
-                    const playNote = (freq, time, dur, vol, type = 'sine') => {
-                        const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                        osc.connect(gain); gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, time); osc.type = type;
-                        gain.gain.setValueAtTime(vol || 0.025, time); gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
-                        osc.start(time); osc.stop(time + dur);
-                    };
-                    this.bgInterval = setInterval(() => {
-                        if (!musicEnabled || !this.initialized) { this.stopBackgroundMusic(); return; }
-                        const t = ctx.currentTime; const bassNotes = [131, 165, 196, 262, 196, 165];
-                        bassNotes.forEach((freq, i) => playNote(freq, t + i * 0.25, 0.2, 0.015, 'square'));
-                    }, 1500);
-                } catch (e) {}
+                    const now = ctx.currentTime;
+                    
+                    // نغمات الخسارة - تنزيل تدريجي
+                    const loseMelody = [
+                        { freq: 349, dur: 0.2 },    // F4
+                        { freq: 330, dur: 0.2 },    // E4
+                        { freq: 294, dur: 0.2 },    // D4
+                        { freq: 262, dur: 0.4 }     // C4 - نغمة منخفضة
+                    ];
+                    
+                    let totalTime = 0;
+                    loseMelody.forEach(({ freq, dur }, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        
+                        osc.frequency.setValueAtTime(freq, now + totalTime);
+                        osc.type = 'sine';
+                        
+                        gain.gain.setValueAtTime(0.12, now + totalTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + totalTime + dur);
+                        
+                        osc.start(now + totalTime);
+                        osc.stop(now + totalTime + dur);
+                        
+                        totalTime += dur + 0.05;
+                    });
+                } catch (e) {
+                    console.warn('Lose sound error:', e);
+                }
             }
-            stopBackgroundMusic() { if (this.bgInterval) { clearInterval(this.bgInterval); this.bgInterval = null; } }
+
+            // تشغيل المقطع الصوتي الترحيبي من رابط خارجي
+            playStartAudio(audioUrl) {
+                if (!soundEnabled || !audioUrl) return;
+                try {
+                    const audio = new Audio(audioUrl);
+                    audio.volume = 0.7;
+                    audio.play().catch(e => console.warn('Start audio error:', e));
+                } catch (e) {
+                    console.warn('Audio playback error:', e);
+                }
+            }
         }
 
-        const soundManager = new SoundManager();
+        const soundManager = new EnhancedSoundManager();
 
         function getUserId() {
             const params = new URLSearchParams(window.location.search);
@@ -900,6 +1039,7 @@
                     if (settingsCache.bg_image_url) document.getElementById('bgImage').src = settingsCache.bg_image_url;
                     if (settingsCache.loading_image_url) document.getElementById('loadingImage').src = settingsCache.loading_image_url;
                     spinDuration = parseInt(settingsCache.spin_duration) || 3500;
+                    startAudioUrl = settingsCache.start_audio_url || '';
                     document.getElementById('editBannerText').value = settingsCache.banner_text || '';
                     document.getElementById('editBgImage').value = settingsCache.bg_image_url || '';
                     document.getElementById('editLoadingImage').value = settingsCache.loading_image_url || '';
@@ -910,6 +1050,7 @@
                     document.getElementById('editDepositRequired').checked = settingsCache.deposit_required === 'true';
                     document.getElementById('editDepositMin').value = settingsCache.deposit_min_amount || 1000;
                     document.getElementById('editDepositHours').value = settingsCache.deposit_check_hours || 24;
+                    document.getElementById('editStartAudioUrl').value = settingsCache.start_audio_url || '';
                     return data.settings;
                 }
             } catch (e) {}
@@ -1090,7 +1231,9 @@
             document.getElementById('spinBtnText').textContent = 'جاري التدوير...';
             document.getElementById('resultBox').classList.remove('show');
             clearWinEffects();
-            soundManager.init(); soundManager.playBackgroundMusic();
+            
+            soundManager.init();
+            soundManager.playSpinSound(); // تشغيل صوت الدوران
 
             try {
                 const response = await fetch(`${API_BASE}/api/wheel/spin`, {
@@ -1130,8 +1273,13 @@
         function showResult(prize, isWin) {
             document.getElementById('prizeDesc').textContent = prize.description || prize.name || 'جائزة!';
             document.getElementById('resultBox').classList.add('show');
-            if (isWin) { document.getElementById('resultBox').classList.add('winner'); createWinEffects(prize.description || prize.name); soundManager.playWinSound(); }
-            else { soundManager.playLoseSound(); }
+            if (isWin) {
+                document.getElementById('resultBox').classList.add('winner');
+                createWinEffects(prize.description || prize.name);
+                soundManager.playWinSound(); // صوت الربح
+            } else {
+                soundManager.playLoseSound(); // صوت الخسارة
+            }
             loadUserStatus();
         }
 
@@ -1139,6 +1287,17 @@
             const el = document.getElementById('errorMsg');
             document.getElementById('errorText').textContent = '❌ ' + msg;
             el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 5000);
+        }
+
+        // تشغيل الصوت الترحيبي عند الضغط على زر البدء
+        function setupStartButton() {
+            const startBtn = document.getElementById('startBtn');
+            startBtn.onclick = () => {
+                soundManager.init();
+                soundManager.playStartAudio(startAudioUrl);
+                startBtn.style.display = 'none';
+                showLoading(false);
+            };
         }
 
         async function init() {
@@ -1151,12 +1310,22 @@
             updateLoading(50); const prizes = await loadPrizes();
             updateLoading(70); drawWheel(prizes, -1, 0);
             updateLoading(85); await loadUserStatus();
-            updateLoading(100); setTimeout(() => { showLoading(false); if (USER_ID === ADMIN_ID) renderAdminPanel(); }, 500);
+            updateLoading(100);
+            
+            // عرض زر البدء بعد اكتمال التحميل
+            setTimeout(() => {
+                const startBtn = document.getElementById('startBtn');
+                if (startAudioUrl) {
+                    startBtn.style.display = 'block';
+                } else {
+                    showLoading(false);
+                    if (USER_ID === ADMIN_ID) renderAdminPanel();
+                }
+            }, 500);
         }
 
         document.getElementById('spinBtn').onclick = spinWheel;
-        document.getElementById('soundToggle').onchange = (e) => { soundEnabled = e.target.checked; if (!soundEnabled) soundManager.stopAll(); else { soundManager.init(); soundManager.playBackgroundMusic(); } };
-        document.getElementById('musicToggle').onchange = (e) => { musicEnabled = e.target.checked; if (!musicEnabled) soundManager.stopBackgroundMusic(); else { soundManager.init(); soundManager.playBackgroundMusic(); } };
+        document.getElementById('soundToggle').onchange = (e) => { soundEnabled = e.target.checked; };
         document.querySelectorAll('.btn-save').forEach(btn => {
             btn.onclick = async function() {
                 const key = this.dataset.setting; const fieldId = this.dataset.field;
@@ -1176,6 +1345,7 @@
         document.getElementById('refreshPrizesBtn').onclick = () => refreshAll();
         document.getElementById('resetPrizesBtn').onclick = async () => { if (confirm('إعادة تعيين؟')) { await resetPrizes(); await refreshAll(); } };
 
+        setupStartButton();
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>

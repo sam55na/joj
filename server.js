@@ -254,30 +254,6 @@ async function ensureTables() {
 }
 
 // ================================================================
-//                      نظام الأقفال
-// ================================================================
-const userLocks = new Map();
-
-function acquireLock(userId) {
-    if (userLocks.has(userId)) return false;
-    userLocks.set(userId, Date.now());
-    return true;
-}
-
-function releaseLock(userId) {
-    userLocks.delete(userId);
-}
-
-setInterval(() => {
-    const now = Date.now();
-    for (const [key, value] of userLocks) {
-        if (value < now - 300000) {
-            userLocks.delete(key);
-        }
-    }
-}, 300000);
-
-// ================================================================
 //                      المسارات (API Endpoints)
 // ================================================================
 
@@ -308,7 +284,8 @@ app.get('/', (req, res) => {
                 add_prize: 'POST /api/admin/prizes',
                 update_prize: 'PUT /api/admin/prizes/:prize_id',
                 delete_prize: 'DELETE /api/admin/prizes/:prize_id',
-                seed_prizes: 'POST /api/admin/seed-prizes'
+                seed_prizes: 'POST /api/admin/seed-prizes',
+                reset_spins: 'POST /api/admin/reset-spins'
             }
         }
     });
@@ -713,6 +690,55 @@ app.post('/api/admin/seed-prizes', async (req, res) => {
     }
 });
 
+// -------------------- إعادة تعيين التدويرات (بدون كاش) --------------------
+app.post('/api/admin/reset-spins', async (req, res) => {
+    const { admin_id, user_id } = req.body;
+
+    console.log(`🔄 Resetting spins: admin=${admin_id}, user=${user_id || 'all'}`);
+
+    if (parseInt(admin_id) !== ADMIN_ID) {
+        return res.status(403).json({
+            success: false,
+            error: 'Unauthorized - Admin only'
+        });
+    }
+
+    try {
+        let deletedCount;
+        
+        if (user_id) {
+            // حذف تدويرات مستخدم محدد
+            const result = await pool.query(
+                'DELETE FROM wheel_spins WHERE user_id = $1 RETURNING id',
+                [user_id]
+            );
+            deletedCount = result.rowCount;
+            console.log(`🗑️ Deleted ${deletedCount} spins for user ${user_id}`);
+        } else {
+            // حذف جميع التدويرات
+            const result = await pool.query('DELETE FROM wheel_spins RETURNING id');
+            deletedCount = result.rowCount;
+            console.log(`🗑️ Deleted ${deletedCount} spins for all users`);
+        }
+
+        // إعادة تعيين التسلسل (sequence)
+        await pool.query('ALTER SEQUENCE wheel_spins_id_seq RESTART WITH 1');
+
+        res.json({
+            success: true,
+            deleted_count: deletedCount,
+            message: `✅ تم حذف ${deletedCount} تدوير${user_id ? ` للمستخدم ${user_id}` : ''} بنجاح`
+        });
+
+    } catch (error) {
+        console.error('❌ Reset spins error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 // -------------------- تدوير العجلة --------------------
 app.post('/api/wheel/spin', async (req, res) => {
     const { user_id } = req.body;
@@ -731,22 +757,15 @@ app.post('/api/wheel/spin', async (req, res) => {
         });
     }
 
-    if (!acquireLock(user_id)) {
-        return res.status(429).json({
-            success: false,
-            error: 'لديك طلب قيد المعالجة، يرجى الانتظار',
-            is_processing: true
-        });
-    }
-
     try {
+        console.log(`🎡 Spin request for user: ${user_id}`);
+
         // 1. التحقق من تفعيل العجلة
         const isActive = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['is_active']
         );
         if (isActive.rows[0]?.setting_value !== 'true') {
-            releaseLock(user_id);
             return res.status(403).json({
                 success: false,
                 error: 'العجلة معطلة حالياً'
@@ -759,8 +778,6 @@ app.post('/api/wheel/spin', async (req, res) => {
             ['deposit_required']
         );
         const isDepositRequired = depositRequired.rows[0]?.setting_value === 'true';
-
-        console.log(`💰 Deposit required: ${isDepositRequired} for user ${user_id}`);
 
         if (isDepositRequired) {
             const minAmount = await pool.query(
@@ -775,8 +792,6 @@ app.post('/api/wheel/spin', async (req, res) => {
             const minAmountValue = parseFloat(minAmount.rows[0]?.setting_value || 1000);
             const checkHoursValue = parseInt(checkHours.rows[0]?.setting_value || 24);
 
-            console.log(`💰 Min amount: ${minAmountValue}, Check hours: ${checkHoursValue}`);
-
             const userDeposits = await pool.query(`
                 SELECT COALESCE(SUM(final_amount), 0) as total
                 FROM external_deposits
@@ -787,10 +802,7 @@ app.post('/api/wheel/spin', async (req, res) => {
 
             const totalDeposits = parseFloat(userDeposits.rows[0]?.total || 0);
 
-            console.log(`💰 User ${user_id} deposits: ${totalDeposits}`);
-
             if (totalDeposits < minAmountValue) {
-                releaseLock(user_id);
                 return res.status(403).json({
                     success: false,
                     error: `مطلوب إيداع ${minAmountValue} SYP خلال آخر ${checkHoursValue} ساعة`,
@@ -803,13 +815,14 @@ app.post('/api/wheel/spin', async (req, res) => {
             }
         }
 
-        // 3. التحقق من آخر تدوير
+        // 3. التحقق من آخر تدوير (من قاعدة البيانات مباشرة)
         const intervalHours = await pool.query(
             'SELECT setting_value FROM wheel_settings WHERE setting_key = $1',
             ['spin_interval_hours']
         );
         const intervalHoursValue = parseInt(intervalHours.rows[0]?.setting_value || 24);
 
+        // ✅ استعلام مباشر من قاعدة البيانات - بدون كاش
         const lastSpin = await pool.query(`
             SELECT spin_date FROM wheel_spins 
             WHERE user_id = $1 
@@ -822,11 +835,12 @@ app.post('/api/wheel/spin', async (req, res) => {
             const now = new Date();
             const hoursDiff = (now - lastSpinDate) / (1000 * 60 * 60);
 
+            console.log(`⏰ Last spin: ${lastSpinDate}, Now: ${now}, Diff: ${hoursDiff}h`);
+
             if (hoursDiff < intervalHoursValue) {
                 const remainingHours = Math.ceil(intervalHoursValue - hoursDiff);
                 const remainingMinutes = Math.ceil((intervalHoursValue - hoursDiff) * 60);
                 
-                releaseLock(user_id);
                 return res.status(429).json({
                     success: false,
                     error: `يمكنك التدوير مرة أخرى بعد ${remainingHours} ساعة`,
@@ -834,6 +848,8 @@ app.post('/api/wheel/spin', async (req, res) => {
                     remaining_minutes: remainingMinutes % 60
                 });
             }
+        } else {
+            console.log(`👤 User ${user_id} has no previous spins`);
         }
 
         // 4. اختيار جائزة
@@ -843,7 +859,6 @@ app.post('/api/wheel/spin', async (req, res) => {
         `);
 
         if (prizes.rows.length === 0) {
-            releaseLock(user_id);
             return res.status(500).json({
                 success: false,
                 error: 'لا توجد جوائز متاحة'
@@ -862,12 +877,16 @@ app.post('/api/wheel/spin', async (req, res) => {
             random -= parseFloat(prize.probability);
         }
 
+        console.log(`🎯 Selected prize: ${selectedPrize.name} (${selectedPrize.probability}%)`);
+
         // 5. تسجيل التدوير في قاعدة البيانات
         const result = await pool.query(`
             INSERT INTO wheel_spins (user_id, prize_id, prize_name, is_claimed)
             VALUES ($1, $2, $3, FALSE)
             RETURNING id, spin_date
         `, [user_id, selectedPrize.id, selectedPrize.name]);
+
+        console.log(`✅ Spin recorded: ID=${result.rows[0].id}, User=${user_id}, Prize=${selectedPrize.name}`);
 
         // 6. إحصائيات المستخدم
         const userStats = await pool.query(`
@@ -877,8 +896,6 @@ app.post('/api/wheel/spin', async (req, res) => {
             FROM wheel_spins 
             WHERE user_id = $1
         `, [user_id]);
-
-        console.log(`✅ Spin recorded: User ${user_id} won ${selectedPrize.name} (Spin ID: ${result.rows[0].id})`);
 
         res.json({
             success: true,
@@ -899,8 +916,6 @@ app.post('/api/wheel/spin', async (req, res) => {
             success: false,
             error: error.message
         });
-    } finally {
-        releaseLock(user_id);
     }
 });
 
@@ -916,6 +931,7 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
     }
 
     try {
+        // ✅ استعلام مباشر من قاعدة البيانات - بدون كاش
         const lastSpin = await pool.query(`
             SELECT spin_date FROM wheel_spins 
             WHERE user_id = $1 
@@ -981,7 +997,6 @@ app.get('/api/wheel/history/:user_id', async (req, res) => {
             }
         }
 
-        // إذا كان شرط الإيداع مفعلاً ولم يتحقق
         if (isDepositRequired && depositInfo && !depositInfo.is_met) {
             can_spin = false;
         }

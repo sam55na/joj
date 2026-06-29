@@ -84,7 +84,7 @@
             display: none;
         }
 
-        /* ===== العجلة مع إطار نيون ذهبي ===== */
+        /* ===== العجلة مع إطار نيون ذهبي عريض ===== */
         .wheel-wrapper {
             position: relative;
             width: 100%;
@@ -104,43 +104,42 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            padding: 16px;
+            padding: 20px;
             background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* ===== إطار نيون ذهبي لامع ===== */
-        .neon-frame-gold {
+        /* ===== إطار نيون ذهبي عريض يدور ===== */
+        .neon-frame-wide {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: -4px;
+            left: -4px;
+            width: calc(100% + 8px);
+            height: calc(100% + 8px);
             border-radius: 50%;
             pointer-events: none;
             z-index: 2;
-            border: 4px solid #FFD700;
-            background: radial-gradient(circle at center, transparent 60%, rgba(255, 215, 0, 0.05) 70%, rgba(255, 215, 0, 0.15) 85%, rgba(255, 215, 0, 0.3) 100%);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1), inset 0 0 30px rgba(255, 215, 0, 0.1);
-            animation: goldNeonPulse 2.5s ease-in-out infinite;
+            border: 8px solid transparent;
+            background: conic-gradient(from 0deg, #FFD700, #FFA500, #FFD700, #FFA500, #FFD700) border-box;
+            -webkit-mask: radial-gradient(circle at center, transparent 62%, black 63%, black 100%);
+            mask: radial-gradient(circle at center, transparent 62%, black 63%, black 100%);
+            animation: frameSpin 6s linear infinite;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), 0 0 80px rgba(255, 215, 0, 0.15), inset 0 0 40px rgba(255, 215, 0, 0.1);
         }
 
-        @keyframes goldNeonPulse {
-            0%,
+        @keyframes frameSpin {
+            0% {
+                transform: rotate(0deg);
+            }
             100% {
-                box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1), inset 0 0 30px rgba(255, 215, 0, 0.1);
-                border-color: #FFD700;
-            }
-            50% {
-                box-shadow: 0 0 50px rgba(255, 215, 0, 0.6), 0 0 100px rgba(255, 215, 0, 0.4), 0 0 150px rgba(255, 215, 0, 0.2), inset 0 0 50px rgba(255, 215, 0, 0.2);
-                border-color: #FFA500;
+                transform: rotate(360deg);
             }
         }
 
-        /* ===== حلقات نبضية ذهبية متلاشية ===== */
-        .wave-ring-gold {
+        /* ===== موجات كخطوط رفيعة تتلاشى ===== */
+        .wave-line {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -148,42 +147,53 @@
             pointer-events: none;
             z-index: 1;
             transform: translate(-50%, -50%);
-            border: 2px solid rgba(255, 215, 0, 0.6);
-            animation: waveGoldExpand 4s ease-out infinite;
+            border: 1.5px solid rgba(255, 215, 0, 0.7);
+            animation: waveLineExpand 3.5s ease-out infinite;
         }
 
-        .wave-ring-gold:nth-child(3) {
+        .wave-line:nth-child(3) {
+            width: 70%;
+            height: 70%;
+            animation-delay: 0s;
+        }
+
+        .wave-line:nth-child(4) {
             width: 78%;
             height: 78%;
-            animation-delay: 0s;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            animation-delay: 1.2s;
+            border-width: 1px;
         }
 
-        .wave-ring-gold:nth-child(4) {
-            width: 85%;
-            height: 85%;
-            animation-delay: 1.3s;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.1);
+        .wave-line:nth-child(5) {
+            width: 86%;
+            height: 86%;
+            animation-delay: 2.4s;
+            border-width: 1px;
         }
 
-        .wave-ring-gold:nth-child(5) {
-            width: 92%;
-            height: 92%;
-            animation-delay: 2.6s;
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.08);
+        .wave-line:nth-child(6) {
+            width: 94%;
+            height: 94%;
+            animation-delay: 0.6s;
+            border-width: 0.5px;
         }
 
-        @keyframes waveGoldExpand {
+        .wave-line:nth-child(7) {
+            width: 102%;
+            height: 102%;
+            animation-delay: 1.8s;
+            border-width: 0.5px;
+        }
+
+        @keyframes waveLineExpand {
             0% {
-                transform: translate(-50%, -50%) scale(0.92);
+                transform: translate(-50%, -50%) scale(0.85);
                 opacity: 0.9;
-                border-width: 4px;
                 border-color: rgba(255, 215, 0, 0.8);
             }
             100% {
-                transform: translate(-50%, -50%) scale(1.2);
+                transform: translate(-50%, -50%) scale(1.25);
                 opacity: 0;
-                border-width: 1px;
                 border-color: rgba(255, 215, 0, 0);
             }
         }
@@ -191,10 +201,10 @@
         /* ===== وهج ذهبي داخلي ===== */
         .inner-glow-gold {
             position: absolute;
-            top: 8%;
-            left: 8%;
-            width: 84%;
-            height: 84%;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
             border-radius: 50%;
             pointer-events: none;
             z-index: 1;
@@ -498,6 +508,7 @@
             animation: fadeIn 0.3s ease;
         }
 
+        /* ===== شاشة اللودينغ ===== */
         .loading-screen {
             display: none;
             position: fixed;
@@ -543,6 +554,7 @@
             width: 60%;
             max-width: 220px;
             position: relative;
+            margin-bottom: 20px;
         }
         .loading-screen .progress-bar-bg {
             width: 100%;
@@ -565,6 +577,40 @@
             text-align: center;
             font-weight: 600;
             letter-spacing: 1px;
+        }
+
+        /* ===== زر البدء في شاشة اللودينغ ===== */
+        .loading-start-btn {
+            display: none;
+            margin-top: 20px;
+            padding: 14px 50px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 50px;
+            color: #0a0a0a;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+            animation: startBtnPulse 1.5s ease-in-out infinite;
+            transition: all 0.3s;
+        }
+        .loading-start-btn.show {
+            display: block;
+        }
+        .loading-start-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.7);
+        }
+
+        @keyframes startBtnPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 80px rgba(255, 215, 0, 0.7);
+            }
         }
 
         .sound-settings {
@@ -1051,6 +1097,10 @@
                 gap: 12px;
                 padding: 4px 12px;
             }
+            .loading-start-btn {
+                font-size: 17px;
+                padding: 12px 35px;
+            }
         }
 
         @media (max-width: 380px) {
@@ -1070,6 +1120,10 @@
             .pointer {
                 font-size: 22px;
                 top: -10px;
+            }
+            .loading-start-btn {
+                font-size: 15px;
+                padding: 10px 25px;
             }
         }
     </style>
@@ -1098,6 +1152,7 @@
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
 
+    <!-- ===== شاشة اللودينغ مع زر البدء ===== -->
     <div class="loading-screen" id="loadingScreen">
         <img class="loading-image" id="loadingImage" src="https://via.placeholder.com/200/1a1a2e/FFD700?text=🎡" alt="Loading">
         <div class="progress-container">
@@ -1106,21 +1161,25 @@
             </div>
             <div class="progress-text" id="loaderStatusText">0%</div>
         </div>
+        <!-- زر البدء -->
+        <button class="loading-start-btn" id="startBtn">🚀 ابدأ</button>
     </div>
 
-    <!-- ===== العجلة مع إطار نيون ذهبي ===== -->
+    <!-- ===== العجلة مع إطار نيون ذهبي عريض وموجات ===== -->
     <div class="wheel-wrapper" id="wheelWrapper">
         <div class="wheel-container">
-            <!-- حلقات نبضية ذهبية متلاشية -->
-            <div class="wave-ring-gold"></div>
-            <div class="wave-ring-gold"></div>
-            <div class="wave-ring-gold"></div>
+            <!-- موجات كخطوط رفيعة -->
+            <div class="wave-line"></div>
+            <div class="wave-line"></div>
+            <div class="wave-line"></div>
+            <div class="wave-line"></div>
+            <div class="wave-line"></div>
 
             <!-- الوهج الداخلي -->
             <div class="inner-glow-gold"></div>
 
-            <!-- الإطار النيون الذهبي -->
-            <div class="neon-frame-gold"></div>
+            <!-- الإطار النيون الذهبي العريض الدوار -->
+            <div class="neon-frame-wide"></div>
 
             <!-- السهم -->
             <div class="pointer" id="pointer">🔽</div>
@@ -1263,6 +1322,8 @@
         let soundEnabled = true;
         let settingsCache = {};
         let spinDuration = 3500;
+        let loadingComplete = false;
+        let gameStarted = false;
 
         // ================================================================
         //                      نظام الصوت المتطور
@@ -1272,7 +1333,6 @@
                 this.initialized = false;
                 this.audioContext = null;
                 this.isPlaying = false;
-                this.spinSoundInterval = null;
             }
 
             init() {
@@ -1286,7 +1346,6 @@
             }
 
             stopAll() {
-                this.stopSpinSound();
                 if (this.audioContext) {
                     try {
                         this.audioContext.close();
@@ -1296,55 +1355,42 @@
                 this.isPlaying = false;
             }
 
-            // ===== صوت تدوير مميز =====
-            playSpinSound() {
+            // ===== تشغيل مقطع صوتي قصير من رابط =====
+            playShortAudio(url) {
                 if (!soundEnabled || !this.initialized) return;
-                this.stopSpinSound();
                 try {
-                    const ctx = this.audioContext;
-                    const now = ctx.currentTime;
-                    let count = 0;
-
-                    this.spinSoundInterval = setInterval(() => {
-                        if (!soundEnabled || !this.initialized) {
-                            this.stopSpinSound();
-                            return;
-                        }
-                        try {
-                            const t = ctx.currentTime;
-                            // نغمة تدوير سريعة تشبه صوت العجلة
-                            const osc = ctx.createOscillator();
-                            const gain = ctx.createGain();
-                            osc.connect(gain);
-                            gain.connect(ctx.destination);
-
-                            // تردد متغير يعطي احساس بالدوران
-                            const freq = 120 + (count % 5) * 30 + Math.sin(count * 0.5) * 20;
-                            osc.frequency.setValueAtTime(freq, t);
-                            osc.type = 'square';
-
-                            gain.gain.setValueAtTime(0.04, t);
-                            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-
-                            osc.start(t);
-                            osc.stop(t + 0.08);
-
-                            count++;
-                        } catch (e) {
-                            console.warn('Spin sound tick error:', e);
-                        }
-                    }, 100);
-
-                    setTimeout(() => this.stopSpinSound(), 6000);
+                    const audio = new Audio(url);
+                    audio.volume = 0.9;
+                    audio.play().catch(e => {
+                        console.warn('Audio play error:', e);
+                        this.playFallbackSound();
+                    });
                 } catch (e) {
-                    console.warn('Spin sound error:', e);
+                    console.warn('Audio error:', e);
+                    this.playFallbackSound();
                 }
             }
 
-            stopSpinSound() {
-                if (this.spinSoundInterval) {
-                    clearInterval(this.spinSoundInterval);
-                    this.spinSoundInterval = null;
+            // ===== صوت احتياطي =====
+            playFallbackSound() {
+                try {
+                    const ctx = this.audioContext;
+                    const now = ctx.currentTime;
+                    const notes = [523, 659, 784, 1047];
+                    notes.forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.frequency.setValueAtTime(freq, now + i * 0.08);
+                        osc.type = 'sine';
+                        gain.gain.setValueAtTime(0.05, now + i * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.12);
+                        osc.start(now + i * 0.08);
+                        osc.stop(now + i * 0.08 + 0.12);
+                    });
+                } catch (e) {
+                    console.warn('Fallback sound error:', e);
                 }
             }
 
@@ -1355,7 +1401,6 @@
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
 
-                    // لحن ربح سعيد ومميز
                     const notes = [
                         [523, 0.15, 0.08],
                         [659, 0.15, 0.08],
@@ -1376,18 +1421,14 @@
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-
                         osc.frequency.setValueAtTime(freq, now + i * 0.07);
                         osc.type = i % 2 === 0 ? 'sine' : 'triangle';
-
                         gain.gain.setValueAtTime(vol || 0.08, now + i * 0.07);
                         gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + dur);
-
                         osc.start(now + i * 0.07);
                         osc.stop(now + i * 0.07 + dur);
                     });
 
-                    // نغمات مرافقة
                     setTimeout(() => {
                         const t = ctx.currentTime;
                         [523, 659, 784, 1047].forEach((freq, i) => {
@@ -1418,7 +1459,6 @@
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
 
-                    // نغمات خسارة حزينة ومميزة
                     const notes = [
                         [440, 0.3, 0.06],
                         [349, 0.3, 0.06],
@@ -1431,18 +1471,14 @@
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-
                         osc.frequency.setValueAtTime(freq, now + i * 0.25);
                         osc.type = 'sawtooth';
-
                         gain.gain.setValueAtTime(vol || 0.05, now + i * 0.25);
                         gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.25 + dur);
-
                         osc.start(now + i * 0.25);
                         osc.stop(now + i * 0.25 + dur);
                     });
 
-                    // تأثير إضافي
                     setTimeout(() => {
                         const t = ctx.currentTime;
                         const osc2 = ctx.createOscillator();
@@ -1462,30 +1498,6 @@
                 } catch (e) {
                     console.warn('Lose sound error:', e);
                     this.isPlaying = false;
-                }
-            }
-
-            // ===== صوت البداية =====
-            playStartSound() {
-                if (!soundEnabled || !this.initialized) return;
-                try {
-                    const ctx = this.audioContext;
-                    const now = ctx.currentTime;
-
-                    [523, 659, 784].forEach((freq, i) => {
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, now + i * 0.08);
-                        osc.type = 'sine';
-                        gain.gain.setValueAtTime(0.03, now + i * 0.08);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.1);
-                        osc.start(now + i * 0.08);
-                        osc.stop(now + i * 0.08 + 0.1);
-                    });
-                } catch (e) {
-                    console.warn('Start sound error:', e);
                 }
             }
         }
@@ -2065,7 +2077,7 @@
                     const canSpin = data.spin_status?.can_spin !== false &&
                         (!data.deposit_requirement?.required || data.deposit_requirement?.is_met);
 
-                    if (canSpin && prizesCache.length > 0) {
+                    if (canSpin && prizesCache.length > 0 && gameStarted) {
                         spinBtn.disabled = false;
                         document.getElementById('spinBtnText').textContent = '🎰 تدوير العجلة';
                     } else if (!data.spin_status?.can_spin) {
@@ -2078,6 +2090,9 @@
                         spinBtn.disabled = true;
                         document.getElementById('spinBtnText').textContent = '💰 إيداع مطلوب';
                         soundManager.stopAll();
+                    } else if (!gameStarted) {
+                        spinBtn.disabled = true;
+                        document.getElementById('spinBtnText').textContent = '⏳ انتظر بدء اللعبة...';
                     } else {
                         spinBtn.disabled = true;
                         document.getElementById('spinBtnText').textContent = '⏳ جاري التحميل...';
@@ -2157,6 +2172,11 @@
             const text = document.getElementById('loaderStatusText');
             bar.style.width = progress + '%';
             text.textContent = progress + '%';
+
+            if (progress >= 100 && !loadingComplete) {
+                loadingComplete = true;
+                document.getElementById('startBtn').classList.add('show');
+            }
         }
 
         function showLoading(show) {
@@ -2170,6 +2190,25 @@
                 wrapper.classList.add('show');
             }
         }
+
+        // ================================================================
+        //                      زر البدء - رابط الصوت هنا
+        // ================================================================
+        document.getElementById('startBtn').addEventListener('click', function() {
+            // ⚠️ ضع رابط المقطع الصوتي القصير هنا ⚠️
+            const audioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+
+            soundManager.init();
+            soundManager.playShortAudio(audioUrl);
+
+            gameStarted = true;
+            showLoading(false);
+            document.getElementById('spinBtn').disabled = false;
+            this.classList.remove('show');
+
+            // تحديث حالة المستخدم لتفعيل الزر
+            loadUserStatus();
+        });
 
         // ================================================================
         //                      التحقق من الاتصال
@@ -2210,8 +2249,6 @@
             clearWinEffects();
 
             soundManager.init();
-            soundManager.playStartSound();
-            soundManager.playSpinSound();
 
             try {
                 const response = await fetch(`${API_BASE}/api/wheel/spin`, {
@@ -2477,9 +2514,6 @@
                 await new Promise(r => setTimeout(r, 600));
                 showError('⚠️ فشل تحميل البيانات: ' + e.message);
             }
-
-            showLoading(false);
-            document.getElementById('spinBtn').onclick = spinWheel;
         }
 
         document.addEventListener('DOMContentLoaded', init);

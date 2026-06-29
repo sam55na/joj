@@ -111,9 +111,55 @@
             border: 2px solid rgba(255, 215, 0, 0.05);
             transition: filter 0.4s ease;
             display: block;
+            position: relative;
+            z-index: 2;
         }
         .wheel-wrapper canvas.spinning {
             filter: brightness(1.15) drop-shadow(0 0 50px rgba(255, 215, 0, 0.12));
+        }
+
+        /* ===== الحاوية الخارجية للإطار المشع ===== */
+        .wheel-glow-container {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
+            border-radius: 50%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: visible;
+        }
+        .wheel-glow-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* ===== طبقة الأمواج الإضافية ===== */
+        .wave-layer {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: calc(100% + 40px);
+            height: calc(100% + 40px);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: visible;
+        }
+        .wave-layer canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         .pointer {
@@ -1014,10 +1060,19 @@
         </div>
     </div>
 
-    <!-- ===== العجلة - بدون حاوية خارجية ===== -->
+    <!-- ===== العجلة مع الإطار المشع ===== -->
     <div class="wheel-wrapper" id="wheelWrapper">
-        <div class="pointer" id="pointer">🔽</div>
+        <!-- طبقة الأمواج (الخلفية) -->
+        <div class="wave-layer" id="waveLayer">
+            <canvas id="waveCanvas" width="500" height="500"></canvas>
+        </div>
+        <!-- طبقة الإطار المشع -->
+        <div class="wheel-glow-container" id="glowContainer">
+            <canvas id="glowCanvas" width="500" height="500"></canvas>
+        </div>
+        <!-- العجلة الرئيسية -->
         <canvas id="wheelCanvas" width="500" height="500"></canvas>
+        <div class="pointer" id="pointer">🔽</div>
     </div>
 
     <!-- ===== لا توجد جوائز ===== -->
@@ -1045,7 +1100,7 @@
         </div>
     </div>
 
-    <!-- ===== النتيجة (يظهر الوصف فقط) ===== -->
+    <!-- ===== النتيجة ===== -->
     <div class="result-box" id="resultBox">
         <div class="confetti-container" id="confettiContainer"></div>
         <div class="prize-icon" id="prizeIcon">🎁</div>
@@ -1380,6 +1435,181 @@
                 return USER_ID;
             }
             return null;
+        }
+
+        // ================================================================
+        //                      رسم الإطار المشع والأمواج
+        // ================================================================
+
+        // ---- متغيرات الإطار المشع ----
+        let glowAngle = 0;
+        let waveAngle = 0;
+
+        function drawGlow() {
+            const canvas = document.getElementById('glowCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width,
+                h = canvas.height;
+            const cx = w / 2,
+                cy = h / 2;
+            const r = Math.min(w, h) / 2 - 6;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // عدد النقاط المشعة
+            const numDots = 60;
+            const angleStep = (2 * Math.PI) / numDots;
+
+            // تحديث زاوية الدوران (بطيء وعكس اتجاه العجلة)
+            glowAngle += 0.002;
+
+            for (let i = 0; i < numDots; i++) {
+                const angle = i * angleStep + glowAngle;
+                const baseR = r - 2;
+                // تموج بسيط في نصف القطر
+                const waveOffset = Math.sin(angle * 3 + glowAngle * 2) * 3;
+                const dotR = baseR + waveOffset;
+
+                const x = cx + Math.cos(angle) * dotR;
+                const y = cy + Math.sin(angle) * dotR;
+
+                // حجم النقطة يتغير مع الوقت
+                const size = 3 + Math.sin(angle * 2 + glowAngle * 3) * 2 + 2;
+
+                // شفافية متغيرة
+                const alpha = 0.4 + Math.sin(angle * 1.5 + glowAngle * 2) * 0.3 + 0.3;
+
+                // لون ذهبي مع تدرج
+                const hue = 45 + Math.sin(angle + glowAngle) * 15;
+                const lightness = 55 + Math.sin(angle * 2 + glowAngle * 2) * 20;
+
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, 2 * Math.PI);
+                ctx.fillStyle = `hsla(${hue}, 100%, ${lightness}%, ${alpha})`;
+                ctx.shadowColor = `hsla(${hue}, 100%, 70%, ${alpha * 0.6})`;
+                ctx.shadowBlur = 20 + size * 4;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // حلقة خارجية حول النقطة
+                ctx.beginPath();
+                ctx.arc(x, y, size * 1.8, 0, 2 * Math.PI);
+                ctx.strokeStyle = `hsla(${hue}, 100%, 70%, ${alpha * 0.2})`;
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+            }
+
+            // حلقة خارجية رفيعة متوهجة
+            for (let j = 0; j < 3; j++) {
+                const ringR = r - 4 + j * 3;
+                const alphaRing = 0.05 - j * 0.015;
+                ctx.beginPath();
+                ctx.arc(cx, cy, ringR, 0, 2 * Math.PI);
+                ctx.strokeStyle = `rgba(255, 215, 0, ${alphaRing})`;
+                ctx.lineWidth = 1.5 - j * 0.4;
+                ctx.shadowColor = `rgba(255, 215, 0, ${alphaRing * 0.5})`;
+                ctx.shadowBlur = 30;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+
+            // خطوط متوهجة شعاعية خفيفة
+            for (let k = 0; k < 24; k++) {
+                const angle = (k / 24) * 2 * Math.PI + glowAngle * 0.5;
+                const startR = r * 0.85;
+                const endR = r + 8;
+
+                const x1 = cx + Math.cos(angle) * startR;
+                const y1 = cy + Math.sin(angle) * startR;
+                const x2 = cx + Math.cos(angle) * endR;
+                const y2 = cy + Math.sin(angle) * endR;
+
+                const alphaLine = 0.03 + Math.sin(angle * 2 + glowAngle) * 0.02 + 0.02;
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = `rgba(255, 215, 0, ${alphaLine})`;
+                ctx.lineWidth = 1.5;
+                ctx.shadowColor = `rgba(255, 215, 0, ${alphaLine * 0.5})`;
+                ctx.shadowBlur = 15;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+
+            // استمرار الحلقة
+            requestAnimationFrame(drawGlow);
+        }
+
+        // ---- رسم الأمواج ----
+        function drawWaves() {
+            const canvas = document.getElementById('waveCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width,
+                h = canvas.height;
+            const cx = w / 2,
+                cy = h / 2;
+            const maxR = Math.min(w, h) / 2 + 10;
+
+            ctx.clearRect(0, 0, w, h);
+
+            waveAngle += 0.003;
+
+            // ثلاث موجات متداخلة
+            const waves = [
+                { offset: 0, speed: 1.2, amplitude: 6, width: 2.5, alpha: 0.08 },
+                { offset: 1.2, speed: 0.9, amplitude: 10, width: 1.8, alpha: 0.05 },
+                { offset: 2.8, speed: 0.6, amplitude: 14, width: 1.2, alpha: 0.03 }
+            ];
+
+            waves.forEach((wave, idx) => {
+                // نصف قطر القاعدة - يتحرك مع الزمن
+                const baseR = maxR - 2;
+
+                ctx.beginPath();
+                for (let i = 0; i <= 200; i++) {
+                    const angle = (i / 200) * 2 * Math.PI;
+                    // تموج نصف القطر
+                    const rOffset = Math.sin(angle * 3 + waveAngle * wave.speed + wave.offset) * wave.amplitude;
+                    const r = baseR + rOffset;
+
+                    const x = cx + Math.cos(angle) * r;
+                    const y = cy + Math.sin(angle) * r;
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.closePath();
+
+                // تأثير التوهج للأمواج
+                const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR + 20);
+                const alphaWave = wave.alpha + Math.sin(waveAngle * 0.5 + idx) * 0.02;
+                gradient.addColorStop(0, `rgba(255, 215, 0, ${alphaWave * 0.3})`);
+                gradient.addColorStop(0.5, `rgba(255, 215, 0, ${alphaWave * 0.7})`);
+                gradient.addColorStop(1, `rgba(255, 215, 0, ${alphaWave * 0.1})`);
+
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = wave.width + Math.sin(waveAngle * 0.7 + idx * 1.5) * 0.5;
+                ctx.shadowColor = `rgba(255, 215, 0, ${alphaWave * 0.3})`;
+                ctx.shadowBlur = 30 + wave.amplitude * 2;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // حلقة داخلية مكررة لتأثير العمق
+                if (idx === 0) {
+                    ctx.beginPath();
+                    const innerR = maxR - 12 + Math.sin(waveAngle * 0.8) * 3;
+                    ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
+                    ctx.strokeStyle = `rgba(255, 215, 0, ${0.02 + Math.sin(waveAngle * 0.5) * 0.01})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                }
+            });
+
+            requestAnimationFrame(drawWaves);
         }
 
         // ================================================================
@@ -2344,6 +2574,10 @@
 
                 soundManager.init();
                 soundManager.playBackgroundMusic();
+
+                // بدء تشغيل الإطار المشع والأمواج
+                drawGlow();
+                drawWaves();
 
             } catch (e) {
                 console.error('Init error:', e);

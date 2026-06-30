@@ -111,7 +111,7 @@
             justify-content: center;
         }
 
-        /* ===== إطار نيون ذهبي - شفاف تماماً بدون أي خلفية ===== */
+        /* ===== إطار نيون ذهبي - شفاف تماماً ===== */
         .neon-frame-gold {
             position: absolute;
             top: 0;
@@ -123,23 +123,23 @@
             z-index: 2;
             border: 4px solid #FFD700;
             background: transparent !important;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1), inset 0 0 30px rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1);
             animation: goldNeonPulse 2.5s ease-in-out infinite;
         }
 
         @keyframes goldNeonPulse {
             0%,
             100% {
-                box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1), inset 0 0 30px rgba(255, 215, 0, 0.1);
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1);
                 border-color: #FFD700;
             }
             50% {
-                box-shadow: 0 0 50px rgba(255, 215, 0, 0.6), 0 0 100px rgba(255, 215, 0, 0.4), 0 0 150px rgba(255, 215, 0, 0.2), inset 0 0 50px rgba(255, 215, 0, 0.2);
+                box-shadow: 0 0 50px rgba(255, 215, 0, 0.6), 0 0 100px rgba(255, 215, 0, 0.4), 0 0 150px rgba(255, 215, 0, 0.2);
                 border-color: #FFA500;
             }
         }
 
-        /* ===== حلقات نبضية ذهبية متلاشية ===== */
+        /* ===== حلقات نبضية ذهبية متلاشية - شفافة ===== */
         .wave-ring-gold {
             position: absolute;
             top: 50%;
@@ -150,27 +150,25 @@
             transform: translate(-50%, -50%);
             border: 2px solid rgba(255, 215, 0, 0.6);
             animation: waveGoldExpand 4s ease-out infinite;
+            background: transparent !important;
         }
 
         .wave-ring-gold:nth-child(3) {
             width: 78%;
             height: 78%;
             animation-delay: 0s;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
         }
 
         .wave-ring-gold:nth-child(4) {
             width: 85%;
             height: 85%;
             animation-delay: 1.3s;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.1);
         }
 
         .wave-ring-gold:nth-child(5) {
             width: 92%;
             height: 92%;
             animation-delay: 2.6s;
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.08);
         }
 
         @keyframes waveGoldExpand {
@@ -1210,12 +1208,12 @@
     <!-- ===== العجلة مع إطار نيون ذهبي ===== -->
     <div class="wheel-wrapper" id="wheelWrapper">
         <div class="wheel-container">
-            <!-- حلقات نبضية ذهبية متلاشية -->
+            <!-- حلقات نبضية ذهبية متلاشية - شفافة تماماً -->
             <div class="wave-ring-gold"></div>
             <div class="wave-ring-gold"></div>
             <div class="wave-ring-gold"></div>
 
-            <!-- الفقاعات المتوهجة باللون الأزرق (بين العجلة والإطار) -->
+            <!-- الفقاعات المتوهجة باللون الأزرق -->
             <div class="glow-bubbles-container">
                 <div class="glow-bubble"></div>
                 <div class="glow-bubble"></div>

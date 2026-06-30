@@ -37,7 +37,7 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 0.15;
+            opacity: 0.1;
             pointer-events: none;
             overflow: hidden;
         }
@@ -111,7 +111,7 @@
             justify-content: center;
         }
 
-        /* ===== إطار نيون ذهبي - شفاف تماماً بدون أي ظلال أو طبقات ===== */
+        /* ===== إطار نيون ذهبي - شفاف تماماً ===== */
         .neon-frame-gold {
             position: absolute;
             top: 0;
@@ -123,16 +123,18 @@
             z-index: 2;
             border: 4px solid #FFD700;
             background: transparent !important;
-            box-shadow: none !important;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1);
             animation: goldNeonPulse 2.5s ease-in-out infinite;
         }
 
         @keyframes goldNeonPulse {
             0%,
             100% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1);
                 border-color: #FFD700;
             }
             50% {
+                box-shadow: 0 0 50px rgba(255, 215, 0, 0.6), 0 0 100px rgba(255, 215, 0, 0.4), 0 0 150px rgba(255, 215, 0, 0.2);
                 border-color: #FFA500;
             }
         }
@@ -149,7 +151,6 @@
             border: 2px solid rgba(255, 215, 0, 0.6);
             animation: waveGoldExpand 4s ease-out infinite;
             background: transparent !important;
-            box-shadow: none !important;
         }
 
         .wave-ring-gold:nth-child(3) {
@@ -1224,7 +1225,7 @@
                 <div class="glow-bubble"></div>
             </div>
 
-            <!-- الإطار النيون الذهبي - بدون أي ظلال أو طبقات شفافة -->
+            <!-- الإطار النيون الذهبي - شفاف تماماً -->
             <div class="neon-frame-gold"></div>
 
             <!-- السهم -->

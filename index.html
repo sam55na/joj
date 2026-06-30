@@ -111,7 +111,7 @@
             justify-content: center;
         }
 
-        /* ===== إطار نيون ذهبي لامع ===== */
+        /* ===== إطار نيون ذهبي لامع (بدون خلفية شفافة) ===== */
         .neon-frame-gold {
             position: absolute;
             top: 0;
@@ -122,7 +122,7 @@
             pointer-events: none;
             z-index: 2;
             border: 4px solid #FFD700;
-            background: radial-gradient(circle at center, transparent 60%, rgba(255, 215, 0, 0.05) 70%, rgba(255, 215, 0, 0.15) 85%, rgba(255, 215, 0, 0.3) 100%);
+            background: transparent;
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1), inset 0 0 30px rgba(255, 215, 0, 0.1);
             animation: goldNeonPulse 2.5s ease-in-out infinite;
         }
@@ -187,8 +187,6 @@
                 border-color: rgba(255, 215, 0, 0);
             }
         }
-
-        /* ===== تم إزالة الوهج الداخلي (inner-glow-gold) ===== */
 
         /* ===== الفقاعات المتوهجة باللون الأزرق ===== */
         .glow-bubbles-container {
@@ -1217,8 +1215,6 @@
             <div class="wave-ring-gold"></div>
             <div class="wave-ring-gold"></div>
 
-            <!-- تم إزالة الوهج الداخلي (inner-glow-gold) -->
-
             <!-- الفقاعات المتوهجة باللون الأزرق (بين العجلة والإطار) -->
             <div class="glow-bubbles-container">
                 <div class="glow-bubble"></div>
@@ -1231,7 +1227,7 @@
                 <div class="glow-bubble"></div>
             </div>
 
-            <!-- الإطار النيون الذهبي -->
+            <!-- الإطار النيون الذهبي (بدون خلفية شفافة) -->
             <div class="neon-frame-gold"></div>
 
             <!-- السهم -->

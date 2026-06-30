@@ -188,32 +188,9 @@
             }
         }
 
-        /* ===== وهج ذهبي داخلي ===== */
-        .inner-glow-gold {
-            position: absolute;
-            top: 8%;
-            left: 8%;
-            width: 84%;
-            height: 84%;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1;
-            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.08), rgba(255, 215, 0, 0.02), transparent 70%);
-            animation: innerGoldPulse 3s ease-in-out infinite alternate;
-        }
+        /* ===== تم إزالة الوهج الداخلي (inner-glow-gold) ===== */
 
-        @keyframes innerGoldPulse {
-            0% {
-                opacity: 0.3;
-                transform: scale(0.95);
-            }
-            100% {
-                opacity: 0.7;
-                transform: scale(1.05);
-            }
-        }
-
-        /* ===== الفقاعات المتوهجة ===== */
+        /* ===== الفقاعات المتوهجة باللون الأزرق ===== */
         .glow-bubbles-container {
             position: absolute;
             top: 0;
@@ -228,11 +205,11 @@
         .glow-bubble {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.4), rgba(255, 215, 0, 0.05));
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2), inset 0 0 10px rgba(255, 215, 0, 0.1);
+            background: radial-gradient(circle at 30% 30%, rgba(0, 150, 255, 0.5), rgba(0, 100, 255, 0.05));
+            box-shadow: 0 0 25px rgba(0, 150, 255, 0.3), inset 0 0 15px rgba(0, 150, 255, 0.15);
             pointer-events: none;
             animation: floatBubble 12s infinite alternate ease-in-out;
-            opacity: 0.6;
+            opacity: 0.7;
         }
         .glow-bubble::after {
             content: '';
@@ -242,7 +219,7 @@
             width: 30%;
             height: 30%;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.7), transparent);
             opacity: 0.4;
         }
 
@@ -271,7 +248,7 @@
             left: 10%;
             animation-duration: 14s;
             animation-delay: 0s;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.5), rgba(255, 215, 0, 0.05));
+            background: radial-gradient(circle at 30% 30%, rgba(0, 150, 255, 0.6), rgba(0, 100, 255, 0.05));
         }
         .glow-bubble:nth-child(2) {
             width: 28px;
@@ -280,7 +257,7 @@
             right: 15%;
             animation-duration: 16s;
             animation-delay: 1.2s;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 200, 50, 0.4), rgba(255, 200, 50, 0.03));
+            background: radial-gradient(circle at 30% 30%, rgba(0, 180, 255, 0.5), rgba(0, 120, 255, 0.03));
         }
         .glow-bubble:nth-child(3) {
             width: 14px;
@@ -289,7 +266,7 @@
             left: 8%;
             animation-duration: 11s;
             animation-delay: 2.5s;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.5), rgba(255, 215, 0, 0.04));
+            background: radial-gradient(circle at 30% 30%, rgba(0, 150, 255, 0.6), rgba(0, 100, 255, 0.04));
         }
         .glow-bubble:nth-child(4) {
             width: 22px;
@@ -298,7 +275,7 @@
             right: 12%;
             animation-duration: 13s;
             animation-delay: 0.7s;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 220, 80, 0.4), rgba(255, 220, 80, 0.03));
+            background: radial-gradient(circle at 30% 30%, rgba(0, 200, 255, 0.5), rgba(0, 130, 255, 0.03));
         }
         .glow-bubble:nth-child(5) {
             width: 16px;
@@ -307,7 +284,7 @@
             left: 4%;
             animation-duration: 15s;
             animation-delay: 3s;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.5), rgba(255, 215, 0, 0.04));
+            background: radial-gradient(circle at 30% 30%, rgba(0, 150, 255, 0.6), rgba(0, 100, 255, 0.04));
         }
         .glow-bubble:nth-child(6) {
             width: 20px;
@@ -316,7 +293,7 @@
             right: 5%;
             animation-duration: 12s;
             animation-delay: 1.8s;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 210, 60, 0.4), rgba(255, 210, 60, 0.03));
+            background: radial-gradient(circle at 30% 30%, rgba(0, 170, 255, 0.5), rgba(0, 110, 255, 0.03));
         }
         .glow-bubble:nth-child(7) {
             width: 12px;
@@ -325,7 +302,7 @@
             left: 20%;
             animation-duration: 14.5s;
             animation-delay: 0.4s;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.6), rgba(255, 215, 0, 0.04));
+            background: radial-gradient(circle at 30% 30%, rgba(0, 150, 255, 0.7), rgba(0, 100, 255, 0.04));
         }
         .glow-bubble:nth-child(8) {
             width: 24px;
@@ -334,7 +311,7 @@
             right: 22%;
             animation-duration: 13.5s;
             animation-delay: 2.2s;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 200, 40, 0.4), rgba(255, 200, 40, 0.03));
+            background: radial-gradient(circle at 30% 30%, rgba(0, 190, 255, 0.5), rgba(0, 125, 255, 0.03));
         }
 
         .wheel-wrapper canvas {
@@ -1240,10 +1217,9 @@
             <div class="wave-ring-gold"></div>
             <div class="wave-ring-gold"></div>
 
-            <!-- الوهج الداخلي -->
-            <div class="inner-glow-gold"></div>
+            <!-- تم إزالة الوهج الداخلي (inner-glow-gold) -->
 
-            <!-- الفقاعات المتوهجة (بين العجلة والإطار) -->
+            <!-- الفقاعات المتوهجة باللون الأزرق (بين العجلة والإطار) -->
             <div class="glow-bubbles-container">
                 <div class="glow-bubble"></div>
                 <div class="glow-bubble"></div>

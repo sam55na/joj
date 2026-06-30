@@ -111,7 +111,7 @@
             justify-content: center;
         }
 
-        /* ===== إطار نيون ذهبي - شفاف تماماً ===== */
+        /* ===== إطار نيون ذهبي - شفاف تماماً بدون أي خلفية ===== */
         .neon-frame-gold {
             position: absolute;
             top: 0;
@@ -1227,7 +1227,7 @@
                 <div class="glow-bubble"></div>
             </div>
 
-            <!-- الإطار النيون الذهبي (شفاف تماماً) -->
+            <!-- الإطار النيون الذهبي - شفاف تماماً -->
             <div class="neon-frame-gold"></div>
 
             <!-- السهم -->
@@ -1373,6 +1373,53 @@
         let spinDuration = 3500;
 
         // ================================================================
+        //                      نظام إعادة محاولة الاتصال
+        // ================================================================
+        class ConnectionManager {
+            constructor() {
+                this.maxRetries = 3;
+                this.retryDelay = 2000;
+                this.timeout = 50000; // 50 ثانية
+            }
+
+            async fetchWithRetry(url, options = {}, retryCount = 0) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+                try {
+                    const response = await fetch(url, {
+                        ...options,
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    return response;
+                } catch (error) {
+                    clearTimeout(timeoutId);
+
+                    if (error.name === 'AbortError') {
+                        throw new Error('انتهت مهلة الاتصال بالخادم (50 ثانية)');
+                    }
+
+                    if (retryCount < this.maxRetries) {
+                        const delay = this.retryDelay * (retryCount + 1);
+                        console.log(`محاولة إعادة الاتصال ${retryCount + 1}/${this.maxRetries} بعد ${delay}ms`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return this.fetchWithRetry(url, options, retryCount + 1);
+                    }
+
+                    throw error;
+                }
+            }
+        }
+
+        const connectionManager = new ConnectionManager();
+
+        // ================================================================
         //                      نظام الصوت الهادئ والمميز
         // ================================================================
         class AdvancedSoundManager {
@@ -1404,7 +1451,6 @@
                 this.isPlaying = false;
             }
 
-            // ===== صوت تدوير هادئ وناعم =====
             playSpinSound() {
                 if (!soundEnabled || !this.initialized) return;
                 this.stopSpinSound();
@@ -1424,7 +1470,6 @@
                             osc.connect(gain);
                             gain.connect(ctx.destination);
 
-                            // نغمة ناعمة تشبه همس العجلة
                             const freq = 180 + Math.sin(count * 0.7) * 25 + Math.sin(count * 0.3) * 15;
                             osc.frequency.setValueAtTime(freq, t);
                             osc.type = 'sine';
@@ -1454,14 +1499,12 @@
                 }
             }
 
-            // ===== صوت ربح هادئ ولطيف =====
             playWinSound() {
                 if (!soundEnabled || !this.initialized) return;
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
 
-                    // لحن ربح هادئ وناعم
                     const notes = [
                         [523, 0.2, 0.06],
                         [587, 0.2, 0.06],
@@ -1493,7 +1536,6 @@
                         osc.stop(now + i * 0.08 + dur);
                     });
 
-                    // نغمات خلفية ناعمة
                     setTimeout(() => {
                         const t = ctx.currentTime;
                         [523, 587, 659, 784].forEach((freq, i) => {
@@ -1517,14 +1559,12 @@
                 }
             }
 
-            // ===== صوت خسارة هادئ ومميز =====
             playLoseSound() {
                 if (!soundEnabled || !this.initialized) return;
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
 
-                    // نغمات خسارة ناعمة وحزينة
                     const notes = [
                         [440, 0.35, 0.04],
                         [370, 0.35, 0.04],
@@ -1548,7 +1588,6 @@
                         osc.stop(now + i * 0.25 + dur);
                     });
 
-                    // تأثير خلفي ناعم
                     setTimeout(() => {
                         const t = ctx.currentTime;
                         const osc2 = ctx.createOscillator();
@@ -1571,7 +1610,6 @@
                 }
             }
 
-            // ===== صوت البداية هادئ =====
             playStartSound() {
                 if (!soundEnabled || !this.initialized) return;
                 try {
@@ -1779,11 +1817,11 @@
         }
 
         // ================================================================
-        //                      دوال الإدارة
+        //                      دوال الإدارة مع إعادة المحاولة
         // ================================================================
         async function loadSettings() {
             try {
-                const res = await fetch(`${API_BASE}/api/admin/settings?admin_id=${ADMIN_ID}`);
+                const res = await connectionManager.fetchWithRetry(`${API_BASE}/api/admin/settings?admin_id=${ADMIN_ID}`);
                 const data = await res.json();
                 if (data.success) {
                     settingsCache = data.settings;
@@ -1814,6 +1852,7 @@
                 return {};
             } catch (e) {
                 console.error('Error loading settings:', e);
+                showError('فشل تحميل الإعدادات: ' + e.message);
                 return {};
             }
         }
@@ -1824,7 +1863,7 @@
                 if (typeof value === 'boolean') {
                     finalValue = value ? 'true' : 'false';
                 }
-                const response = await fetch(`${API_BASE}/api/admin/setting`, {
+                const response = await connectionManager.fetchWithRetry(`${API_BASE}/api/admin/setting`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1847,7 +1886,7 @@
 
         async function loadAdminPrizes() {
             try {
-                const res = await fetch(`${API_BASE}/api/admin/prizes?admin_id=${ADMIN_ID}`);
+                const res = await connectionManager.fetchWithRetry(`${API_BASE}/api/admin/prizes?admin_id=${ADMIN_ID}`);
                 const data = await res.json();
                 if (data.success) {
                     return data.prizes || [];
@@ -1855,13 +1894,14 @@
                 return [];
             } catch (e) {
                 console.error('Error loading admin prizes:', e);
+                showError('فشل تحميل الجوائز: ' + e.message);
                 return [];
             }
         }
 
         async function loadPublicPrizes() {
             try {
-                const res = await fetch(`${API_BASE}/api/prizes`);
+                const res = await connectionManager.fetchWithRetry(`${API_BASE}/api/prizes`);
                 const data = await res.json();
                 if (data.success) {
                     return data.prizes || [];
@@ -1875,7 +1915,7 @@
 
         async function updatePrize(prizeId, data) {
             try {
-                const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
+                const response = await connectionManager.fetchWithRetry(`${API_BASE}/api/admin/prizes/${prizeId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ admin_id: ADMIN_ID, ...data })
@@ -1894,7 +1934,7 @@
 
         async function deletePrize(prizeId) {
             try {
-                const response = await fetch(`${API_BASE}/api/admin/prizes/${prizeId}`, {
+                const response = await connectionManager.fetchWithRetry(`${API_BASE}/api/admin/prizes/${prizeId}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ admin_id: ADMIN_ID })
@@ -1913,7 +1953,7 @@
 
         async function addPrize(name, icon, description, probability, color, color2) {
             try {
-                const response = await fetch(`${API_BASE}/api/admin/prizes`, {
+                const response = await connectionManager.fetchWithRetry(`${API_BASE}/api/admin/prizes`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1940,7 +1980,7 @@
 
         async function resetPrizes() {
             try {
-                const res = await fetch(`${API_BASE}/api/admin/seed-prizes`, {
+                const res = await connectionManager.fetchWithRetry(`${API_BASE}/api/admin/seed-prizes`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ admin_id: ADMIN_ID })
@@ -1949,6 +1989,7 @@
                 return data.success;
             } catch (e) {
                 console.error('Error resetting prizes:', e);
+                showError('❌ فشل إعادة التعيين: ' + e.message);
                 return false;
             }
         }
@@ -2121,7 +2162,7 @@
         // ================================================================
         async function loadPrizes() {
             try {
-                const res = await fetch(`${API_BASE}/api/prizes`);
+                const res = await connectionManager.fetchWithRetry(`${API_BASE}/api/prizes`);
                 const data = await res.json();
                 if (data.success && data.prizes && data.prizes.length > 0) {
                     prizesCache = data.prizes;
@@ -2130,6 +2171,7 @@
                 return [];
             } catch (e) {
                 console.error('Error loading prizes:', e);
+                showError('فشل تحميل الجوائز: ' + e.message);
                 return [];
             }
         }
@@ -2140,7 +2182,7 @@
         async function loadUserStatus() {
             if (!USER_ID) return;
             try {
-                const res = await fetch(`${API_BASE}/api/wheel/history/${USER_ID}`);
+                const res = await connectionManager.fetchWithRetry(`${API_BASE}/api/wheel/history/${USER_ID}`);
                 const data = await res.json();
                 if (data.success) {
                     const depositNotice = document.getElementById('depositNotice');
@@ -2191,6 +2233,7 @@
                 }
             } catch (e) {
                 console.error('Error loading user status:', e);
+                showError('فشل تحميل حالة المستخدم: ' + e.message);
             }
         }
 
@@ -2278,15 +2321,11 @@
         }
 
         // ================================================================
-        //                      التحقق من الاتصال
+        //                      التحقق من الاتصال مع إعادة المحاولة
         // ================================================================
         async function checkConnection() {
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
-                const response = await fetch(`${API_BASE}/api/status`, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                await connectionManager.fetchWithRetry(`${API_BASE}/api/status`);
                 return true;
             } catch (e) {
                 console.error('Connection failed:', e);
@@ -2320,7 +2359,7 @@
             soundManager.playSpinSound();
 
             try {
-                const response = await fetch(`${API_BASE}/api/wheel/spin`, {
+                const response = await connectionManager.fetchWithRetry(`${API_BASE}/api/wheel/spin`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: USER_ID })

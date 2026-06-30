@@ -213,6 +213,130 @@
             }
         }
 
+        /* ===== الفقاعات المتوهجة ===== */
+        .glow-bubbles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: visible;
+            border-radius: 50%;
+        }
+        .glow-bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.4), rgba(255, 215, 0, 0.05));
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2), inset 0 0 10px rgba(255, 215, 0, 0.1);
+            pointer-events: none;
+            animation: floatBubble 12s infinite alternate ease-in-out;
+            opacity: 0.6;
+        }
+        .glow-bubble::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 20%;
+            width: 30%;
+            height: 30%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
+            opacity: 0.4;
+        }
+
+        @keyframes floatBubble {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(15px, -20px) scale(1.1);
+            }
+            50% {
+                transform: translate(-10px, 25px) scale(0.9);
+            }
+            75% {
+                transform: translate(20px, 10px) scale(1.05);
+            }
+            100% {
+                transform: translate(-15px, -15px) scale(0.95);
+            }
+        }
+
+        .glow-bubble:nth-child(1) {
+            width: 18px;
+            height: 18px;
+            top: 12%;
+            left: 10%;
+            animation-duration: 14s;
+            animation-delay: 0s;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.5), rgba(255, 215, 0, 0.05));
+        }
+        .glow-bubble:nth-child(2) {
+            width: 28px;
+            height: 28px;
+            top: 8%;
+            right: 15%;
+            animation-duration: 16s;
+            animation-delay: 1.2s;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 200, 50, 0.4), rgba(255, 200, 50, 0.03));
+        }
+        .glow-bubble:nth-child(3) {
+            width: 14px;
+            height: 14px;
+            bottom: 20%;
+            left: 8%;
+            animation-duration: 11s;
+            animation-delay: 2.5s;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.5), rgba(255, 215, 0, 0.04));
+        }
+        .glow-bubble:nth-child(4) {
+            width: 22px;
+            height: 22px;
+            bottom: 15%;
+            right: 12%;
+            animation-duration: 13s;
+            animation-delay: 0.7s;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 220, 80, 0.4), rgba(255, 220, 80, 0.03));
+        }
+        .glow-bubble:nth-child(5) {
+            width: 16px;
+            height: 16px;
+            top: 45%;
+            left: 4%;
+            animation-duration: 15s;
+            animation-delay: 3s;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.5), rgba(255, 215, 0, 0.04));
+        }
+        .glow-bubble:nth-child(6) {
+            width: 20px;
+            height: 20px;
+            top: 40%;
+            right: 5%;
+            animation-duration: 12s;
+            animation-delay: 1.8s;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 210, 60, 0.4), rgba(255, 210, 60, 0.03));
+        }
+        .glow-bubble:nth-child(7) {
+            width: 12px;
+            height: 12px;
+            top: 70%;
+            left: 20%;
+            animation-duration: 14.5s;
+            animation-delay: 0.4s;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.6), rgba(255, 215, 0, 0.04));
+        }
+        .glow-bubble:nth-child(8) {
+            width: 24px;
+            height: 24px;
+            top: 68%;
+            right: 22%;
+            animation-duration: 13.5s;
+            animation-delay: 2.2s;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 200, 40, 0.4), rgba(255, 200, 40, 0.03));
+        }
+
         .wheel-wrapper canvas {
             width: 100% !important;
             height: 100% !important;
@@ -1119,6 +1243,18 @@
             <!-- الوهج الداخلي -->
             <div class="inner-glow-gold"></div>
 
+            <!-- الفقاعات المتوهجة (بين العجلة والإطار) -->
+            <div class="glow-bubbles-container">
+                <div class="glow-bubble"></div>
+                <div class="glow-bubble"></div>
+                <div class="glow-bubble"></div>
+                <div class="glow-bubble"></div>
+                <div class="glow-bubble"></div>
+                <div class="glow-bubble"></div>
+                <div class="glow-bubble"></div>
+                <div class="glow-bubble"></div>
+            </div>
+
             <!-- الإطار النيون الذهبي -->
             <div class="neon-frame-gold"></div>
 
@@ -1265,7 +1401,7 @@
         let spinDuration = 3500;
 
         // ================================================================
-        //                      نظام الصوت المتطور
+        //                      نظام الصوت الهادئ والمميز
         // ================================================================
         class AdvancedSoundManager {
             constructor() {
@@ -1296,13 +1432,12 @@
                 this.isPlaying = false;
             }
 
-            // ===== صوت تدوير مميز =====
+            // ===== صوت تدوير هادئ وناعم =====
             playSpinSound() {
                 if (!soundEnabled || !this.initialized) return;
                 this.stopSpinSound();
                 try {
                     const ctx = this.audioContext;
-                    const now = ctx.currentTime;
                     let count = 0;
 
                     this.spinSoundInterval = setInterval(() => {
@@ -1312,28 +1447,27 @@
                         }
                         try {
                             const t = ctx.currentTime;
-                            // نغمة تدوير سريعة تشبه صوت العجلة
                             const osc = ctx.createOscillator();
                             const gain = ctx.createGain();
                             osc.connect(gain);
                             gain.connect(ctx.destination);
 
-                            // تردد متغير يعطي احساس بالدوران
-                            const freq = 120 + (count % 5) * 30 + Math.sin(count * 0.5) * 20;
+                            // نغمة ناعمة تشبه همس العجلة
+                            const freq = 180 + Math.sin(count * 0.7) * 25 + Math.sin(count * 0.3) * 15;
                             osc.frequency.setValueAtTime(freq, t);
-                            osc.type = 'square';
+                            osc.type = 'sine';
 
-                            gain.gain.setValueAtTime(0.04, t);
-                            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+                            gain.gain.setValueAtTime(0.025, t);
+                            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
 
                             osc.start(t);
-                            osc.stop(t + 0.08);
+                            osc.stop(t + 0.07);
 
                             count++;
                         } catch (e) {
                             console.warn('Spin sound tick error:', e);
                         }
-                    }, 100);
+                    }, 110);
 
                     setTimeout(() => this.stopSpinSound(), 6000);
                 } catch (e) {
@@ -1348,27 +1482,27 @@
                 }
             }
 
-            // ===== صوت ربح مميز =====
+            // ===== صوت ربح هادئ ولطيف =====
             playWinSound() {
                 if (!soundEnabled || !this.initialized) return;
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
 
-                    // لحن ربح سعيد ومميز
+                    // لحن ربح هادئ وناعم
                     const notes = [
-                        [523, 0.15, 0.08],
-                        [659, 0.15, 0.08],
-                        [784, 0.15, 0.08],
-                        [1047, 0.25, 0.1],
-                        [784, 0.15, 0.08],
-                        [1047, 0.15, 0.08],
-                        [1175, 0.15, 0.08],
-                        [1319, 0.3, 0.12],
-                        [1175, 0.15, 0.08],
-                        [1047, 0.15, 0.08],
-                        [1175, 0.15, 0.08],
-                        [1568, 0.35, 0.15]
+                        [523, 0.2, 0.06],
+                        [587, 0.2, 0.06],
+                        [659, 0.2, 0.06],
+                        [784, 0.3, 0.07],
+                        [659, 0.2, 0.06],
+                        [784, 0.2, 0.06],
+                        [880, 0.2, 0.06],
+                        [988, 0.35, 0.08],
+                        [880, 0.2, 0.06],
+                        [784, 0.2, 0.06],
+                        [880, 0.2, 0.06],
+                        [1175, 0.4, 0.09]
                     ];
 
                     notes.forEach(([freq, dur, vol], i) => {
@@ -1377,32 +1511,32 @@
                         osc.connect(gain);
                         gain.connect(ctx.destination);
 
-                        osc.frequency.setValueAtTime(freq, now + i * 0.07);
+                        osc.frequency.setValueAtTime(freq, now + i * 0.08);
                         osc.type = i % 2 === 0 ? 'sine' : 'triangle';
 
-                        gain.gain.setValueAtTime(vol || 0.08, now + i * 0.07);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + dur);
+                        gain.gain.setValueAtTime(vol || 0.05, now + i * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + dur);
 
-                        osc.start(now + i * 0.07);
-                        osc.stop(now + i * 0.07 + dur);
+                        osc.start(now + i * 0.08);
+                        osc.stop(now + i * 0.08 + dur);
                     });
 
-                    // نغمات مرافقة
+                    // نغمات خلفية ناعمة
                     setTimeout(() => {
                         const t = ctx.currentTime;
-                        [523, 659, 784, 1047].forEach((freq, i) => {
+                        [523, 587, 659, 784].forEach((freq, i) => {
                             const osc = ctx.createOscillator();
                             const gain = ctx.createGain();
                             osc.connect(gain);
                             gain.connect(ctx.destination);
-                            osc.frequency.setValueAtTime(freq, t + i * 0.06);
+                            osc.frequency.setValueAtTime(freq, t + i * 0.07);
                             osc.type = 'sine';
-                            gain.gain.setValueAtTime(0.04, t + i * 0.06);
-                            gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.06 + 0.2);
-                            osc.start(t + i * 0.06);
-                            osc.stop(t + i * 0.06 + 0.2);
+                            gain.gain.setValueAtTime(0.025, t + i * 0.07);
+                            gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.07 + 0.25);
+                            osc.start(t + i * 0.07);
+                            osc.stop(t + i * 0.07 + 0.25);
                         });
-                    }, notes.length * 0.07 + 0.1);
+                    }, notes.length * 0.08 + 0.1);
 
                     setTimeout(() => { this.isPlaying = false; }, 3000);
                 } catch (e) {
@@ -1411,19 +1545,19 @@
                 }
             }
 
-            // ===== صوت خسارة مميز =====
+            // ===== صوت خسارة هادئ ومميز =====
             playLoseSound() {
                 if (!soundEnabled || !this.initialized) return;
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
 
-                    // نغمات خسارة حزينة ومميزة
+                    // نغمات خسارة ناعمة وحزينة
                     const notes = [
-                        [440, 0.3, 0.06],
-                        [349, 0.3, 0.06],
-                        [294, 0.4, 0.07],
-                        [220, 0.5, 0.08]
+                        [440, 0.35, 0.04],
+                        [370, 0.35, 0.04],
+                        [330, 0.45, 0.05],
+                        [247, 0.6, 0.05]
                     ];
 
                     notes.forEach(([freq, dur, vol], i) => {
@@ -1435,27 +1569,27 @@
                         osc.frequency.setValueAtTime(freq, now + i * 0.25);
                         osc.type = 'sawtooth';
 
-                        gain.gain.setValueAtTime(vol || 0.05, now + i * 0.25);
+                        gain.gain.setValueAtTime(vol || 0.04, now + i * 0.25);
                         gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.25 + dur);
 
                         osc.start(now + i * 0.25);
                         osc.stop(now + i * 0.25 + dur);
                     });
 
-                    // تأثير إضافي
+                    // تأثير خلفي ناعم
                     setTimeout(() => {
                         const t = ctx.currentTime;
                         const osc2 = ctx.createOscillator();
                         const gain2 = ctx.createGain();
                         osc2.connect(gain2);
                         gain2.connect(ctx.destination);
-                        osc2.frequency.setValueAtTime(180, t);
-                        osc2.frequency.exponentialRampToValueAtTime(80, t + 0.6);
+                        osc2.frequency.setValueAtTime(200, t);
+                        osc2.frequency.exponentialRampToValueAtTime(100, t + 0.7);
                         osc2.type = 'sawtooth';
-                        gain2.gain.setValueAtTime(0.03, t);
-                        gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+                        gain2.gain.setValueAtTime(0.02, t);
+                        gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
                         osc2.start(t);
-                        osc2.stop(t + 0.6);
+                        osc2.stop(t + 0.7);
                     }, notes.length * 0.25 + 0.1);
 
                     setTimeout(() => { this.isPlaying = false; }, 2000);
@@ -1465,24 +1599,24 @@
                 }
             }
 
-            // ===== صوت البداية =====
+            // ===== صوت البداية هادئ =====
             playStartSound() {
                 if (!soundEnabled || !this.initialized) return;
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
 
-                    [523, 659, 784].forEach((freq, i) => {
+                    [440, 554, 659].forEach((freq, i) => {
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, now + i * 0.08);
+                        osc.frequency.setValueAtTime(freq, now + i * 0.1);
                         osc.type = 'sine';
-                        gain.gain.setValueAtTime(0.03, now + i * 0.08);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.1);
-                        osc.start(now + i * 0.08);
-                        osc.stop(now + i * 0.08 + 0.1);
+                        gain.gain.setValueAtTime(0.02, now + i * 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.12);
+                        osc.start(now + i * 0.1);
+                        osc.stop(now + i * 0.1 + 0.12);
                     });
                 } catch (e) {
                     console.warn('Start sound error:', e);

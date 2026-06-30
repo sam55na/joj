@@ -84,7 +84,7 @@
             display: none;
         }
 
-        /* ===== العجلة مع إطار نيون ذهبي عريض ===== */
+        /* ===== العجلة مع إطار نيون ذهبي ===== */
         .wheel-wrapper {
             position: relative;
             width: 100%;
@@ -104,67 +104,43 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            padding: 20px;
+            padding: 16px;
             background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* ===== إطار نيون ذهبي عريض يدور مع توهج قوي ===== */
-        .neon-frame-wide {
+        /* ===== إطار نيون ذهبي لامع ===== */
+        .neon-frame-gold {
             position: absolute;
-            top: -6px;
-            left: -6px;
-            width: calc(100% + 12px);
-            height: calc(100% + 12px);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             pointer-events: none;
             z-index: 2;
-            border: 10px solid transparent;
-            background: conic-gradient(from 0deg, #FFD700, #FFA500, #FFD700, #FFA500, #FFD700, #FFD700) border-box;
-            -webkit-mask: radial-gradient(circle at center, transparent 60%, black 61%, black 100%);
-            mask: radial-gradient(circle at center, transparent 60%, black 61%, black 100%);
-            animation: frameSpin 4s linear infinite;
-            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 60px rgba(255, 215, 0, 0.5)) drop-shadow(0 0 100px rgba(255, 215, 0, 0.3));
+            border: 4px solid #FFD700;
+            background: radial-gradient(circle at center, transparent 60%, rgba(255, 215, 0, 0.05) 70%, rgba(255, 215, 0, 0.15) 85%, rgba(255, 215, 0, 0.3) 100%);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1), inset 0 0 30px rgba(255, 215, 0, 0.1);
+            animation: goldNeonPulse 2.5s ease-in-out infinite;
         }
 
-        @keyframes frameSpin {
-            0% {
-                transform: rotate(0deg);
-            }
+        @keyframes goldNeonPulse {
+            0%,
             100% {
-                transform: rotate(360deg);
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 100px rgba(255, 215, 0, 0.1), inset 0 0 30px rgba(255, 215, 0, 0.1);
+                border-color: #FFD700;
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(255, 215, 0, 0.6), 0 0 100px rgba(255, 215, 0, 0.4), 0 0 150px rgba(255, 215, 0, 0.2), inset 0 0 50px rgba(255, 215, 0, 0.2);
+                border-color: #FFA500;
             }
         }
 
-        /* ===== توهج إضافي للإطار ===== */
-        .neon-glow-extra {
-            position: absolute;
-            top: -12px;
-            left: -12px;
-            width: calc(100% + 24px);
-            height: calc(100% + 24px);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1;
-            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05), transparent 70%);
-            animation: glowPulse 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glowPulse {
-            0% {
-                transform: scale(0.95);
-                opacity: 0.5;
-            }
-            100% {
-                transform: scale(1.08);
-                opacity: 1;
-            }
-        }
-
-        /* ===== موجات كخطوط رفيعة تتلاشى ===== */
-        .wave-line {
+        /* ===== حلقات نبضية ذهبية متلاشية ===== */
+        .wave-ring-gold {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -172,53 +148,42 @@
             pointer-events: none;
             z-index: 1;
             transform: translate(-50%, -50%);
-            border: 2px solid rgba(255, 215, 0, 0.8);
-            animation: waveLineExpand 3.5s ease-out infinite;
+            border: 2px solid rgba(255, 215, 0, 0.6);
+            animation: waveGoldExpand 4s ease-out infinite;
         }
 
-        .wave-line:nth-child(4) {
-            width: 68%;
-            height: 68%;
+        .wave-ring-gold:nth-child(3) {
+            width: 78%;
+            height: 78%;
             animation-delay: 0s;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
         }
 
-        .wave-line:nth-child(5) {
-            width: 76%;
-            height: 76%;
-            animation-delay: 1.1s;
-            border-width: 1.5px;
+        .wave-ring-gold:nth-child(4) {
+            width: 85%;
+            height: 85%;
+            animation-delay: 1.3s;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.1);
         }
 
-        .wave-line:nth-child(6) {
-            width: 84%;
-            height: 84%;
-            animation-delay: 2.2s;
-            border-width: 1px;
-        }
-
-        .wave-line:nth-child(7) {
+        .wave-ring-gold:nth-child(5) {
             width: 92%;
             height: 92%;
-            animation-delay: 0.5s;
-            border-width: 1px;
+            animation-delay: 2.6s;
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.08);
         }
 
-        .wave-line:nth-child(8) {
-            width: 100%;
-            height: 100%;
-            animation-delay: 1.6s;
-            border-width: 0.5px;
-        }
-
-        @keyframes waveLineExpand {
+        @keyframes waveGoldExpand {
             0% {
-                transform: translate(-50%, -50%) scale(0.88);
+                transform: translate(-50%, -50%) scale(0.92);
                 opacity: 0.9;
-                border-color: rgba(255, 215, 0, 0.9);
+                border-width: 4px;
+                border-color: rgba(255, 215, 0, 0.8);
             }
             100% {
                 transform: translate(-50%, -50%) scale(1.2);
                 opacity: 0;
+                border-width: 1px;
                 border-color: rgba(255, 215, 0, 0);
             }
         }
@@ -226,15 +191,15 @@
         /* ===== وهج ذهبي داخلي ===== */
         .inner-glow-gold {
             position: absolute;
-            top: 10%;
-            left: 10%;
-            width: 80%;
-            height: 80%;
+            top: 8%;
+            left: 8%;
+            width: 84%;
+            height: 84%;
             border-radius: 50%;
             pointer-events: none;
             z-index: 1;
-            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.03), transparent 70%);
-            animation: innerGoldPulse 2.5s ease-in-out infinite alternate;
+            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.08), rgba(255, 215, 0, 0.02), transparent 70%);
+            animation: innerGoldPulse 3s ease-in-out infinite alternate;
         }
 
         @keyframes innerGoldPulse {
@@ -243,7 +208,7 @@
                 transform: scale(0.95);
             }
             100% {
-                opacity: 0.8;
+                opacity: 0.7;
                 transform: scale(1.05);
             }
         }
@@ -533,7 +498,6 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* ===== شاشة اللودينغ ===== */
         .loading-screen {
             display: none;
             position: fixed;
@@ -579,7 +543,6 @@
             width: 60%;
             max-width: 220px;
             position: relative;
-            margin-bottom: 20px;
         }
         .loading-screen .progress-bar-bg {
             width: 100%;
@@ -602,40 +565,6 @@
             text-align: center;
             font-weight: 600;
             letter-spacing: 1px;
-        }
-
-        /* ===== زر البدء في شاشة اللودينغ ===== */
-        .loading-start-btn {
-            display: none;
-            margin-top: 20px;
-            padding: 14px 50px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            border: none;
-            border-radius: 50px;
-            color: #0a0a0a;
-            font-size: 20px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
-            animation: startBtnPulse 1.5s ease-in-out infinite;
-            transition: all 0.3s;
-        }
-        .loading-start-btn.show {
-            display: block;
-        }
-        .loading-start-btn:hover {
-            transform: scale(1.08);
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.7);
-        }
-
-        @keyframes startBtnPulse {
-            0%,
-            100% {
-                box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
-            }
-            50% {
-                box-shadow: 0 0 80px rgba(255, 215, 0, 0.7);
-            }
         }
 
         .sound-settings {
@@ -1122,10 +1051,6 @@
                 gap: 12px;
                 padding: 4px 12px;
             }
-            .loading-start-btn {
-                font-size: 17px;
-                padding: 12px 35px;
-            }
         }
 
         @media (max-width: 380px) {
@@ -1145,10 +1070,6 @@
             .pointer {
                 font-size: 22px;
                 top: -10px;
-            }
-            .loading-start-btn {
-                font-size: 15px;
-                padding: 10px 25px;
             }
         }
     </style>
@@ -1177,7 +1098,6 @@
         <button class="btn-open-bot" onclick="window.open('https://t.me/IChancyBot', '_blank')">🚀 فتح البوت</button>
     </div>
 
-    <!-- ===== شاشة اللودينغ مع زر البدء ===== -->
     <div class="loading-screen" id="loadingScreen">
         <img class="loading-image" id="loadingImage" src="https://via.placeholder.com/200/1a1a2e/FFD700?text=🎡" alt="Loading">
         <div class="progress-container">
@@ -1186,27 +1106,21 @@
             </div>
             <div class="progress-text" id="loaderStatusText">0%</div>
         </div>
-        <button class="loading-start-btn" id="startBtn">🚀 ابدأ</button>
     </div>
 
-    <!-- ===== العجلة ===== -->
+    <!-- ===== العجلة مع إطار نيون ذهبي ===== -->
     <div class="wheel-wrapper" id="wheelWrapper">
         <div class="wheel-container">
-            <!-- موجات -->
-            <div class="wave-line"></div>
-            <div class="wave-line"></div>
-            <div class="wave-line"></div>
-            <div class="wave-line"></div>
-            <div class="wave-line"></div>
-
-            <!-- توهج إضافي -->
-            <div class="neon-glow-extra"></div>
+            <!-- حلقات نبضية ذهبية متلاشية -->
+            <div class="wave-ring-gold"></div>
+            <div class="wave-ring-gold"></div>
+            <div class="wave-ring-gold"></div>
 
             <!-- الوهج الداخلي -->
             <div class="inner-glow-gold"></div>
 
-            <!-- الإطار النيون الذهبي العريض الدوار -->
-            <div class="neon-frame-wide"></div>
+            <!-- الإطار النيون الذهبي -->
+            <div class="neon-frame-gold"></div>
 
             <!-- السهم -->
             <div class="pointer" id="pointer">🔽</div>
@@ -1349,17 +1263,16 @@
         let soundEnabled = true;
         let settingsCache = {};
         let spinDuration = 3500;
-        let loadingComplete = false;
-        let gameStarted = false;
 
         // ================================================================
-        //                      نظام الصوت
+        //                      نظام الصوت المتطور
         // ================================================================
-        class SoundManager {
+        class AdvancedSoundManager {
             constructor() {
                 this.initialized = false;
                 this.audioContext = null;
                 this.isPlaying = false;
+                this.spinSoundInterval = null;
             }
 
             init() {
@@ -1373,6 +1286,7 @@
             }
 
             stopAll() {
+                this.stopSpinSound();
                 if (this.audioContext) {
                     try {
                         this.audioContext.close();
@@ -1382,45 +1296,55 @@
                 this.isPlaying = false;
             }
 
-            // ===== تشغيل صوت قصير جداً (0.3 ثانية) =====
-            playShortBeep() {
+            // ===== صوت تدوير مميز =====
+            playSpinSound() {
                 if (!soundEnabled || !this.initialized) return;
+                this.stopSpinSound();
                 try {
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
+                    let count = 0;
 
-                    // نغمة قصيرة جداً
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
+                    this.spinSoundInterval = setInterval(() => {
+                        if (!soundEnabled || !this.initialized) {
+                            this.stopSpinSound();
+                            return;
+                        }
+                        try {
+                            const t = ctx.currentTime;
+                            // نغمة تدوير سريعة تشبه صوت العجلة
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
 
-                    osc.frequency.setValueAtTime(880, now);
-                    osc.type = 'sine';
+                            // تردد متغير يعطي احساس بالدوران
+                            const freq = 120 + (count % 5) * 30 + Math.sin(count * 0.5) * 20;
+                            osc.frequency.setValueAtTime(freq, t);
+                            osc.type = 'square';
 
-                    gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                            gain.gain.setValueAtTime(0.04, t);
+                            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
 
-                    osc.start(now);
-                    osc.stop(now + 0.15);
+                            osc.start(t);
+                            osc.stop(t + 0.08);
 
-                    // نغمة ثانية أعلى
-                    const osc2 = ctx.createOscillator();
-                    const gain2 = ctx.createGain();
-                    osc2.connect(gain2);
-                    gain2.connect(ctx.destination);
+                            count++;
+                        } catch (e) {
+                            console.warn('Spin sound tick error:', e);
+                        }
+                    }, 100);
 
-                    osc2.frequency.setValueAtTime(1100, now + 0.1);
-                    osc2.type = 'sine';
-
-                    gain2.gain.setValueAtTime(0.12, now + 0.1);
-                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-
-                    osc2.start(now + 0.1);
-                    osc2.stop(now + 0.25);
-
+                    setTimeout(() => this.stopSpinSound(), 6000);
                 } catch (e) {
-                    console.warn('Beep error:', e);
+                    console.warn('Spin sound error:', e);
+                }
+            }
+
+            stopSpinSound() {
+                if (this.spinSoundInterval) {
+                    clearInterval(this.spinSoundInterval);
+                    this.spinSoundInterval = null;
                 }
             }
 
@@ -1431,15 +1355,20 @@
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
 
+                    // لحن ربح سعيد ومميز
                     const notes = [
-                        [523, 0.12, 0.08],
-                        [659, 0.12, 0.08],
-                        [784, 0.12, 0.08],
-                        [1047, 0.2, 0.1],
-                        [784, 0.12, 0.08],
-                        [1047, 0.12, 0.08],
-                        [1175, 0.12, 0.08],
-                        [1319, 0.25, 0.12]
+                        [523, 0.15, 0.08],
+                        [659, 0.15, 0.08],
+                        [784, 0.15, 0.08],
+                        [1047, 0.25, 0.1],
+                        [784, 0.15, 0.08],
+                        [1047, 0.15, 0.08],
+                        [1175, 0.15, 0.08],
+                        [1319, 0.3, 0.12],
+                        [1175, 0.15, 0.08],
+                        [1047, 0.15, 0.08],
+                        [1175, 0.15, 0.08],
+                        [1568, 0.35, 0.15]
                     ];
 
                     notes.forEach(([freq, dur, vol], i) => {
@@ -1447,15 +1376,35 @@
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, now + i * 0.06);
+
+                        osc.frequency.setValueAtTime(freq, now + i * 0.07);
                         osc.type = i % 2 === 0 ? 'sine' : 'triangle';
-                        gain.gain.setValueAtTime(vol || 0.08, now + i * 0.06);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + dur);
-                        osc.start(now + i * 0.06);
-                        osc.stop(now + i * 0.06 + dur);
+
+                        gain.gain.setValueAtTime(vol || 0.08, now + i * 0.07);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + dur);
+
+                        osc.start(now + i * 0.07);
+                        osc.stop(now + i * 0.07 + dur);
                     });
 
-                    setTimeout(() => { this.isPlaying = false; }, 1500);
+                    // نغمات مرافقة
+                    setTimeout(() => {
+                        const t = ctx.currentTime;
+                        [523, 659, 784, 1047].forEach((freq, i) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.frequency.setValueAtTime(freq, t + i * 0.06);
+                            osc.type = 'sine';
+                            gain.gain.setValueAtTime(0.04, t + i * 0.06);
+                            gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.06 + 0.2);
+                            osc.start(t + i * 0.06);
+                            osc.stop(t + i * 0.06 + 0.2);
+                        });
+                    }, notes.length * 0.07 + 0.1);
+
+                    setTimeout(() => { this.isPlaying = false; }, 3000);
                 } catch (e) {
                     console.warn('Win sound error:', e);
                     this.isPlaying = false;
@@ -1469,11 +1418,12 @@
                     const ctx = this.audioContext;
                     const now = ctx.currentTime;
 
+                    // نغمات خسارة حزينة ومميزة
                     const notes = [
-                        [440, 0.25, 0.06],
-                        [349, 0.25, 0.06],
-                        [294, 0.3, 0.07],
-                        [220, 0.4, 0.08]
+                        [440, 0.3, 0.06],
+                        [349, 0.3, 0.06],
+                        [294, 0.4, 0.07],
+                        [220, 0.5, 0.08]
                     ];
 
                     notes.forEach(([freq, dur, vol], i) => {
@@ -1481,23 +1431,66 @@
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, now + i * 0.2);
+
+                        osc.frequency.setValueAtTime(freq, now + i * 0.25);
                         osc.type = 'sawtooth';
-                        gain.gain.setValueAtTime(vol || 0.05, now + i * 0.2);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.2 + dur);
-                        osc.start(now + i * 0.2);
-                        osc.stop(now + i * 0.2 + dur);
+
+                        gain.gain.setValueAtTime(vol || 0.05, now + i * 0.25);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.25 + dur);
+
+                        osc.start(now + i * 0.25);
+                        osc.stop(now + i * 0.25 + dur);
                     });
 
-                    setTimeout(() => { this.isPlaying = false; }, 1200);
+                    // تأثير إضافي
+                    setTimeout(() => {
+                        const t = ctx.currentTime;
+                        const osc2 = ctx.createOscillator();
+                        const gain2 = ctx.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(ctx.destination);
+                        osc2.frequency.setValueAtTime(180, t);
+                        osc2.frequency.exponentialRampToValueAtTime(80, t + 0.6);
+                        osc2.type = 'sawtooth';
+                        gain2.gain.setValueAtTime(0.03, t);
+                        gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+                        osc2.start(t);
+                        osc2.stop(t + 0.6);
+                    }, notes.length * 0.25 + 0.1);
+
+                    setTimeout(() => { this.isPlaying = false; }, 2000);
                 } catch (e) {
                     console.warn('Lose sound error:', e);
                     this.isPlaying = false;
                 }
             }
+
+            // ===== صوت البداية =====
+            playStartSound() {
+                if (!soundEnabled || !this.initialized) return;
+                try {
+                    const ctx = this.audioContext;
+                    const now = ctx.currentTime;
+
+                    [523, 659, 784].forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.frequency.setValueAtTime(freq, now + i * 0.08);
+                        osc.type = 'sine';
+                        gain.gain.setValueAtTime(0.03, now + i * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.1);
+                        osc.start(now + i * 0.08);
+                        osc.stop(now + i * 0.08 + 0.1);
+                    });
+                } catch (e) {
+                    console.warn('Start sound error:', e);
+                }
+            }
         }
 
-        const soundManager = new SoundManager();
+        const soundManager = new AdvancedSoundManager();
 
         // ================================================================
         //                      جلب USER_ID
@@ -2072,7 +2065,7 @@
                     const canSpin = data.spin_status?.can_spin !== false &&
                         (!data.deposit_requirement?.required || data.deposit_requirement?.is_met);
 
-                    if (canSpin && prizesCache.length > 0 && gameStarted) {
+                    if (canSpin && prizesCache.length > 0) {
                         spinBtn.disabled = false;
                         document.getElementById('spinBtnText').textContent = '🎰 تدوير العجلة';
                     } else if (!data.spin_status?.can_spin) {
@@ -2085,9 +2078,6 @@
                         spinBtn.disabled = true;
                         document.getElementById('spinBtnText').textContent = '💰 إيداع مطلوب';
                         soundManager.stopAll();
-                    } else if (!gameStarted) {
-                        spinBtn.disabled = true;
-                        document.getElementById('spinBtnText').textContent = '⏳ انتظر بدء اللعبة...';
                     } else {
                         spinBtn.disabled = true;
                         document.getElementById('spinBtnText').textContent = '⏳ جاري التحميل...';
@@ -2167,11 +2157,6 @@
             const text = document.getElementById('loaderStatusText');
             bar.style.width = progress + '%';
             text.textContent = progress + '%';
-
-            if (progress >= 100 && !loadingComplete) {
-                loadingComplete = true;
-                document.getElementById('startBtn').classList.add('show');
-            }
         }
 
         function showLoading(show) {
@@ -2185,23 +2170,6 @@
                 wrapper.classList.add('show');
             }
         }
-
-        // ================================================================
-        //                      زر البدء - صوت قصير جداً
-        // ================================================================
-        document.getElementById('startBtn').addEventListener('click', function() {
-            soundManager.init();
-            // تشغيل صوت قصير جداً (0.25 ثانية)
-            soundManager.playShortBeep();
-
-            gameStarted = true;
-            showLoading(false);
-            document.getElementById('spinBtn').disabled = false;
-            this.classList.remove('show');
-
-            // تحديث حالة المستخدم لتفعيل الزر
-            loadUserStatus();
-        });
 
         // ================================================================
         //                      التحقق من الاتصال
@@ -2242,6 +2210,8 @@
             clearWinEffects();
 
             soundManager.init();
+            soundManager.playStartSound();
+            soundManager.playSpinSound();
 
             try {
                 const response = await fetch(`${API_BASE}/api/wheel/spin`, {
@@ -2507,6 +2477,9 @@
                 await new Promise(r => setTimeout(r, 600));
                 showError('⚠️ فشل تحميل البيانات: ' + e.message);
             }
+
+            showLoading(false);
+            document.getElementById('spinBtn').onclick = spinWheel;
         }
 
         document.addEventListener('DOMContentLoaded', init);

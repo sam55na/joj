@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>🎡 عجلة الحظ</title>
+    <title>IChancy</title>
     <script src="https://telegram.org/js/telegram-web-app.js">
     </script>
     <style>
@@ -54,30 +54,6 @@
             100% {
                 transform: scale(1.05);
             }
-        }
-
-        .banner-text {
-            text-align: center;
-            padding: 10px 12px;
-            margin-bottom: 10px;
-            width: 100%;
-            max-width: 520px;
-            background: rgba(18, 18, 18, 0.85);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 215, 0, 0.05);
-            font-size: 20px;
-            font-weight: 700;
-            color: #FFD700;
-            letter-spacing: 0.5px;
-            min-height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(6px);
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
-            z-index: 1;
         }
 
         .user-status {
@@ -1094,11 +1070,6 @@
         }
 
         @media (max-width: 480px) {
-            .banner-text {
-                font-size: 17px;
-                padding: 8px 10px;
-                min-height: 40px;
-            }
             .btn {
                 font-size: 16px;
                 padding: 14px 16px;
@@ -1151,9 +1122,6 @@
         }
 
         @media (max-width: 380px) {
-            .banner-text {
-                font-size: 15px;
-            }
             .btn-spin {
                 font-size: 15px;
                 padding: 12px 14px;
@@ -1180,8 +1148,6 @@
     <div class="notification-bar" id="notificationBar">
         🎉 مبروك! لقد فزت بـ <span id="notifPrizeName">جائزة</span>!
     </div>
-
-    
 
     <div class="user-status" id="userStatus"></div>
 
@@ -1296,11 +1262,6 @@
 
         <div class="settings-section">
             <div class="setting-row">
-                <label>النص العلوي</label>
-                <input type="text" id="editBannerText" placeholder="النص الذي يظهر في الأعلى">
-                <button class="btn-save" data-setting="banner_text" data-field="editBannerText">💾 حفظ</button>
-            </div>
-            <div class="setting-row">
                 <label>صورة الخلفية</label>
                 <input type="text" id="editBgImage" placeholder="رابط الصورة">
                 <button class="btn-save" data-setting="bg_image_url" data-field="editBgImage">💾 حفظ</button>
@@ -1377,7 +1338,7 @@
             constructor() {
                 this.maxRetries = 3;
                 this.retryDelay = 2000;
-                this.timeout = 50000; // 50 ثانية
+                this.timeout = 50000;
             }
 
             async fetchWithRetry(url, options = {}, retryCount = 0) {
@@ -1823,9 +1784,6 @@
                 const data = await res.json();
                 if (data.success) {
                     settingsCache = data.settings;
-                    if (settingsCache.banner_text) {
-                        document.getElementById('bannerText').textContent = settingsCache.banner_text;
-                    }
                     if (settingsCache.bg_image_url) {
                         document.getElementById('bgImage').src = settingsCache.bg_image_url;
                     }
@@ -1835,7 +1793,6 @@
                     if (settingsCache.spin_duration) {
                         spinDuration = parseInt(settingsCache.spin_duration) || 3500;
                     }
-                    document.getElementById('editBannerText').value = settingsCache.banner_text || '';
                     document.getElementById('editBgImage').value = settingsCache.bg_image_url || '';
                     document.getElementById('editLoadingImage').value = settingsCache.loading_image_url || '';
                     document.getElementById('editCenterIcon').value = settingsCache.center_icon || '⭐';
